@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입 동의</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script>
+        function checkAgreement() {
+            const checkbox1 = document.getElementById('agreement1');
+            const checkbox2 = document.getElementById('agreement2');
+            const submitButton = document.getElementById('submit-button');
+            submitButton.disabled = !(checkbox1.checked && checkbox2.checked);
+        }
+    </script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">회원가입 약관 동의</h1>
+        
+        <div class="mt-4">
+            <h2>회원가입 약관</h2>
+            <div class="border p-3" style="height: 200px; overflow-y: scroll;">
+                <p>
+                    제 1 조 (목적)<br>
+                    이 약관은 회사가 제공하는 모든 서비스의 이용 조건 및 절차, 회사와 회원 간의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다.
+                </p>
+                <p>
+                    제 2 조 (회원가입)<br>
+                    이용자가 회원가입 양식에 따라 회원 정보를 기입하고, 이 약관에 동의함으로써 회원가입을 신청합니다. 회사는 회원가입을 신청한 이용자 중 다음 각 호에 해당하지 않는 한 회원으로 등록합니다:<br>
+                    1. 등록 내용에 허위, 기재 누락, 오기가 있는 경우<br>
+                    2. 다른 사람의 명의를 사용하여 신청한 경우
+                </p>
+                <p>
+                    제 3 조 (회원 탈퇴 및 자격 상실)<br>
+                    회원은 언제든지 탈퇴를 요청할 수 있으며, 회사는 즉시 회원 탈퇴를 처리합니다. 회원이 다음 각 호에 해당하는 경우, 회사는 회원 자격을 제한 및 정지시킬 수 있습니다:<br>
+                    1. 가입 신청 시 허위 내용을 등록한 경우<br>
+                    2. 타인의 서비스 이용을 방해하거나 그 정보를 도용하는 경우
+                </p>
+                <p>
+                    제 4 조 (서비스의 제공 및 변경)<br>
+                    회사는 회원에게 다음과 같은 서비스를 제공합니다:<br>
+                    1. [구체적인 서비스 내용]<br>
+                    회사는 서비스의 내용이 변경되는 경우, 회원에게 사전 통지하고 변경된 서비스 내용을 제공합니다.
+                </p>
+                <p>
+                    제 5 조 (서비스의 중단)<br>
+                    회사는 천재지변 또는 불가항력적인 사유로 인하여 서비스를 제공할 수 없는 경우, 서비스의 제공을 일시적으로 중단할 수 있습니다. 이 경우 회사는 사전 통지하거나 사후에 통지합니다.
+                </p>
+                <p>
+                    제 6 조 (회원의 의무)<br>
+                    회원은 다음 행위를 하여서는 안 됩니다:<br>
+                    1. 신청 또는 변경 시 허위 내용의 등록<br>
+                    2. 타인의 정보 도용<br>
+                    3. 회사의 사전 동의 없이 영리 목적의 광고성 정보를 전송하는 행위
+                </p>
+                <p>
+                    제 7 조 (회사의 의무)<br>
+                    회사는 회원의 개인정보를 보호하며, 관련 법령 및 개인정보 처리방침을 준수합니다. 회사는 회원이 안전하게 서비스를 이용할 수 있도록 최선을 다합니다.
+                </p>
+                <p>
+                    제 8 조 (개인정보의 보호)<br>
+                    회사는 회원의 개인정보를 보호하기 위해 노력하며, 개인정보 처리방침에 따라 회원의 개인정보를 적법하게 처리합니다.
+                </p>
+                <p>
+                    제 9 조 (분쟁 해결)<br>
+                    회사와 회원 간의 분쟁에 대해 법적 분쟁이 발생한 경우, 회사의 소재지를 관할하는 법원을 전속 관할 법원으로 합니다.
+                </p>
+                <p>
+                    제 10 조 (기타)<br>
+                    이 약관에 명시되지 않은 사항은 관계법령 및 상관례에 따릅니다.
+                </p>
+            </div>
+            <div class="form-check mt-3">
+                <input type="checkbox" class="form-check-input" id="agreement1" onclick="checkAgreement()">
+                <label class="form-check-label" for="agreement1">회원가입 약관에 동의합니다</label>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <h2>개인정보 처리방침</h2>
+            <div class="border p-3" style="height: 200px; overflow-y: scroll;">
+                <p>
+                    제 1 조 (개인정보의 수집 및 이용 목적)<br>
+                    회사는 다음의 목적을 위하여 개인정보를 수집하고 이용합니다:<br>
+                    1. 서비스 제공 및 운영<br>
+                    2. 회원 관리<br>
+                    3. 마케팅 및 광고에 활용
+                </p>
+                <p>
+                    제 2 조 (수집하는 개인정보의 항목)<br>
+                    회사는 회원가입, 상담, 서비스 신청 등을 위해 다음과 같은 개인정보를 수집할 수 있습니다:<br>
+                    1. 성명, 생년월일, 성별, 로그인 ID, 비밀번호, 전화번호, 이메일 주소 등
+                </p>
+                <p>
+                    제 3 조 (개인정보의 보유 및 이용 기간)<br>
+                    회사는 개인정보 수집 및 이용 목적이 달성된 후에는 해당 정보를 지체 없이 파기합니다. 단, 관련 법령에 따라 보관해야 하는 경우에는 그러하지 않을 수 있습니다.
+                </p>
+                <p>
+                    제 4 조 (개인정보의 제3자 제공)<br>
+                    회사는 회원의 개인정보를 원칙적으로 외부에 제공하지 않습니다. 다만, 다음의 경우에는 예외로 합니다:<br>
+                    1. 회원이 사전에 동의한 경우<br>
+                    2. 법령의 규정에 의거하거나, 수사 목적으로 법령에 정해진 절차와 방법에 따라 수사기관의 요구가 있는 경우
+                </p>
+                <p>
+                    제 5 조 (개인정보의 파기절차 및 방법)<br>
+                    회사는 개인정보 보유 기간의 경과, 처리 목적 달성 등 개인정보가 불필요하게 되었을 때에는 지체 없이 해당 개인정보를 파기합니다.
+                </p>
+                <p>
+                    제 6 조 (이용자의 권리와 그 행사 방법)<br>
+                    이용자는 언제든지 자신의 개인정보를 조회하거나 수정할 수 있으며, 개인정보의 처리에 대한 동의 철회 및 회원 탈퇴를 요청할 수 있습니다.
+                </p>
+                <p>
+                    제 7 조 (개인정보의 안전성 확보 조치)<br>
+                    회사는 개인정보의 안전성 확보를 위해 다음과 같은 조치를 취하고 있습니다:<br>
+                    1. 관리적 조치: 내부관리계획 수립 및 시행, 정기적 직원 교육 등<br>
+                    2. 기술적 조치: 개인정보처리시스템 등의 접근권한 관리, 접근통제시스템 설치 등<br>
+                    3. 물리적 조치: 전산실, 자료보관실 등의 접근통제
+                </p>
+                <p>
+                    제 8 조 (개인정보 보호책임자)<br>
+                    회사는 개인정보 처리에 관한 업무를 총괄해서 책임지고, 개인정보 처리와 관련한 정보주체의 불만처리 및 피해구제 등을 위하여 아래와 같이 개인정보 보호책임자를 지정하고 있습니다:<br>
+                    [개인정보 보호책임자 성명, 부서명, 연락처]
+                </p>
+                <p>
+                    제 9 조 (개인정보 처리방침 변경)<br>
+                    이 개인정보 처리방침은 시행일로부터 적용되며, 법령 및 방침에 따른 변경내용의 추가, 삭제 및 정정이 있는 경우에는 변경사항의 시행 7일 전부터 공지사항을 통하여 고지할 것입니다.
+                </p>
+            </div>
+            <div class="form-check mt-3">
+                <input type="checkbox" class="form-check-input" id="agreement2" onclick="checkAgreement()">
+                <label class="form-check-label" for="agreement2">개인정보 처리방침에 동의합니다</label>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <button id="submit-button" class="btn btn-primary"  onclick="window.location='/user/register' " disabled>동의하고 회원가입</button>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

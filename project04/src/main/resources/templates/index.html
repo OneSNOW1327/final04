@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product List</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .product-card {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Shop</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="register.html">Register</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="openLoginWindow()">Login</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Product List -->
+    <div class="container">
+        <div class="row" id="product-list">
+            <!-- Product items will be appended here by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        function openLoginWindow() {
+            window.open('login.html', 'Login', 'width=400,height=400');
+        }
+
+        // Simulated data loading
+        let productsLoaded = 0;
+        const productsPerLoad = 8;
+
+        function loadProducts() {
+            for (let i = 0; i < productsPerLoad; i++) {
+                const productCard = `
+                    <div class="col-md-3">
+                        <div class="card product-card">
+                            <img src="https://via.placeholder.com/150" class="card-img-top" alt="Product Image">
+                            <div class="card-body">
+                                <h5 class="card-title">Product ${productsLoaded + i + 1}</h5>
+                                <p class="card-text">$${(Math.random() * 100).toFixed(2)}</p>
+                                <a href="#" class="btn btn-primary">Buy Now</a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('product-list').insertAdjacentHTML('beforeend', productCard);
+            }
+            productsLoaded += productsPerLoad;
+        }
+
+        // Load initial products
+        loadProducts();
+
+        // Load more products on scroll
+        window.addEventListener('scroll', () => {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
+                loadProducts();
+            }
+        });
+    </script>
+</body>
+</html>
