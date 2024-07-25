@@ -1,3 +1,7 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout}">
+    <div class="container my-3" layout:fragment="content">
+
 <h1>장바구니</h1>
 <thead>
 <tr>
@@ -23,7 +27,8 @@
 	<input type="hidden" id="selectProduct" name="selectProduct"> <!-- 숨겨진 필드, 선택된 장바구니 항목 저장 -->
 	<button type="submit">결제하기</button> 
 </form>
-
+</div>
+</html>
 <script>
 document.getElementById('basketForm').addEventListener('submit', function(event) {
 	event.preventDefault(); // 기본 폼 제출 동작을 막습니다.

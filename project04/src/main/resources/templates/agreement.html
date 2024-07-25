@@ -1,21 +1,6 @@
 <!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>회원가입 동의</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <script>
-        function checkAgreement() {
-            const checkbox1 = document.getElementById('agreement1');
-            const checkbox2 = document.getElementById('agreement2');
-            const submitButton = document.getElementById('submit-button');
-            submitButton.disabled = !(checkbox1.checked && checkbox2.checked);
-        }
-    </script>
-</head>
-<body>
+<html layout:decorate="~{layout}">
+    <div class="container my-3" layout:fragment="content">
     <div class="container mt-5">
         <h1 class="text-center">회원가입 약관 동의</h1>
         
@@ -138,6 +123,14 @@
             <button id="submit-button" class="btn btn-primary"  onclick="window.location='/user/register' " disabled>동의하고 회원가입</button>
         </div>
     </div>
-
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+	</div>
+	</html>
+	
+	<script>
+	    function checkAgreement() {
+	        const checkbox1 = document.getElementById('agreement1');
+	        const checkbox2 = document.getElementById('agreement2');
+	        const submitButton = document.getElementById('submit-button');
+	        submitButton.disabled = !(checkbox1.checked && checkbox2.checked);
+	    }
+	</script>

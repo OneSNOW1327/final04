@@ -1,12 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>회원가입</title>
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
+<html layout:decorate="~{layout}">
+    <div class="container my-3" layout:fragment="content">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-6">
@@ -56,11 +50,9 @@
             </div>
         </div>
     </div>
-
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script>
+	</div>
+	</html>
+	<script>
         document.getElementById('registerForm').addEventListener('submit', function(event) {
             const realName = document.getElementById('realName').value.trim();
             const username = document.getElementById('username').value.trim();

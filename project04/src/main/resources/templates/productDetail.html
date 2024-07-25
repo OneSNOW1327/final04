@@ -1,10 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Product Detail</title>
-</head>
-<body>
+<html layout:decorate="~{layout}">
+    <div class="container my-3" layout:fragment="content">
     <h1>Product Detail</h1>
     
     <!-- 상품 썸네일 이미지  ProductThumbnail -->
@@ -44,4 +40,5 @@
     </div>
 
 </body>
+</div>
 </html>
