@@ -15,24 +15,37 @@
                         <h3>회원가입</h3>
                     </div>
                     <div class="card-body">
-                        <form method="post"  th:action="@{/user/register}">
+                        <form method="post" th:action="@{/user/register}" onsubmit="phoneNum()">
                             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                             <div class="form-group">
-                                <label for="realName">이름</label>
-                                   <input type="text" class="form-control" id="username" name="realName" required>
-                            </div> 
+                                <label for="realName">*이름</label>
+                                <input type="text" class="form-control" id="realName" name="realName" required>
+                            </div>
                             <div class="form-group">
-                                <label for="username">아이디</label>
+                                <label for="username">*아이디</label>
                                 <input type="text" class="form-control" id="username" name="username" required>
                             </div>
                             <div class="form-group">
-                                <label for="password">비밀번호</label>
+                                <label for="password">*비밀번호</label>
                                 <input type="password" class="form-control" id="password" name="password" required>
                             </div>
                             <div class="form-group">
-                                <label for="email">이메일</label>
+                                <label for="email">*이메일</label>
                                 <input type="email" class="form-control" id="email" name="email" required>
                             </div>
+                            <div class="form-group">
+                                <label for="adress">*주소</label>
+                                <input type="text" class="form-control" id="adress" name="adress" required>
+                            </div>
+				            <div class="form-group">
+				            	<input type="hidden" id="phone" name="phone">
+				                <label for="phone">*전화번호</label>
+				                <div class=" d-flex justify-content-start">
+					                <input type="text" class="form-control col1" id="phone1" name="phone1" required>-
+					                <input type="text" class="form-control col2" id="phone2" name="phone2" required>-
+					                <input type="text" class="form-control col3" id="phone3" name="phone3" required>
+				                </div>
+				            </div>
                             <button type="submit" class="btn btn-success btn-block">회원가입</button>
                         </form>
                         <div class="mt-3 text-center">
@@ -47,5 +60,29 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', function(event) {
+            const realName = document.getElementById('realName').value.trim();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const adress = document.getElementById('adress').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+
+            if (!realName || !username || !password || !email || !adress || !phone) {
+                alert("* 은 필수입력항목입니다.");
+                event.preventDefault(); // 폼 제출 막기
+            }
+        });
+    </script>
+	<script>
+        function phoneNum(){
+	        var phone1= document.getElementById("phone1").value;
+	        var phone2= document.getElementById("phone2").value;
+	        var phone3= document.getElementById("phone3").value;
+	        var phone = phone1+"-"+phone2+"-"+phone3;
+	        document.getElementById("phone").value = phone;
+        }
+        </script>
 </body>
 </html>

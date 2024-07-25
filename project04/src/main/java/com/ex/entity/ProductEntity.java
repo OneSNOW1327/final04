@@ -28,36 +28,44 @@ public class ProductEntity {
     private Integer id;
 
     @ManyToOne
-    private ProducttypeEntity type;
+    private ProducttypeEntity type; //상품타입
 
-    @OneToMany(mappedBy = "product", cascade=CascadeType.REMOVE)
-    private List<ReviewEntity> review;
+    @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
+    private List<ReviewEntity> review; // 리뷰
 
-    @OneToMany(mappedBy = "product", cascade=CascadeType.REMOVE)
-    private List<ProductImgEntity> detail;
+    @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
+    private List<ProductImgEntity> detail; // 상품이미지
 
-    @OneToMany(mappedBy = "product", cascade=CascadeType.REMOVE)
-    private List<ProductThumbnailEntity> thumbnail;
+    @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
+    private List<ProductThumbnailEntity> thumbnail; //썸네일
 
     @ManyToMany
-    private List<OrderlistEntity> orderlist;
+    private List<OrderlistEntity> orderlist; // 주문내역
 
-    @ManyToOne
-    private SalesVolumeEntity salesVolume;
+    @ManyToMany
+    private List<BasketEntity> basketlist; // 장바구니
 
-    private String name;
+    @ManyToMany
+    private List<UserEntity> wishUser; //유저의 위시리스트
+    
+    @OneToMany
+    private List<SalesVolumeEntity> salesVolume; //판매량ID
 
-    private String explanation;
+    private String name; //상품명
 
-    private double discount;
+    private String description; //상품설명
 
-    private int BuyPrice;
+    private double discount; // 할인률
 
-    private int SellPrice;
+    private int buyPrice; // 구매가
 
-    private int stock;
+    private int purchasePrice; // 매입가
 
-    private LocalDateTime registrationDate;
+    private int sellPrice; //판매가
 
-    private String orderEmail;
+    private int stock; //잔량
+
+    private LocalDateTime registrationDate; //상품등록일자
+
+    private String orderEmail; //주문메일
 }

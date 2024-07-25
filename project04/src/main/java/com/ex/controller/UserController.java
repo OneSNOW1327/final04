@@ -1,6 +1,6 @@
 package com.ex.controller;
 
-import com.ex.dto.UserDTO;
+import com.ex.data.UserDTO;
 import com.ex.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -26,12 +26,12 @@ public class UserController {
 	public String registerPage() {
 		return "register";
 	}
-
 	@PostMapping("register")
 	public String registerUser( UserDTO userDTO) {
 		this.userService.registerUser(userDTO);
 		return "redirect:/";
 	}
+
 	@GetMapping("agreement")
 	public String agreement() {
 		return "agreement";
@@ -43,10 +43,34 @@ public class UserController {
 	}
 
 	@PostMapping("findidpro")
-	public String findidpro(@RequestParam("realName") String realName, @RequestParam("email") String email, @RequestParam("phone") String phone, Model model) {
-		String result = userService.findUsername(realName, email, phone);
-		model.addAttribute("result", result);
-		return "findidpro";
+    public String findidpro(@RequestParam("realName") String realName, @RequestParam("email") String email, @RequestParam("phone") String phone, Model model) {
+        String result = userService.findUsername(realName, email, phone);
+        if (result.equals("존재하지 않는 아이디입니다.")) {
+            model.addAttribute("error", result);
+        } else {
+            model.addAttribute("username", result);
+        }
+        return "findidpro";
+    }
+	
+	@GetMapping("findpw")
+	public String findpw() {
+		return "findpw";
 	}
+	@PostMapping("/findpwpro")
+    public String findPassword(@RequestParam("username") String username, @RequestParam("realName") String realName, @RequestParam("email") String email, Model model) {
+        try {
+            userService.verifyUser(username, realName, email);
+            model.addAttribute("username", username);
+            return "findpwpro";
+        } catch (RuntimeException e) {
+            return "redirect:/user/findpw?error=true";
+        }
+    }
+	@PostMapping("/setnewpassword")
+    public String setNewPassword(@RequestParam("username") String username, @RequestParam("newPassword") String newPassword) {
+        userService.updatePassword(username, newPassword);
+        return "redirect:/user/login";
+    }
 
 }

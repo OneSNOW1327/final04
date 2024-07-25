@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Product Detail</title>
+</head>
+<body>
+    <h1>Product Detail</h1>
+    
+    <!-- 상품 썸네일 이미지  ProductThumbnail -->
+     <div th:each="img : ${productDTO.thumbnailPaths}">
+        <img th:src="|/file/display?folder=thumbnails&filename=${img.sysname}|" style="max-width: 400px;">
+    </div>
+    
+    <!-- 간략한 상품정보 Product -->
+    <h2 th:text="${productDTO.name}">상품명</h2><br>
+    <span th:text="|${productDTO.sellPrice}원|">가격</span><br>
+    <span th:text="|${productDTO.sellPrice * (1 - productDTO.discount)}원|">할인가</span><br>
+    <span th:text="|${productDTO.discount}%|">할인률</span>    <br>
+<!-- 
+    <form th:action="@{|/product/basketAdd/${productDTO.id}|}" method="post">
+        <input type="hidden" name="productId" th:value="${productDTO.id}">
+        <input type="hidden" name="userId" th:value="${user.id}">
+        <label for="quantity" th:attr="for: 'quantity-' + ${productDTO.id}"></label>
+        <input type="number" th:attr="id='quantity-' + ${productDTO.id}" name="quantity" min="1" value="1">
+        <input type="submit" value="장바구니"> 
+    </form> 
+    <form th:attr="id='form-' + ${productDTO.id}" th:action="@{|/바로구매/|}" method="post">
+        <input type="hidden" name="productId" th:value="${productDTO.id}">
+        <input type="hidden" name="userId" th:value="${user.id}">
+        <label for="quantity" th:attr="for: 'quantity-' + ${productDTO.id}"></label>
+        <input type="number" th:attr="id='quantity-' + ${productDTO.id}" name="quantity" min="1" value="1">
+        <input type="submit" value="바로구매"> 
+    </form>
+    <form th:attr="id='form-' + ${productDTO.id}" th:action="@{|/찜♥/|}" method="post">
+        <input type="hidden" name="productId" th:value="${productDTO.id}">
+        <input type="hidden" name="userId" th:value="${user.id}">
+        <input type="submit" value="찜♥"> 
+    </form> 
+ -->
+    <!-- 상품상세 이미지 ProductImg -->
+      <div th:each="img : ${productDTO.descriptionImagePaths}">
+        <img th:src="|/file/display?folder=descriptions&filename=${img.sysname}|" style="max-width: 400px;">
+    </div>
+
+</body>
+</html>

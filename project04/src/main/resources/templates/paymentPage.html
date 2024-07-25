@@ -1,0 +1,27 @@
+<h1>결제</h1>
+
+<h3>주문예정 list</h3>
+	<tr>
+		<th>선택</th>
+		<th>상품사진</th>
+		<th>상품명</th>
+		<th>판매가</th>
+		<th>수량</th>
+	</tr>
+	<tr th:each=" product : ${selectedProducts}">
+			<td><input type="checkbox" class="basket-check" name="check" th:value="${basket.id}"/></td>
+			<td><img src="|/file/display?filename=${basket.product.thumbnail[0]}|" style="max-width: 50px;">상품사진</td>
+			<td th:text="${basket.product.name}">상품명</td>
+			<td th:text="${product.sellPrice*(1-product.discount)}">할인가</td>
+			<td th:text="${basket.quantity}">수량</td>
+	</tr>
+
+</tbody>
+<h3>주문서 작성</h3>
+<span>주문자 정보</span>
+
+<span>배송 정보</span>
+
+<span>결제금액</span>
+
+<span>결제수단</span>

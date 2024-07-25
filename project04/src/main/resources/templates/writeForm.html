@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>제품 등록 폼</title>
+    <!-- 부트스트랩 CSS 포함 -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="card shadow">
+            <div class="card-header text-center">
+                <h2>제품 등록 폼</h2>
+            </div>
+            <div class="card-body">
+                <form action="/product/writePro" method="post" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <!-- 제품 정보 -->
+                            <div class="card mb-3">
+                                <div class="card-header">
+                                    <h5>제품 정보</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-group">
+                                        <label for="name">제품 이름</label>
+                                        <input type="text" class="form-control" id="name" name="name" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="explanation">제품 설명</label>
+                                        <textarea class="form-control" id="explanation" name="explanation" rows="4" required></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="buyPrice">구매 금액</label>
+                                        <input type="number" class="form-control" id="buyPrice" name="buyPrice" step="0.01" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="sellPrice">판매 금액</label>
+                                        <input type="number" class="form-control" id="sellPrice" name="sellPrice" step="0.01" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- 이미지 업로드 -->
+                            <div class="card mb-3">
+                                <div class="card-header">
+                                    <h5>이미지 업로드</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-group">
+                                        <label for="thumbnails">썸네일 이미지 업로드</label>
+                                        <input type="file" class="form-control-file" id="thumbnails" name="thumbnails" multiple required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="descriptionImages">설명 이미지 업로드</label>
+                                        <input type="file" class="form-control-file" id="descriptionImages" name="descriptionImages" multiple required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- 추가 정보 -->
+                            <div class="card mb-3">
+                                <div class="card-header">
+                                    <h5>추가 정보</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-group">
+                                        <label for="stock">재고 수량</label>
+                                        <input type="number" class="form-control" id="stock" name="stock" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="discount">할인율</label>
+                                        <input type="text" class="form-control" id="discount" name="discount" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="typeId">제품 유형</label>
+                                        <select class="form-control" id="typeId" name="typeId" required>
+                                            <option value="">제품 유형 선택</option>
+                                            <th:block th:each="productTypes : ${productTypes}">
+                                                <option th:value="${productTypes.id}" th:text="${productTypes.typename}"></option>
+                                            </th:block>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="orderEmail">주문 이메일</label>
+                                        <input type="email" class="form-control" id="orderEmail" name="orderEmail" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group text-center mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg">제출</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 부트스트랩 JS 및 의존성 포함 (선택 사항) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrap.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

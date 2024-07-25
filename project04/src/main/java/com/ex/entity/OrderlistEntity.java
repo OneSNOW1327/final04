@@ -24,19 +24,23 @@ public class OrderlistEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id; 
 
-    private String productName;
-
-    private Integer quantity;
+    private Integer quantity; //수량
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private UserEntity user;
+    private UserEntity user; //유저ID
 
     @ManyToOne
-    @JoinColumn(name = "product_id")
-    private ProductEntity product;
+    private ProductEntity product; //상품ID
+    
+    private LocalDateTime orderTime; //주문일시
+    
+    private String payOption; //결제방식
+    
+    private double discount;//할인률
+    
+    
 
-    // Getter and Setter methods
+    
 }

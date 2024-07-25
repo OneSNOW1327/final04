@@ -27,6 +27,6 @@ public class ProductThumbnailEntity {
 	String orgname;
 	
 	String sysname;
-
+	
 	
 }

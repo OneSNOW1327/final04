@@ -1,5 +1,7 @@
 package com.ex.entity;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -15,20 +17,17 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Entity
-public class ProductImgEntity {
-	
+public class SoldEntity {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
-	private String orgname;
-	
-	private String sysname;
-
 	@ManyToOne
 	private ProductEntity product;
 	
+	private LocalDate recordDate;
 	
-	
+	private int salesRate;
 	
 }
