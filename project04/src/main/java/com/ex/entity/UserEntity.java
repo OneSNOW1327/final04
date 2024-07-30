@@ -50,7 +50,7 @@ public class UserEntity {
     
     private LocalDateTime reg;
     
-    private int grade1;
+    private int grade;
     
     private long point;
     

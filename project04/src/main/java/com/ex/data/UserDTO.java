@@ -36,7 +36,7 @@ public class UserDTO {
     
     private LocalDateTime reg;
     
-    private int grade1;
+    private int grade;
     
     private long point;
     
@@ -57,7 +57,7 @@ public class UserDTO {
 				.point(ue.getPoint())
 				.basketList(ue.getBasketList())
 				.wishList(ue.getWishList())
-				.grade1(ue.getGrade1())
+				.grade(ue.getGrade())
 				.build();
 	}
 

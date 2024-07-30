@@ -30,7 +30,7 @@ public class UserSecurityService implements UserDetailsService {
 		}
 		UserEntity ue = op.get();  // DB에 저장되어있는 ID와 PW를 꺼내주는역할
 		List<GrantedAuthority> grantList = new ArrayList<>();
-		if(ue.getGrade1() == 1) {
+		if(ue.getGrade() == 3) {
 			grantList.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
 		}else {
 			grantList.add(new SimpleGrantedAuthority("ROLE_USER"));
