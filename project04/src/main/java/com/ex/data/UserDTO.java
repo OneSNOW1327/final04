@@ -36,6 +36,8 @@ public class UserDTO {
     
     private LocalDateTime reg;
     
+    private int grade;
+    
     private long point;
     
     private List<BasketEntity> basketList; //해당회원의 장바구니
@@ -55,6 +57,7 @@ public class UserDTO {
 				.point(ue.getPoint())
 				.basketList(ue.getBasketList())
 				.wishList(ue.getWishList())
+				.grade(ue.getGrade())
 				.build();
 	}
 

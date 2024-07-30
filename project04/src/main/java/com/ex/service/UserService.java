@@ -40,6 +40,7 @@ public class UserService{
 				.phone(userDTO.getPhone())
 				.reg(LocalDateTime.now())
 				.point(1000)
+				.grade(1)
 				.build();
         userRepository.save(user);
     }
