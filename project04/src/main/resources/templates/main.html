@@ -11,5 +11,10 @@
                 th:href="@{/user/logout}" sec:authorize="isAuthenticated()" style="font-size:23px;">로그아웃
             </a>
         </div>
+
+     <div th:each="product,loop : ${productDTO}">
+        <a th:text="${product.name}" th:href="@{|/product/detail/${product.id}|}"></a>
+    </div>
+    
     </div>
 </html>

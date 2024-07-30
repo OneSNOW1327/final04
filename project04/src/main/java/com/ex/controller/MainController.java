@@ -11,8 +11,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import com.ex.data.ProductDTO;
+import com.ex.service.ProductService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,8 +24,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MainController {
 	
+	private final ProductService productService;
+	
     @GetMapping("/main")
-    public String mainPage() {
+    public String mainPage(Model model) {    	
+    	model.addAttribute("productDTO", productService.allProduct());
     	return "main";
     }
     

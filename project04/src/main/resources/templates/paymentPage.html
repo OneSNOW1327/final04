@@ -4,14 +4,15 @@
 
 <h1>결제</h1>
 
-<h3>주문예정 list</h3>
+<h3>주문상품<spanth:text="'('+'${#lists.size(selectedProducts)}'+')'">상품개수표시</span></h3>
 	<tr>
 		<th>선택</th>
 		<th>상품사진</th>
 		<th>상품명</th>
-		<th>판매가</th>
+		<th>할인가</th>
 		<th>수량</th>
 	</tr>
+	
 	<tr th:each=" product : ${selectedProducts}">
 			<td><input type="checkbox" class="basket-check" name="check" th:value="${basket.id}"/></td>
 			<td><img src="|/file/display?filename=${basket.product.thumbnail[0]}|" style="max-width: 50px;">상품사진</td>
@@ -20,14 +21,26 @@
 			<td th:text="${basket.quantity}">수량</td>
 	</tr>
 
-</tbody>
 <h3>주문서 작성</h3>
-<span>주문자 정보</span>
+	<span>주문자 정보</span>
 
-<span>배송 정보</span>
 
-<span>결제금액</span>
-
-<span>결제수단</span>
+	<span>배송 정보</span>
+		<th>이름</th>
+		<td><input type="text" name="realName"></td>
+		<th>전화번호</th>
+		<td><input type="text" name="phone"></td>
+		<th>주소</th>
+		<td><input type="text" name="adress"></td>
+		<th>배송메모</th>
+		<td><input type="text" name="memo"></td>
+		
+	<span>결제금액</span>
+		총상품금액
+		배송료
+		총할인금액
+		총 결제금액
+		
+	<span>결제수단</span>
 </div>
 </html>

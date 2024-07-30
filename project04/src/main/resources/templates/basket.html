@@ -4,6 +4,15 @@
 
 <h1>장바구니</h1>
 <thead>
+</thead>
+<tbody>
+
+<div>
+<input type="checkbox" id="selectAll">전체상품 선택
+<button id="deleteSelected">선택 삭제</button>
+</div> 
+
+<table>
 <tr>
 	<th>선택</th>
 	<th>상품사진</th>
@@ -11,25 +20,26 @@
 	<th>판매가</th>
 	<th>수량</th>
 </tr>
-</thead>
-
-<tbody>
-<tr th:each=" basket : ${user.basketList}">
+<tr th:each=" basket : ${userBasket}">
 		<td><input type="checkbox" class="basket-check" name="check" th:value="${basket.id}"/></td>
-		<td><img src="|/file/display?filename=${basket.product.thumbnail[0]}|" style="max-width: 50px;">상품사진</td>
+		<td><img th:src="|/file/display?folder=thumbnails&filename=${basket.product.thumbnail[0].sysname}|" style="max-width: 50px;"></td>
 		<td th:text="${basket.product.name}">상품명</td>
-		<td th:text="${product.sellPrice*(1-product.discount)}">할인가</td>
-		<td th:text="${basket.quantity}">수량</td>
+		<td th:text="${basket.product.sellPrice*(1-basket.product.discount/100)}">할인가</td>
+		<td th:text="'수량 '+${basket.quantity}">수량</td><br>
 </tr>
+
+</table>
 </tbody>
 
-<form id="basketForm" action="/??" method="post"> 
+<form id="basketForm" action="/paymentPage" method="post"> 
 	<input type="hidden" id="selectProduct" name="selectProduct"> <!-- 숨겨진 필드, 선택된 장바구니 항목 저장 -->
 	<button type="submit">결제하기</button> 
 </form>
 </div>
 </html>
+
 <script>
+///선택한 제품만 결제 페이지로 보내기
 document.getElementById('basketForm').addEventListener('submit', function(event) {
 	event.preventDefault(); // 기본 폼 제출 동작을 막습니다.
 	const checkboxes = document.querySelectorAll('.basket-check:checked'); // 선택된 체크박스들을 모두 선택합니다.
@@ -38,4 +48,19 @@ document.getElementById('basketForm').addEventListener('submit', function(event)
 	// 폼을 제출합니다.
 	this.submit(); // 폼을 다시 제출합니다.
 });
+
+//"전체상품 선택" 체크박스
+document.getElementById('selectAll').addEventListener('change', function() {
+ const checkboxes = document.querySelectorAll('.basket-check'); // "basket-check" 각각의 상품에 대한 체크박스
+ checkboxes.forEach(cb => cb.checked = this.checked);// "전체상품 선택" 체크박스의 체크 상태를 각 상품의 체크박스에 적용
+});
+
+//"선택 삭제" 링크
+document.getElementById('deleteSelected').addEventListener('click', function() {
+ const checkboxes = document.querySelectorAll('.basket-check:checked');//체크된 체크박스들을 모두 선택
+ checkboxes.forEach(cb => cb.parentElement.parentElement.remove()); 
+});// 체크박스의 부모 요소의 부모 요소를 찾아 삭제
+   //부모 요소는 <td> 태그, 그 부모 요소는 <tr> 태그 즉,체크박스가 있는 행을 삭제
 </script>
+
+<!-- ★★결제 완료 상품 장바구니에서 삭제★★ -->

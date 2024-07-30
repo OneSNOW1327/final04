@@ -1,5 +1,6 @@
 package com.ex.service;
 
+import com.ex.data.BasketDTO;
 import com.ex.data.ProductDTO;
 import com.ex.entity.BasketEntity;
 import com.ex.entity.ProductEntity;
@@ -16,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -88,7 +90,7 @@ public class ProductService {
     }
     
 
-  //장바구니 추가_가은
+  //장바구니 추가
   	public void addToBasket(Integer productId, String userName, int quantity) {
   		Optional<ProductEntity> pop = this.productRepository.findById(productId);
   		UserEntity ue = this.userService.findByUserName(userName);
@@ -99,10 +101,15 @@ public class ProductService {
   				.build();
   		basketRepository.save(be);		
   		}
-
   	
+  //장바구니 현황_로그인유저에 대한 BasketEntity
+  	public List<BasketEntity> userBasket(String userName) {
+  		UserEntity ue = this.userService.findByUserName(userName);
+  		List<BasketEntity> userBasket = ue.getBasketList(); // 유저의 장바구니 리스트
+  	    return userBasket;
+  	}  	
   	
-  //찜리스트 추가_가은
+  //찜♥ 추가
   	public void addToWish(Integer productId, String userName) {
   		Optional<ProductEntity> pop = this.productRepository.findById(productId);
   		Optional<UserEntity> uop = this.userRepository.findByUsername(userName);
@@ -113,13 +120,31 @@ public class ProductService {
   				ue.getWishList().add(pe);
   				userRepository.save(ue);
   			}
-  		}
-  		
+  		}  		
+  	}
+
+//결제페이지 결제예정 상품
+  	public List<ProductEntity> expectPay(String selectProduct) {
+  		 String[] productIds = selectProduct.split(",");//선택된 상품의 ID를 배열로		    
+		    List<ProductEntity> selectedProducts = new ArrayList<>();// 선택된 상품들을 저장할 리스트
+		    for (String id : productIds) {// 각 ID에 해당하는 상품을 찾아서 리스트에 추가
+		        Optional<ProductEntity> op = this.productRepository.findById(Integer.parseInt(id));
+		        selectedProducts.add(op.get());		        
+		    }
+		    return selectedProducts;
   	}
   	
-  //주문내역(결제) 넣기
+//주문내역(결제) 넣기 미완성
   	public void addToOrderList(Integer productId, String userName) {
   		Optional<ProductEntity> pop = this.productRepository.findById(productId);
   		UserEntity ue = this.userService.findByUserName(userName);
   	}
+  	
+//모든상품 조회 리스트
+  	public List<ProductEntity> allProduct() {
+  		return productRepository.findAll();
+  	}
+
+  	
+  	
 }
