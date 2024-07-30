@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html layout:decorate="~{layout}">
     <div class="container my-3" layout:fragment="content">
-        <div class="container mt-5"> 
+        <div class="container mt-5">
             <h1>메인 페이지</h1>
             <h2 sec:authorize="isAuthenticated()" sec:authentication="name"></h2>
             <a class="btn btn-black d-flex align-items-center justify-content-center text-center" 
