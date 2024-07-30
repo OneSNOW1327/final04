@@ -3,6 +3,8 @@ package com.ex.entity;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.hibernate.annotations.ColumnDefault;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -47,6 +49,8 @@ public class UserEntity {
     private String phone;
     
     private LocalDateTime reg;
+    
+    private int grade;
     
     private long point;
     
