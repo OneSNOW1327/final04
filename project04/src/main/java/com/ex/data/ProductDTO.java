@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.ex.entity.BasketEntity;
 import com.ex.entity.OrderlistEntity;
-import com.ex.entity.ProductEntity;
 import com.ex.entity.ProductImgEntity;
 import com.ex.entity.ProductThumbnailEntity;
 import com.ex.entity.ProducttypeEntity;
@@ -17,7 +16,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @Builder

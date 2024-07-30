@@ -8,7 +8,6 @@ import com.ex.entity.OrderlistEntity;
 import com.ex.entity.ProductEntity;
 import com.ex.entity.UserEntity;
 
-import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
