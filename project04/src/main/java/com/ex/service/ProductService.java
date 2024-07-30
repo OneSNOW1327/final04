@@ -1,6 +1,5 @@
 package com.ex.service;
 
-import com.ex.data.BasketDTO;
 import com.ex.data.ProductDTO;
 import com.ex.entity.BasketEntity;
 import com.ex.entity.ProductEntity;
@@ -33,25 +32,45 @@ public class ProductService {
     private final ProducttypeRepository producttypeRepository;
     private final PhotoService photoService;
 
-    public Integer create(ProductDTO productDTO, MultipartFile[] thumbnails, MultipartFile[] descriptionImages) throws IOException {
+    public Integer createOrUpdate(ProductDTO productDTO, MultipartFile[] thumbnails, MultipartFile[] descriptionImages, List<Integer> deleteThumbnailIds, List<Integer> deleteDescriptionImageIds) throws IOException {
         Optional<ProducttypeEntity> optionalProductType = producttypeRepository.findById(productDTO.getTypeId());
         if (!optionalProductType.isPresent()) {
             throw new IllegalArgumentException("Invalid typeId");
         }
         ProducttypeEntity productType = optionalProductType.get();
 
-        ProductEntity productEntity = ProductEntity.builder()
-                .name(productDTO.getName())
-                .description(productDTO.getDescription())
-                .buyPrice(productDTO.getBuyPrice())
-                .purchasePrice(productDTO.getPurchasePrice())
-                .sellPrice(productDTO.getSellPrice())
-                .discount(productDTO.getDiscount())
-                .stock(productDTO.getStock())
-                .type(productType)
-                .registrationDate(LocalDateTime.now())
-                .orderEmail(productDTO.getOrderEmail())
-                .build();
+        ProductEntity productEntity;
+        if (productDTO.getId() != null) {
+            productEntity = productRepository.findById(productDTO.getId()).orElseThrow(() -> new RuntimeException("product not found"));
+            productEntity.setName(productDTO.getName());
+            productEntity.setDescription(productDTO.getDescription());
+            productEntity.setBuyPrice(productDTO.getBuyPrice());
+            productEntity.setSellPrice(productDTO.getSellPrice());
+            productEntity.setDiscount(productDTO.getDiscount());
+            productEntity.setStock(productDTO.getStock());
+            productEntity.setType(productType);
+            productEntity.setOrderEmail(productDTO.getOrderEmail());
+
+            // 기존 사진 삭제
+            if (deleteThumbnailIds != null) {
+                photoService.deleteThumbnails(deleteThumbnailIds);
+            }
+            if (deleteDescriptionImageIds != null) {
+                photoService.deleteDescriptionImages(deleteDescriptionImageIds);
+            }
+        } else {
+            productEntity = ProductEntity.builder()
+                    .name(productDTO.getName())
+                    .description(productDTO.getDescription())
+                    .buyPrice(productDTO.getBuyPrice())
+                    .sellPrice(productDTO.getSellPrice())
+                    .discount(productDTO.getDiscount())
+                    .stock(productDTO.getStock())
+                    .type(productType)
+                    .registrationDate(LocalDateTime.now())
+                    .orderEmail(productDTO.getOrderEmail())
+                    .build();
+        }
 
         productRepository.save(productEntity);
 
@@ -72,13 +91,11 @@ public class ProductService {
                     .description(pe.getDescription())
                     .discount(pe.getDiscount())
                     .buyPrice(pe.getBuyPrice())
-                    .purchasePrice(pe.getPurchasePrice())
                     .sellPrice(pe.getSellPrice())
                     .stock(pe.getStock())
                     .registrationDate(pe.getRegistrationDate())
                     .orderEmail(pe.getOrderEmail())
                     .build();
-
             return productDTO;
         } else {
             throw new RuntimeException("product not found");

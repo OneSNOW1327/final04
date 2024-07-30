@@ -1,94 +1,155 @@
 <!DOCTYPE html>
 <html layout:decorate="~{layout}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>제품 등록/수정 폼</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .img-thumbnail {
+            max-width: 100px;
+            margin: 5px;
+            position: relative;
+        }
+        .btn-delete {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 2px 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
     <div class="container my-3" layout:fragment="content">
-    <div class="container mt-5">
-        <div class="card shadow">
-            <div class="card-header text-center">
-                <h2>제품 등록 폼</h2>
-            </div>
-            <div class="card-body">
-                <form action="/product/writePro" method="post" enctype="multipart/form-data">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <!-- 제품 정보 -->
-                            <div class="card mb-3">
-                                <div class="card-header">
-                                    <h5>제품 정보</h5>
+        <div class="container mt-5">
+            <div class="card shadow">
+                <div class="card-header text-center">
+                    <h2>제품 등록/수정 폼</h2>
+                </div>
+                <div class="card-body">
+                    <form th:action="@{/product/writePro}" method="post" enctype="multipart/form-data">
+                        <input type="hidden" th:name="id" th:value="${productDTO.id}">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <!-- 제품 정보 -->
+                                <div class="card mb-3">
+                                    <div class="card-header">
+                                        <h5>제품 정보</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="form-group">
+                                            <label for="name">제품 이름</label>
+                                            <input type="text" class="form-control" id="name" name="name" th:value="${productDTO.name}" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="description">제품 설명</label>
+                                            <textarea class="form-control" id="description" name="description" rows="4" th:text="${productDTO.description}" required></textarea>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="buyPrice">구매 금액</label>
+                                            <input type="number" class="form-control" id="buyPrice" name="buyPrice" step="0.01" th:value="${productDTO.buyPrice}" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="sellPrice">판매 금액</label>
+                                            <input type="number" class="form-control" id="sellPrice" name="sellPrice" step="0.01" th:value="${productDTO.sellPrice}" required>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="card-body">
-                                    <div class="form-group">
-                                        <label for="name">제품 이름</label>
-                                        <input type="text" class="form-control" id="name" name="name" required>
+                                <!-- 이미지 업로드 -->
+                                <div class="card mb-3">
+                                    <div class="card-header">
+                                        <h5>이미지 업로드</h5>
                                     </div>
-                                    <div class="form-group">
-                                        <label for="explanation">제품 설명</label>
-                                        <textarea class="form-control" id="explanation" name="explanation" rows="4" required></textarea>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="buyPrice">구매 금액</label>
-                                        <input type="number" class="form-control" id="buyPrice" name="buyPrice" step="0.01" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="sellPrice">판매 금액</label>
-                                        <input type="number" class="form-control" id="sellPrice" name="sellPrice" step="0.01" required>
+                                    <div class="card-body">
+                                        <div class="form-group">
+                                            <label for="thumbnails">썸네일 이미지 업로드</label>
+                                            <input type="file" class="form-control-file" id="thumbnails" name="thumbnails" multiple>
+                                            <!-- 기존 썸네일 이미지 표시 -->
+                                            <div th:each="thumbnail, stat : ${productDTO.thumbnailPaths}" class="mt-3 position-relative d-inline-block">
+                                                <img th:src="|/file/display?folder=thumbnails&filename=${thumbnail.sysname}|" class="img-thumbnail" data-id="[[${thumbnail.id}]]">
+                                                <button type="button" class="btn-delete" onclick="removeThumbnail(this)">삭제</button>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="descriptionImages">설명 이미지 업로드</label>
+                                            <input type="file" class="form-control-file" id="descriptionImages" name="descriptionImages" multiple>
+                                            <!-- 기존 설명 이미지 표시 -->
+                                            <div th:each="descriptionImage, stat : ${productDTO.descriptionImagePaths}" class="mt-3 position-relative d-inline-block">
+                                                <img th:src="|/file/display?folder=descriptions&filename=${descriptionImage.sysname}|" class="img-thumbnail" data-id="[[${descriptionImage.id}]]">
+                                                <button type="button" class="btn-delete" onclick="removeDescriptionImage(this)">삭제</button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <!-- 이미지 업로드 -->
-                            <div class="card mb-3">
-                                <div class="card-header">
-                                    <h5>이미지 업로드</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="form-group">
-                                        <label for="thumbnails">썸네일 이미지 업로드</label>
-                                        <input type="file" class="form-control-file" id="thumbnails" name="thumbnails" multiple required>
+                            <div class="col-md-6">
+                                <!-- 추가 정보 -->
+                                <div class="card mb-3">
+                                    <div class="card-header">
+                                        <h5>추가 정보</h5>
                                     </div>
-                                    <div class="form-group">
-                                        <label for="descriptionImages">설명 이미지 업로드</label>
-                                        <input type="file" class="form-control-file" id="descriptionImages" name="descriptionImages" multiple required>
+                                    <div class="card-body">
+                                        <div class="form-group">
+                                            <label for="stock">재고 수량</label>
+                                            <input type="number" class="form-control" id="stock" name="stock" th:value="${productDTO.stock}" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="discount">할인율</label>
+                                            <input type="text" class="form-control" id="discount" name="discount" th:value="${productDTO.discount}" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="typeId">제품 유형</label>
+                                            <select class="form-control" id="typeId" name="typeId" required>
+                                                <option value="" disabled selected>제품 유형 선택</option>
+                                                <th:block th:each="productTypes : ${productTypes}">
+                                                    <option th:value="${productTypes.id}" th:text="${productTypes.typename}" th:selected="${productDTO.typeId == productTypes.id}"></option>
+                                                </th:block>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="orderEmail">주문 이메일</label>
+                                            <input type="email" class="form-control" id="orderEmail" name="orderEmail" th:value="${productDTO.orderEmail}" required>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <!-- 추가 정보 -->
-                            <div class="card mb-3">
-                                <div class="card-header">
-                                    <h5>추가 정보</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="form-group">
-                                        <label for="stock">재고 수량</label>
-                                        <input type="number" class="form-control" id="stock" name="stock" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="discount">할인율</label>
-                                        <input type="text" class="form-control" id="discount" name="discount" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="typeId">제품 유형</label>
-                                        <select class="form-control" id="typeId" name="typeId" required>
-                                            <option value="">제품 유형 선택</option>
-                                            <th:block th:each="productTypes : ${productTypes}">
-                                                <option th:value="${productTypes.id}" th:text="${productTypes.typename}"></option>
-                                            </th:block>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="orderEmail">주문 이메일</label>
-                                        <input type="email" class="form-control" id="orderEmail" name="orderEmail" required>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="form-group text-center mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">저장</button>
                         </div>
-                    </div>
-                    <div class="form-group text-center mt-4">
-                        <button type="submit" class="btn btn-primary btn-lg">제출</button>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
+<script>
+    // 썸네일 이미지 삭제 함수
+    function removeThumbnail(button) {
+        const imgElement = button.previousElementSibling;
+        const id = imgElement.getAttribute('data-id');
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'deleteThumbnailIds';
+        input.value = id;
+        button.parentElement.appendChild(input);
+        button.parentElement.style.display = 'none';
+    }
+
+    // 설명 이미지 삭제 함수
+    function removeDescriptionImage(button) {
+        const imgElement = button.previousElementSibling;
+        const id = imgElement.getAttribute('data-id');
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'deleteDescriptionImageIds';
+        input.value = id;
+        button.parentElement.appendChild(input);
+        button.parentElement.style.display = 'none';
+    }
+</script>
+</body>
 </html>

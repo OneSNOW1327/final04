@@ -59,8 +59,6 @@ public class ProductEntity {
 
     private int buyPrice; // 구매가
 
-    private int purchasePrice; // 매입가
-
     private int sellPrice; //판매가
 
     private int stock; //잔량

@@ -7,18 +7,12 @@ import com.ex.entity.ProductThumbnailEntity;
 import com.ex.repository.ProductImgRepository;
 import com.ex.repository.ProductThumbnailRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -104,6 +98,26 @@ public class PhotoService {
         }
         return photoDTOList;
     }
-    
-    
+
+    public void deleteThumbnails(List<Integer> thumbnailIds) {
+        for (Integer id : thumbnailIds) {
+            ProductThumbnailEntity thumbnail = productThumbnailRepository.findById(id).orElseThrow(() -> new RuntimeException("Thumbnail not found"));
+            File file = new File(THUMBNAIL_DIR + thumbnail.getSysname());
+            if (file.exists()) {
+                file.delete();
+            }
+            productThumbnailRepository.deleteById(id);
+        }
+    }
+
+    public void deleteDescriptionImages(List<Integer> descriptionImageIds) {
+        for (Integer id : descriptionImageIds) {
+            ProductImgEntity descriptionImage = productImgRepository.findById(id).orElseThrow(() -> new RuntimeException("Description image not found"));
+            File file = new File(DESCRIPTION_DIR + descriptionImage.getSysname());
+            if (file.exists()) {
+                file.delete();
+            }
+            productImgRepository.deleteById(id);
+        }
+    }
 }

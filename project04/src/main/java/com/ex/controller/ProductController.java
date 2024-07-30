@@ -1,19 +1,13 @@
 package com.ex.controller;
 
-import com.ex.data.BasketDTO;
 import com.ex.data.ProductDTO;
-import com.ex.data.UserDTO;
 import com.ex.entity.BasketEntity;
-import com.ex.entity.ProductEntity;
 import com.ex.entity.ProducttypeEntity;
-import com.ex.entity.UserEntity;
 import com.ex.service.ProductService;
-import com.ex.service.UserService;
 import com.ex.service.PhotoService;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -36,23 +29,33 @@ public class ProductController {
 
     private final ProductService productService;
     private final PhotoService photoService;
-    private final UserService userService;
 
+    // 등록/수정 페이지로 이동
     @GetMapping("/writeForm")
-    public String productWriteForm(Model model) {
+    public String productWriteForm(@RequestParam(value = "id", required = false) Integer id, Model model) {
+        if (id != null) {
+            ProductDTO productDTO = productService.findById(id);
+            productDTO.setThumbnailPaths(photoService.getThumbnailPaths(id));
+            productDTO.setDescriptionImagePaths(photoService.getDescriptionImagePaths(id));
+            model.addAttribute("productDTO", productDTO);
+        } else {
+            model.addAttribute("productDTO", new ProductDTO());
+        }
         List<ProducttypeEntity> productTypes = productService.getAllProductTypes();
         model.addAttribute("productTypes", productTypes);
         return "writeForm";
     }
 
+    // 등록/수정 처리 메서드
     @PostMapping("/writePro")
-    public String productWrite(
+    public String saveOrUpdateProduct(
             @ModelAttribute ProductDTO productDTO,
             @RequestParam("thumbnails") MultipartFile[] thumbnails,
-            @RequestParam("descriptionImages") MultipartFile[] descriptionImages
+            @RequestParam("descriptionImages") MultipartFile[] descriptionImages,
+            @RequestParam(value = "deleteThumbnailIds", required = false) List<Integer> deleteThumbnailIds,
+            @RequestParam(value = "deleteDescriptionImageIds", required = false) List<Integer> deleteDescriptionImageIds
     ) throws IOException {
-
-        Integer id = productService.create(productDTO, thumbnails, descriptionImages);
+        Integer id = productService.createOrUpdate(productDTO, thumbnails, descriptionImages, deleteThumbnailIds, deleteDescriptionImageIds);
         return String.format("redirect:/product/detail/%d", id);
     }
 
