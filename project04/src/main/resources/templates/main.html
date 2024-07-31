@@ -18,6 +18,6 @@
      <div th:each="product,loop : ${productDTO}">
         <a th:text="${product.name}" th:href="@{|/product/detail/${product.id}|}"></a>
     </div>
-    
+     
     </div>
 </html>

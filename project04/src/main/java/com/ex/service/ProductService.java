@@ -176,7 +176,7 @@ public class ProductService {
 			public Predicate toPredicate(Root<ProductEntity> root,  
 					//쿼리문
 					CriteriaQuery<?> query,
-					 //쿼리실행
+					//쿼리실행
 					CriteriaBuilder criteriaBuilder) {
 				//중복제거
 				query.distinct(true);
@@ -206,7 +206,7 @@ public class ProductService {
 		List<BasketEntity> basketsToPay = basketRepository.findAllById(basketIds);         		
 		return basketRepository.saveAll(basketsToPay);		 
 	}
-	
+
 	//장바구니 추가
 	public void addToBasket(Integer productId, String userName, int quantity) {
 		Optional<ProductEntity> pop = productRepository.findById(productId);

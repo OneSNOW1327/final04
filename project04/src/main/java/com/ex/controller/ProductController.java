@@ -146,7 +146,7 @@ public class ProductController {
 		productService.addToWish(id, principal.getName());
 		return "redirect:/product/Detail/"+id;
 	}
-
+ 
 	//결제페이지
 	//선택된 장바구니 항목이 넘어옴
 	@PostMapping("/paymentPage")

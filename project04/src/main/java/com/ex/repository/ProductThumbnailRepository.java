@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface ProductThumbnailRepository extends JpaRepository<ProductThumbnailEntity, Integer> {
-    List<ProductThumbnailEntity> findByProductIdOrderByIdAsc(Integer productId);
+    List<ProductThumbnailEntity> findByProductIdOrderByIdAsc(Integer productId); 
 }
