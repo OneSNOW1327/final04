@@ -9,58 +9,101 @@
 
 <div>
 <input type="checkbox" id="selectAll">전체상품 선택
-<button id="deleteSelected">선택 삭제</button>
+<!-- 선택상품 장바구니 삭제  -->
+<form id="removeBasket" action="/product/removeBasket" method="post"> 
+	<input type="hidden" id="removeSelected" name="removeSelected"> <!-- 숨겨진 필드, 선택된 장바구니 항목 저장 -->
+	<button type="submit">선택 삭제</button> 
+</form>
 </div> 
 
 <table>
 <tr>
-	<th>선택</th>
+	<th>선택</th> 
 	<th>상품사진</th>
 	<th>상품명</th>
 	<th>판매가</th>
 	<th>수량</th>
 </tr>
 <tr th:each=" basket : ${userBasket}">
-		<td><input type="checkbox" class="basket-check" name="check" th:value="${basket.id}"/></td>
-		<td><img th:src="|/file/display?folder=thumbnails&filename=${basket.product.thumbnail[0].sysname}|" style="max-width: 50px;"></td>
-		<td th:text="${basket.product.name}">상품명</td>
-		<td th:text="${basket.product.sellPrice*(1-basket.product.discount/100)}">할인가</td>
-		<td th:text="'수량 '+${basket.quantity}">수량</td><br>
+    <td><input type="checkbox" class="basket-check" name="check" th:value="${basket.id}"/></td>
+    <td><img th:src="|/file/display?folder=thumbnails&filename=${basket.product.thumbnail[0].sysname}|" style="max-width: 100px;"></td>
+    <td th:text="${basket.product.name}">상품명</td>
+    <td class="price" th:text="${basket.product.sellPrice*(1-basket.product.discount/100)}">할인가</td>
+    <td class="quantity" th:text="'수량 '+${basket.quantity}">수량</td><br>
 </tr>
 
 </table>
-</tbody>
 
-<form id="basketForm" action="/paymentPage" method="post"> 
+<br><h5>
+	<p id="totalQuantity">선택한 상품 0개</p> 
+	<p id="totalPrice">결제예정금액: 0원</p>
+</h5><br>
+
+<!-- 선택상품 결제 페이지로 제출 -->
+<form id="basketForm" action="/product/paymentPage" method="post"> 
 	<input type="hidden" id="selectProduct" name="selectProduct"> <!-- 숨겨진 필드, 선택된 장바구니 항목 저장 -->
-	<button type="submit">결제하기</button> 
+	<button type="submit">주문하기</button> 	
 </form>
+<a href="/main" type="submit">쇼핑계속하기</a>
+</tbody>
 </div>
 </html>
 
 <script>
-///선택한 제품만 결제 페이지로 보내기
+//"전체상품 선택" 체크박스
+document.getElementById('selectAll').addEventListener('change', function() {
+ const checkboxes = document.querySelectorAll('.basket-check'); // "basket-check" 각각의 상품에 대한 체크박스
+ checkboxes.forEach(cb => cb.checked = this.checked);// "전체상품 선택" 체크박스의 체크 상태를 각 상품의 체크박스에 적용
+ updateTotals();
+});
+
+//선택한 제품만 결제 페이지로 보내기
 document.getElementById('basketForm').addEventListener('submit', function(event) {
 	event.preventDefault(); // 기본 폼 제출 동작을 막습니다.
 	const checkboxes = document.querySelectorAll('.basket-check:checked'); // 선택된 체크박스들을 모두 선택합니다.
 	const selectedValues = Array.from(checkboxes).map(cb => cb.value); // 각 체크박스의 값을 추출하여 배열로 만듭니다.
 	document.getElementById('selectProduct').value = selectedValues.join(','); // 배열을 콤마로 구분된 문자열로 변환하여 히든 필드에 설정합니다.
-	// 폼을 제출합니다.
 	this.submit(); // 폼을 다시 제출합니다.
 });
-
-//"전체상품 선택" 체크박스
-document.getElementById('selectAll').addEventListener('change', function() {
- const checkboxes = document.querySelectorAll('.basket-check'); // "basket-check" 각각의 상품에 대한 체크박스
- checkboxes.forEach(cb => cb.checked = this.checked);// "전체상품 선택" 체크박스의 체크 상태를 각 상품의 체크박스에 적용
+//"선택 삭제" 
+document.getElementById('removeBasket').addEventListener('submit', function(event) {
+ event.preventDefault(); // 기본 폼 제출 동작을 막습니다.
+ const checkboxes = document.querySelectorAll('.basket-check:checked');//체크된 체크박스들을 모두 선택
+ const selectedValues = Array.from(checkboxes).map(cb => cb.value); // 각 체크박스의 값을 추출하여 배열로 만듭니다.
+ document.getElementById('removeSelected').value = selectedValues.join(','); // 배열을 콤마로 구분된 문자열로 변환하여 히든 필드에 설정합니다.
+ this.submit(); // 폼을 다시 제출합니다.
 });
 
-//"선택 삭제" 링크
-document.getElementById('deleteSelected').addEventListener('click', function() {
- const checkboxes = document.querySelectorAll('.basket-check:checked');//체크된 체크박스들을 모두 선택
- checkboxes.forEach(cb => cb.parentElement.parentElement.remove()); 
-});// 체크박스의 부모 요소의 부모 요소를 찾아 삭제
-   //부모 요소는 <td> 태그, 그 부모 요소는 <tr> 태그 즉,체크박스가 있는 행을 삭제
+//총합 업데이트 함수
+function updateTotals() {
+    const checkboxes = document.querySelectorAll('.basket-check:checked');
+    let totalQuantity = 0;
+    let totalPrice = 0;
+    checkboxes.forEach(cb => {    	
+        const row = cb.parentNode.parentNode; // 체크박스가 속한 행
+        // 행에서 '.quantity' 클래스를 가진 요소의 텍스트를 가져와서 '수량 ' 문자열을 제거하고 공백을 제거합니다.
+        const quantityText = row.querySelector('.quantity').textContent.replace('수량 ', '').trim();
+        const priceText = row.querySelector('.price').textContent.trim();
+        // 수량 텍스트와 가격 텍스트를 각각 정수와 실수로 변환합니다.
+        const quantity = parseInt(quantityText, 10);
+        const price = parseFloat(priceText);
+        // 수량과 가격이 숫자인 경우에만 총 수량과 총 가격에 더합니다.
+        if (!isNaN(quantity) && !isNaN(price)) {
+            totalQuantity += quantity;
+            totalPrice += quantity * price;
+        }
+    });
+    document.getElementById('totalQuantity').textContent = '선택한 상품 ' + totalQuantity +'개';
+    // 'totalPrice' 요소의 텍스트를 '결제예정금액: ' + 총 가격(숫자를 문자열로 변환하고 천 단위로 콤마를 추가) + '원'으로 설정합니다.
+    document.getElementById('totalPrice').textContent = '결제예정금액: ' + totalPrice.toLocaleString() + '원';
+}
+
+// 체크박스 변경 시 총합 업데이트
+document.querySelectorAll('.basket-check').forEach(cb => {
+    cb.addEventListener('change', updateTotals);
+});
+//페이지 로드 시 초기 총합 계산
+window.addEventListener('load', updateTotals);
 </script>
 
 <!-- ★★결제 완료 상품 장바구니에서 삭제★★ -->

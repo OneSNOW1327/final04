@@ -4,34 +4,32 @@
 
 <h1>결제</h1>
 
-<h3>주문상품<spanth:text="'('+'${#lists.size(selectedProducts)}'+')'">상품개수표시</span></h3>
+<h3>주문상품<span th:text="'('+'${#lists.size(BasketPay)}'+')'">총상품개수표시</span></h3>
+<table>
 	<tr>
-		<th>선택</th>
 		<th>상품사진</th>
 		<th>상품명</th>
 		<th>할인가</th>
 		<th>수량</th>
+	</tr>	
+	<tr th:each=" BasketPay : ${expectPay}">
+			<td><img th:src="|/file/display?folder=thumbnails&filename=${BasketPay.product.thumbnail[0].sysname}|" style="max-width: 50px;"></td>
+			<td th:text="${BasketPay.product.name}">상품명</td>
+			<td th:text="${BasketPay.product.sellPrice*(1-BasketPay.product.discount/100)}">할인가</td>
+			<td class="quantity" th:text="'수량 '+${BasketPay.quantity}">수량</td>
 	</tr>
-	
-	<tr th:each=" product : ${selectedProducts}">
-			<td><input type="checkbox" class="basket-check" name="check" th:value="${basket.id}"/></td>
-			<td><img src="|/file/display?filename=${basket.product.thumbnail[0]}|" style="max-width: 50px;">상품사진</td>
-			<td th:text="${basket.product.name}">상품명</td>
-			<td th:text="${product.sellPrice*(1-product.discount)}">할인가</td>
-			<td th:text="${basket.quantity}">수량</td>
-	</tr>
-
+</table>
 <h3>주문서 작성</h3>
 	<span>주문자 정보</span>
 
 
 	<span>배송 정보</span>
 		<th>이름</th>
-		<td><input type="text" name="realName"></td>
+		<td><input type="text" name="realName"></td><br>
 		<th>전화번호</th>
-		<td><input type="text" name="phone"></td>
+		<td><input type="text" name="phone"></td><br>
 		<th>주소</th>
-		<td><input type="text" name="adress"></td>
+		<td><input type="text" name="adress"></td><br>
 		<th>배송메모</th>
 		<td><input type="text" name="memo"></td>
 		
