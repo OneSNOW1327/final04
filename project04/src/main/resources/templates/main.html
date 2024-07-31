@@ -14,7 +14,7 @@
                 th:href="@{/product/basketList}" sec:authorize="isAuthenticated()" style="font-size:23px;">장바구니
             </a>
         </div>
-
+ 
      <div th:each="product,loop : ${productDTO}">
         <a th:text="${product.name}" th:href="@{|/product/detail/${product.id}|}"></a>
     </div>

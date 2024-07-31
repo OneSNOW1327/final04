@@ -30,7 +30,7 @@ public class MainController {
 
 	private final ProductService productService;
 	private final PhotoService photoService;
-
+ 
 	@GetMapping("/main")
 	public String mainPage(Model model) {    	
 		model.addAttribute("productDTO", productService.allProduct());
