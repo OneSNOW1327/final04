@@ -1,17 +1,23 @@
 <nav th:fragment="navbarFragment" class="navbar navbar-expand-lg navbar-dark bg-dark" data-bs-theme="dark">
-    <div class="container-fluid">
-        <div class="d-flex justify-content-start align-content-center flex-wrap">
-            <a class="navbar-brand" href="/">
-                <img src="#" width="50px">
-            </a>
-            <a class="btn btn-dark d-flex align-items-center justify-content-center text-center" sec:authorize="isAuthenticated()" 
-                th:href="@{|/user/info/${#authentication.getPrincipal().getUsername()}|}" sec:authentication="name" style="font-size:23px;"></a>
-            <a class="btn btn-dark d-flex align-items-center justify-content-center text-center" 
-                th:href="@{/user/login}" sec:authorize="isAnonymous()" style="font-size:23px;">로그인
-            </a>
-            <a class="btn btn-dark d-flex align-items-center justify-content-center text-center" 
-                th:href="@{/user/logout}" sec:authorize="isAuthenticated()" style="font-size:23px;">로그아웃
-            </a>
-        </div>
-    </div>    
+	<div class="container-fluid">
+		<div class="d-flex justify-content-between align-content-center flex-wrap">
+			<div>
+				<a class="navbar-brand" href="/">
+					<img src="#" width="50px">
+				</a>
+			</div>
+			<div>
+				<a class="btn btn-dark d-flex align-items-center justify-content-center text-center" th:href="@{/user/userinfo}"
+					sec:authorize="isAuthenticated()"  sec:authentication="name" style="font-size:23px;"></a>
+				<a class="btn btn-dark d-flex align-items-center justify-content-center text-center" 
+					th:href="@{/user/login}" sec:authorize="isAnonymous()" style="font-size:23px;">로그인
+				</a>
+				<a class="btn btn-dark d-flex align-items-center justify-content-center text-center" 
+					th:href="@{/user/logout}" sec:authorize="isAuthenticated()" style="font-size:23px;">로그아웃
+				</a>
+			</div>
+		</div>
+	</div>
+
+	
 </nav>
