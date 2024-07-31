@@ -5,6 +5,7 @@ import com.ex.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 
+import java.security.Principal;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -72,5 +73,11 @@ public class UserController {
         userService.updatePassword(username, newPassword);
         return "redirect:/user/login";
     }
-
+	// entityToDTO = 엔티티를 DTO형식으로 리턴해서 받는 방식
+	   @GetMapping("userinfo")
+	   public String userinfo(Principal principal , Model model) {
+	      UserDTO userDTO = UserDTO.entityToDTO(this.userService.findByUserName(principal.getName())); 
+	      model.addAttribute("userDTO", userDTO);
+	      return "userinfo";
+	   }
 }
