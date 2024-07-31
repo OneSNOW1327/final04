@@ -129,37 +129,36 @@ public class ProductController {
 	}
 
 	//장바구니 선택상품 삭제
-	@PostMapping("/removeBasket")
-	public String removeBasket(@RequestParam("removeSelected") String removeSelected) {
-		// "removeSelected"라는 이름의 파라미터 basket의ID를 "ID,ID,.."형식으로 가지고있음
-		List<Integer> basketIds = Arrays.stream(removeSelected.split(","))//콤마를 기준으로 분리
-				.map(Integer::parseInt)//스트림의 요소를 정수로 변환
-				.collect(Collectors.toList());//스트림의 모든 요소를 새로운 리스트로 만들어 반환
-		productService.removeSelectedBaskets(basketIds);
-		return "redirect:/product/basketList";
-	}
+			@PostMapping("/removeBasket")
+			public String removeBasket(@RequestParam("removeSelected") String removeSelected) {
+			    // "removeSelected"라는 이름의 파라미터 basket의ID를 "ID,ID,.."형식으로 가지고있음
+			    List<Integer> basketIds = Arrays.stream(removeSelected.split(","))//콤마를 기준으로 분리
+			                                    .map(Integer::parseInt)//스트림의 요소를 정수로 변환
+			                                    .collect(Collectors.toList());//스트림의 모든 요소를 새로운 리스트로 만들어 반환
+			    productService.removeSelectedBaskets(basketIds);
+			    return "redirect:/product/basketList";
+			}
 
 	//찜 버튼 눌렀을때
-	@PostMapping("/wishadd/{id}")
-	public String addToWish(Principal principal,
-			@PathVariable("id")Integer id){
-		productService.addToWish(id, principal.getName());
-		return "redirect:/product/Detail/"+id;
-	}
- 
-	//결제페이지
-	//선택된 장바구니 항목이 넘어옴
-	@PostMapping("/paymentPage")
-	public String paymentPage(@RequestParam("selectProduct") String selectProduct,
-			Model model, Principal principal) {
-		List<Integer> basketIds = Arrays.stream(selectProduct.split(","))
-				//스트림의 요소를 정수로 변환
-				.map(Integer::parseInt)
-				//스트림의 모든 요소를 새로운 리스트로
-				//선택된 상품들 결제페이지로 보내기
-				.collect(Collectors.toList());
-		model.addAttribute("expectPay", productService.expectPay(basketIds));
+			@PostMapping("/wishadd/{id}")
+			public String addToWish(Principal principal,
+								   @PathVariable("id")Integer id){
+				productService.addToWish(id, principal.getName());
+				return "redirect:/product/Detail/"+id;
+			}
 
-		return "paymentPage";
-	}
+	//결제페이지
+			@PostMapping("/paymentPage")//선택된 장바구니 항목이 넘어옴
+			public String paymentPage(@RequestParam("selectProduct") String selectProduct,
+									 Model model, Principal principal) {
+				List<Integer> basketIds = Arrays.stream(selectProduct.split(","))
+						.map(Integer::parseInt)//스트림의 요소를 정수로 변환
+						.collect(Collectors.toList());//스트림의 모든 요소를 새로운 리스트로
+			    //선택된 상품들 결제페이지로 보내기
+			    model.addAttribute("expectPay", productService.expectPay(basketIds));
+				
+			    return "paymentPage";
+			}
+
+	
 }

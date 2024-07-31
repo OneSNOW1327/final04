@@ -202,29 +202,29 @@ public class ProductService {
 	}
 
 	//결제페이지 결제예정 상품리스트
-	public List<BasketEntity> expectPay(List<Integer> basketIds) {  		
-		List<BasketEntity> basketsToPay = basketRepository.findAllById(basketIds);         		
-		return basketRepository.saveAll(basketsToPay);		 
-	}
+  	public List<BasketEntity> expectPay(List<Integer> basketIds) {  		
+  		List<BasketEntity> basketsToPay = basketRepository.findAllById(basketIds);         		
+		 return basketRepository.saveAll(basketsToPay);		 
+  	}
 
 	//장바구니 추가
-	public void addToBasket(Integer productId, String userName, int quantity) {
-		Optional<ProductEntity> pop = productRepository.findById(productId);
-		UserEntity ue = userService.findByUserName(userName);
-		BasketEntity be = BasketEntity.builder()
-				.product(pop.get())
-				.user(ue)
-				.quantity(quantity)
-				.build();
-		basketRepository.save(be);        
-	}
-
-	//장바구니 현황_로그인유저에 대한 BasketEntity
-	public List<BasketEntity> userBasket(String userName) {
-		UserEntity ue = this.userService.findByUserName(userName);
-		List<BasketEntity> userBasket = ue.getBasketList(); // 유저의 장바구니 리스트
-		return userBasket;
-	}  	
+  	public void addToBasket(Integer productId, String userName, int quantity) {
+  		Optional<ProductEntity> pop = this.productRepository.findById(productId);
+  		UserEntity ue = this.userService.findByUserName(userName);
+  		BasketEntity be = BasketEntity.builder()
+  				.product(pop.get())
+  				.user(ue)
+  				.quantity(quantity)
+  				.build();
+  		basketRepository.save(be);		
+  		}
+  	
+  //장바구니 현황_로그인유저에 대한 BasketEntity
+  	public List<BasketEntity> userBasket(String userName) {
+  		UserEntity ue = this.userService.findByUserName(userName);
+  		List<BasketEntity> userBasket = ue.getBasketList(); // 유저의 장바구니 리스트
+  	    return userBasket;
+  	}  	
 
 	//찜♥ 추가
 	public void addToWish(Integer productId, String userName) {
