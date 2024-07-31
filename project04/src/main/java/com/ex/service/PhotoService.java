@@ -20,7 +20,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class PhotoService {
- 
+  
     private final ProductThumbnailRepository productThumbnailRepository;
     private final ProductImgRepository productImgRepository;
 
