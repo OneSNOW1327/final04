@@ -85,12 +85,15 @@
             <p class="text-muted">가격: <span th:text="|${productDTO.sellPrice}원|">가격</span></p>
             <p class="text-danger">할인가: <span th:text="|${productDTO.sellPrice - (productDTO.sellPrice * (productDTO.discount / 100))}원|">할인가</span></p>
             <p class="text-info">할인률: <span th:text="|${productDTO.discount}%|">할인률</span></p>
-            <!-- 수정 버튼 추가 -->
+            <!-- 수정 및 삭제 버튼 추가 -->
             <a th:href="@{/product/writeForm(id=${productDTO.id})}" class="btn btn-warning mt-2">수정</a>
+            <form th:action="@{/product/delete/{id}(id=${productDTO.id})}" method="post" style="display: inline;">
+                <button type="submit" class="btn btn-danger mt-2">삭제</button>
+            </form>
         </div>
     </div>
     
-        <form th:action="@{|/product/basketAdd|}" method="post">
+    <form th:action="@{|/product/basketAdd|}" method="post">
         <input type="hidden" name="productId" th:value="${productDTO.id}">
         <label th:text="수량"></label>
         <input type="number" name="quantity" min="1" value="1">

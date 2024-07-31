@@ -17,7 +17,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
 @Service
 @RequiredArgsConstructor
 public class PhotoService {
@@ -78,6 +77,7 @@ public class PhotoService {
         List<PhotoDTO> photoDTOList = new ArrayList<>();
         for (ProductThumbnailEntity thumbnail : thumbnails) {
             photoDTOList.add(new PhotoDTO(
+                    thumbnail.getId(),
                     thumbnail.getOrgname(),
                     thumbnail.getSysname(),
                     "/file/display?filename=thumbnails/" + thumbnail.getSysname()
@@ -91,6 +91,7 @@ public class PhotoService {
         List<PhotoDTO> photoDTOList = new ArrayList<>();
         for (ProductImgEntity image : descriptionImages) {
             photoDTOList.add(new PhotoDTO(
+                    image.getId(),
                     image.getOrgname(),
                     image.getSysname(),
                     "/file/display?filename=descriptions/" + image.getSysname()
@@ -99,25 +100,40 @@ public class PhotoService {
         return photoDTOList;
     }
 
-    public void deleteThumbnails(List<Integer> thumbnailIds) {
-        for (Integer id : thumbnailIds) {
-            ProductThumbnailEntity thumbnail = productThumbnailRepository.findById(id).orElseThrow(() -> new RuntimeException("Thumbnail not found"));
-            File file = new File(THUMBNAIL_DIR + thumbnail.getSysname());
-            if (file.exists()) {
-                file.delete();
-            }
-            productThumbnailRepository.deleteById(id);
+    public void deleteThumbnail(Integer id) {
+        ProductThumbnailEntity thumbnail = productThumbnailRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Thumbnail not found"));
+        File file = new File(THUMBNAIL_DIR + thumbnail.getSysname());
+        if (file.exists()) {
+            file.delete();
+        }
+        productThumbnailRepository.deleteById(id);
+    }
+
+    public void deleteDescriptionImage(Integer id) {
+        ProductImgEntity descriptionImage = productImgRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Description image not found"));
+        File file = new File(DESCRIPTION_DIR + descriptionImage.getSysname());
+        if (file.exists()) {
+            file.delete();
+        }
+        productImgRepository.deleteById(id);
+    }
+
+    public void deleteThumbnails(List<Integer> ids) {
+        for (Integer id : ids) {
+            deleteThumbnail(id);
         }
     }
 
-    public void deleteDescriptionImages(List<Integer> descriptionImageIds) {
-        for (Integer id : descriptionImageIds) {
-            ProductImgEntity descriptionImage = productImgRepository.findById(id).orElseThrow(() -> new RuntimeException("Description image not found"));
-            File file = new File(DESCRIPTION_DIR + descriptionImage.getSysname());
-            if (file.exists()) {
-                file.delete();
-            }
-            productImgRepository.deleteById(id);
+    public void deleteDescriptionImages(List<Integer> ids) {
+        for (Integer id : ids) {
+            deleteDescriptionImage(id);
         }
+    }
+    
+    public List<ProductThumbnailEntity> findSysname(Integer id){
+    	List<ProductThumbnailEntity> pes = productThumbnailRepository.findByProductIdOrderByIdAsc(id);
+    	return pes;
     }
 }

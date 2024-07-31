@@ -24,43 +24,45 @@ import lombok.NoArgsConstructor;
 public class ProductDTO {
     
     private Integer id;
-    private ProducttypeEntity type; //상품타입
+    private ProducttypeEntity type; // 상품 타입
     
     private List<ReviewEntity> review; // 리뷰
     
-    private List<ProductImgEntity> detail; // 상품이미지
+    private List<ProductImgEntity> detail; // 상품 이미지
     
-    private List<ProductThumbnailEntity> thumbnail; //썸네일
+    private List<ProductThumbnailEntity> thumbnail; // 썸네일
     
-    private List<OrderlistEntity> orderlist; // 주문내역
+    private List<OrderlistEntity> orderlist; // 주문 내역
     
     private List<BasketEntity> basketlist; // 장바구니
     
-    private List<UserEntity> wishUser; //유저의 위시리스트
+    private List<UserEntity> wishUser; // 유저의 위시리스트
 
-    private List<SalesVolumeEntity> salesVolume; //판매량ID
+    private List<SalesVolumeEntity> salesVolume; // 판매량 ID
 
-    private String name; //상품명
+    private String name; // 상품명
 
-    private String description; //상품설명
+    private String description; // 상품 설명
 
     private double discount; // 할인률
 
-    private int purchasePrice; // 매입가
+    private int buyPrice; // 매입가
 
-    private int sellPrice; //판매가
+    private int sellPrice; // 판매가
 
-    private int stock; //잔량
+    private int stock; // 잔량
 
-    private LocalDateTime registrationDate; //상품등록일자
+    private LocalDateTime registrationDate; // 상품 등록 일자
 
-    private String orderEmail; //주문메일
+    private String orderEmail; // 주문 메일
 
     // 추가된 필드들
-    private int buyPrice; // 구매 금액
+    private int purchasePrice; // 구매 금액
 
     private int typeId; // 상품 유형 ID
     
-    private List<PhotoDTO> thumbnailPaths;//사진주소
-    private List<PhotoDTO> descriptionImagePaths;//사진주소
+    private List<PhotoDTO> thumbnailPaths; // 썸네일 이미지 경로
+    private List<PhotoDTO> descriptionImagePaths; // 설명 이미지 경로
+
+
 }

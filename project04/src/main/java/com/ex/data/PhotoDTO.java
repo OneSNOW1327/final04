@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class PhotoDTO {
+    private Integer id;
     private String orgname;
     private String sysname;
     private String filePath;

@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -13,8 +15,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.ex.entity.ProductThumbnailEntity;
+import com.ex.service.PhotoService;
 import com.ex.service.ProductService;
 
 import lombok.RequiredArgsConstructor;
@@ -24,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 public class MainController {
 	
 	private final ProductService productService;
+	private final PhotoService photoService;
 	
     @GetMapping("/main")
     public String mainPage(Model model) {    	
@@ -65,4 +71,14 @@ public class MainController {
  	      // 파일 리소스와 200 OK 상태 코드를 포함한 ResponseEntity 객체를 반환 / 이래야 브라우저에서 다운로드및 이미지 출려이 가능하다.
  	      return new ResponseEntity<Resource>(resource, header, HttpStatus.OK);
  	   }
+ 	
+    @GetMapping("/file/list/{id}")
+    public ResponseEntity<List<String>> getImageList(@PathVariable("id") Integer id) {
+        List<String> imageList = photoService.findSysname(id)
+                .stream()
+                .map(ProductThumbnailEntity::getSysname)
+                .collect(Collectors.toList());
+        return new ResponseEntity<>(imageList, HttpStatus.OK);
+    }
+	
 }
