@@ -178,10 +178,10 @@ public class ProductService {
 					CriteriaQuery<?> query,
 					//쿼리실행
 					CriteriaBuilder criteriaBuilder) {
-				//중복제거
-				query.distinct(true);
-				Join<ProductEntity, ProducttypeEntity> u1 = root.join("type", JoinType.LEFT);
-				return criteriaBuilder.or(criteriaBuilder.like(root.get("name"), "%"+kw+"%"),
+					//중복제거
+					query.distinct(true); 
+					Join<ProductEntity, ProducttypeEntity> u1 = root.join("type", JoinType.LEFT);
+					return criteriaBuilder.or(criteriaBuilder.like(root.get("name"), "%"+kw+"%"),
 						criteriaBuilder.like(root.get("description"), "%"+kw+"%"),
 						criteriaBuilder.like(u1.get("typename"), "%"+kw+"%"));
 			}

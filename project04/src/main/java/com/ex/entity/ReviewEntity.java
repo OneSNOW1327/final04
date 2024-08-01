@@ -38,4 +38,6 @@ public class ReviewEntity {
 	@ManyToMany
 	private Set<UserEntity> voter;
 	
+	private String content;
+	
 }
