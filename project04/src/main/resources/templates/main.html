@@ -1,26 +1,29 @@
 <!DOCTYPE html> 
 <html layout:decorate="~{layout}">
-    <div class="container my-3" layout:fragment="content">
-        <div class="container mt-5">
-            <h1>메인 페이지</h1>
-            <h2 sec:authorize="isAuthenticated()" sec:authentication="name"></h2>
-            <a class="btn btn-black d-flex align-items-center justify-content-center text-center" 
-                th:href="@{/user/login}" sec:authorize="isAnonymous()" style="font-size:23px;">로그인
-            </a>
-            <a class="btn btn-black d-flex align-items-center justify-content-center text-center" 
-                th:href="@{/user/logout}" sec:authorize="isAuthenticated()" style="font-size:23px;">로그아웃
-            </a>
-            <a class="btn btn-black d-flex align-items-center justify-content-center text-center" 
-                th:href="@{/product/basketList}" sec:authorize="isAuthenticated()" style="font-size:23px;">장바구니
-            </a>
-            <a class="btn btn-black d-flex align-items-center justify-content-center text-center" 
-                th:href="@{/product/writeForm}"  style="font-size:23px;">제품등록
-            </a>
-        </div>
- 
-     <div th:each="product,loop : ${productDTO}">
-        <a th:text="${product.name}" th:href="@{|/product/detail/${product.id}|}"></a>
-    </div>
-     
-    </div>
+	<div class="container my-3" layout:fragment="content" style="max-width:1600px;">
+		<div class="container mt-5">
+			<div class=" d-flex justify-content-center">
+			<div>
+			<h1>메인 페이지</h1>
+			 <h2 sec:authorize="isAuthenticated()" sec:authentication="name" class="text-center"></h2>
+			 </div>
+			 </div>
+			 <div class="d-flex justify-content-end">
+			 <a class="btn btn-black d-flex align-items-center justify-content-center text-center" 
+			 	th:href="@{/user/login}" sec:authorize="isAnonymous()" style="font-size:23px;">로그인
+			 </a>
+			 <a class="btn btn-black d-flex align-items-center justify-content-center text-center" 
+			 	th:href="@{/user/logout}" sec:authorize="isAuthenticated()" style="font-size:23px;">로그아웃
+			 </a>
+			 <a class="btn btn-black d-flex align-items-center justify-content-center text-center" 
+			 	th:href="@{/product/basketList}" sec:authorize="isAuthenticated()" style="font-size:23px;">장바구니
+			 </a>
+			 </div>
+		</div>
+		<div class="text-align">
+		<div th:each="type : ${typeList}">
+			<a th:text="${type.typename}" th:href="@{|/product/list/${type.id}|}" class="btn btn-primary my-1"></a>
+		</div>
+		</div>
+	</div>
 </html>

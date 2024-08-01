@@ -1,112 +1,103 @@
 <!DOCTYPE html>
-<html layout:decorate="~{layout}">
-
-<head>
-	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-	<script type="text/javascript">
-		$(document).ready(function() {
-			let imageList = [];
-			let currentIndex = 0;
-
-			function fetchImageList() {
-				const numElement = document.getElementById("num");
-				if (!numElement) {
-					console.error("Element with id 'num' not found");
-					return;
-				}
-				$.ajax({
-					url: "/file/list/" + numElement.value,
-					success: function(data) {
-						imageList = data;
-						if (imageList.length > 0) {
-							displayNextImage();
-						}
-					}
-				});
-			}
-
-			function displayNextImage() {
-				if (imageList.length > 0) {
-					let imageUrl = '/file/display?folder=thumbnails&filename=' + imageList[currentIndex] + '&' + new Date().getTime();
-					$("#images").attr("src", imageUrl);
-					currentIndex = (currentIndex + 1) % imageList.length;
-				}
-			}
-
-			setInterval(displayNextImage, 2000); // 2초마다 이미지 변경
-			fetchImageList();
-
-			// 페이지 링크 클릭 이벤트 등록
-			$('.page-link').click(function() {
-				let page = $(this).data('page');
-				$('#page').val(page);
-				$('#listNumber').submit();
-			});
-		});
-	</script>
-	<link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
-</head>
-
-<body>
+<html lang="ko" layout:decorate="~{layout}">
 	<div class="container my-3" layout:fragment="content">
-		<div class="row justify-content-start" style="max-width: 2200px;">
-			<div class="text-center col-md-3" th:if="${productList != null}" th:each="product, loop : ${productList}">
-				<!-- 이미지_썸네일  List<PhotoEntity> photo -->
-				<div th:onclick="|location.href='@{|/product/detail/${product.id}|}'|" style="width: 400px; height: 250px;">
-					<div>
-						<img id="images" src="" alt="Product Image" class="img-fluid" style="max-width: auto;">
+		<div class="row justify-content-start" style="width: 1400px;">
+			<div class="text-center d-flex flex-wrap m-2 btn btn-outline-dark justify-content-center" th:if="${productList != null}" th:each="product, loop : ${productList}">
+				<div th:data-num="${product.id}" class="product-container" style="width: 250px; height: 200px;" th:onclick="|location.href='@{|/product/detail/${product.id}|}'|">
+					<div class="image-container  text-center" style="height:150px;">
+						<img th:if="${product.thumbnail.size() > 0}" th:id="|images_${product.id}|" src="" alt="Product Image" class="pt-1 img-fluid" style="max-width: 150px; max-height: 150px;">
 					</div>
-
-					<!-- 상품명  String productName -->
 					<div class="text-center">
 						<span th:text="${product.name}" class="text-dark link-offset-2 link-underline link-underline-opacity-0"></span>
 						<div>
 							<span th:if="${product.discount == 0}" th:text="${#numbers.formatDecimal(product.sellPrice, 0, 'COMMA', 3, 'POINT').replace('.000', '')} + '원'"></span>
-							<span th:unless="${product.discount != 0}" th:text="${#numbers.formatDecimal(product.sellPrice * product.discount, 0, 'COMMA', 3, 'POINT').replace('.000', '')} + '원'"></span>
+							<span th:unless="${product.discount == 0}" th:text="${#numbers.formatDecimal(product.sellPrice * product.discount, 0, 'COMMA', 3, 'POINT').replace('.000', '')} + '원'"></span>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-
-		<!-- 페이징처리 -->
+		
 		<div th:if="${!productList.isEmpty()}">
-
-		<ul class="pagination justify-content-center">
-			<li class="page-item" th:classappend="${!productList.hasPrevious}?'disabled'">
-				<a class="page-link text-dark" href="javascript:void(0)" 	th:data-page="1" aria-label="Previous">
-					<span aria-hidden="true">&laquo;</span>
-				</a>
-			</li>
-			<li class="page-item" th:classappend="${!productList.hasPrevious}?'disabled'">
-				<a class="page-link text-dark" href="javascript:void(0)" th:data-page="${productList.number}" aria-label="Previous">
-					<span	aria-hidden="true" th:text="'<'"></span>
-				</a>
-			</li>
-			<li class="page-item"
-				th:each="page : ${#numbers.sequence(1,productList.totalPages)}"
-				th:if="${page >= productList.number-4 and page <= productList.number+6}"
-				th:classappend="${page == productList.number+1} ? 'disabled'">
-				<a class="page-link text-dark" href="javascript:void(0)" th:data-page="${page}" th:text="${page}"></a>
-			</li>
-			<li class="page-item" th:classappend="${!productList.hasNext}?'disabled'">
-				<a class="page-link text-dark" href="javascript:void(0)" th:data-page="${productList.number+2}" aria-label="Next">
-					<span aria-hidden="true" th:text="'>'"></span>
-				</a>
-			</li>
-			<li class="page-item" th:classappend="${!productList.hasNext}?'disabled'">
-				<a class="page-link text-dark" href="javascript:void(0)" th:data-page="${productList.totalPages}" aria-label="Next">
-					<span aria-hidden="true">&raquo;</span>
-				</a>
-			</li>
-		</ul>
-	
+			<ul class="pagination justify-content-center">
+				<li class="page-item" th:classappend="${!productList.hasPrevious}?'disabled'">
+					<a class="page-link text-dark" href="javascript:void(0)" th:data-page="1" aria-label="Previous">
+						<span aria-hidden="true">&laquo;</span>
+					</a>
+				</li>
+				<li class="page-item" th:classappend="${!productList.hasPrevious}?'disabled'">
+					<a class="page-link text-dark" href="javascript:void(0)" th:data-page="${productList.number}" aria-label="Previous">
+						<span aria-hidden="true" th:text="'<'"></span>
+					</a>
+				</li>
+				<li class="page-item" th:each="page : ${#numbers.sequence(1,productList.totalPages)}" th:if="${page >= productList.number-4 and page <= productList.number+6}" th:classappend="${page == productList.number+1} ? 'disabled'">
+					<a class="page-link text-dark" href="javascript:void(0)" th:data-page="${page}" th:text="${page}"></a>
+				</li>
+				<li class="page-item" th:classappend="${!productList.hasNext}?'disabled'">
+					<a class="page-link text-dark" href="javascript:void(0)" th:data-page="${productList.number+2}" aria-label="Next">
+						<span aria-hidden="true" th:text="'>'"></span>
+					</a>
+				</li>
+				<li class="page-item" th:classappend="${!productList.hasNext}?'disabled'">
+					<a class="page-link text-dark" href="javascript:void(0)" th:data-page="${productList.totalPages}" aria-label="Next">
+						<span aria-hidden="true">&raquo;</span>
+					</a>
+				</li>
+			</ul>
 		</div>
-
+		
 		<form th:action="@{|/product/list/${productType}|}" method="get" id="listNumber">
 			<input type="hidden" id="page" name="page" th:value="${productList.number}" th:if="${productList != null}">
 		</form>
-		
 	</div>
-</body>
+
+	<th:block layout:fragment="script">
+		<script type="text/javascript">
+			$(document).ready(function() {
+				let imageLists = {};
+				
+				function fetchImageList(num) {
+					$.ajax({
+						url: "/file/list/" + num,
+						success: function(data) {
+							console.log("Fetched image list for product " + num, data);
+							imageLists[num] = {
+								list: data,
+								index: 0
+							};
+							if (data.length > 0) {
+								displayNextImage(num);
+							}
+						},
+						error: function(err) {
+							console.error("Error fetching image list for product " + num, err);
+						}
+					});
+				}
+				
+				function displayNextImage(num) {
+					if (imageLists[num] && imageLists[num].list.length > 0) {
+						let currentImageList = imageLists[num];
+						let imageUrl = '/file/display?folder=thumbnails&filename=' + currentImageList.list[currentImageList.index] + '&' + new Date().getTime();
+						$("#images_" + num).attr("src", imageUrl);
+						currentImageList.index = (currentImageList.index + 1) % currentImageList.list.length;
+					}
+				}
+				
+				$('.product-container').each(function() {
+					let num = $(this).data('num');
+					if (num) {
+						fetchImageList(num);
+						setInterval(() => displayNextImage(num), 2000); // 2초마다 이미지 변경
+					}
+				});
+
+				$('.page-link').click(function() {
+					let page = $(this).data('page');
+					$('#page').val(page);
+					$('#listNumber').submit();
+				});
+			});
+		</script>
+	</th:block>
 </html>

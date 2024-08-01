@@ -50,9 +50,11 @@ public class ProductService {
 	public List<ProductEntity> allProduct() {
 		return productRepository.findAll();
 	}
+	
 	public List<ProducttypeEntity> getAllProductTypes() {
 		return producttypeRepository.findAll();
 	}
+	
 	@Transactional
 	public Integer createOrUpdate(ProductDTO productDTO, MultipartFile[] thumbnails, MultipartFile[] descriptionImages, List<Integer> deleteThumbnailIds, List<Integer> deleteDescriptionImageIds) throws IOException {
 		Optional<ProducttypeEntity> optionalProductType = producttypeRepository.findById(productDTO.getTypeId());
@@ -150,17 +152,17 @@ public class ProductService {
 		productRepository.deleteById(id);
 	}
 
-	//통합검색 페이징 처리
-	public Page<ProductEntity> productAll(int page, String kw){
+	//0801 성진
+	public Page<ProductEntity> productSearch(int page, String kw){
 		//Sort.Order DB 쿼리 결과를 ★특정 필드★를 기준으로 정렬
 		List<Sort.Order> sorts = new ArrayList<>();
-		// ★특정 필드★:registrationDate 기준 내림차순
-		sorts.add(Sort.Order.desc("registrationDate"));
+		// ★특정 필드★:제품 타입별 정렬
+		sorts.add(Sort.Order.asc("type_id"));
 		/*search(kw): kw에 대한 Specification 객체를 생성
 		 생성된 Specification 객체는 ProductEntity의 특정 필드가 검색 키워드를 포함하는지 여부를 확인하는 쿼리를 생성*/
 		Specification<ProductEntity> spec = search(kw);		      				
 		//.findAll() 데이터베이스에서 특정 엔티티 타입의 모든 레코드를 반환
-		return productRepository.findAll(spec, PageRequest.of(page,10,Sort.by(sorts)));
+		return productRepository.findAll(spec, PageRequest.of(page,12,Sort.by(sorts)));
 	}
 
 	//통합검색	__통합검색 페이징 처리에서 사용
@@ -168,6 +170,7 @@ public class ProductService {
 		Optional<ProductEntity> pop = productRepository.findById(productId);
 		UserEntity ue = userService.findByUserName(userName);
 	}
+	
 	//검색 키워드에 해당하는 ProductEntity를 찾는 데 필요한 검색 조건을 설정
 	private Specification<ProductEntity> search(String kw){
 		return new Specification<>() {

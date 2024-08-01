@@ -103,14 +103,15 @@ public class ProductController {
 		return "productList";
 	}
 
+	//0801 성진추가
 	@PostMapping("search")
-	public String search(@PathVariable("id")Integer id,@RequestParam(value="kw", defaultValue="") String kw, 
-			@RequestParam(value="page", defaultValue="1")  int page, Model model) {			
-		model.addAttribute("productList", productService.productAll(page-1, kw));
-		model.addAttribute("nowTime",LocalDateTime.now());
+	public String search(@RequestParam(value="kw", defaultValue="") String kw, Model model,
+										@RequestParam(value="page", defaultValue="1")  int page) {			
+		model.addAttribute("productList", productService.productSearch(page-1, kw));
+		model.addAttribute("kw",kw);
 		return "productSearch";
 	}
-
+	
 	//♣가은♣장바구니담기 버튼 눌렀을때 
 		@PostMapping("/basketAdd")
 		public String addToBasket(Principal principal,
