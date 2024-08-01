@@ -1,44 +1,99 @@
 <!DOCTYPE html>
-<html layout:decorate="~{layout}">
+<html xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+    <title>결제페이지</title>
+    
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var size = document.getElementById('size').value;
+        var sumSellPrice = 0; // 원가
+        var sumDiscount = 0; // 할인금액
+        var sumPayprice = 0; // 할인적용금액
+        for (var i = 0; i < size; i++) {
+        	sumSellPrice += parseFloat(document.getElementById('sellPrice_' + i).value) || 0;
+        	sumDiscount += parseFloat(document.getElementById('discount_' + i).value) || 0;
+        }
+        document.getElementById('sellPrice').value = sumSellPrice;
+        document.getElementById('discount').value = sumDiscount;
+        document.getElementById('payPrice').value = sumSellPrice - sumDiscount;
+    });
+    </script>
+    
+</head>
+<body>
     <div class="container my-3" layout:fragment="content">
+        <h1>주문서 작성</h1>
 
-<h1>결제</h1>
+        <h4>주문상품</h4>
+        <span th:text="'주문상품 (' + ${#lists.size(expectPay)} + ')'"></span>
+        <input type="hidden" th:value="${#lists.size(expectPay)}" id="size">
+        <table>
+            <tr>
+                <th> 상품사진 </th>
+                <th> 상품명 </th>
+                <th> 원가 </th>
+                <th> 할인금액 </th>
+                <th> 할인적용금액 </th>
+                <th> 수량 </th>
+            </tr>
+            <tr th:each="basketPay,loop : ${expectPay}">
+                <td><img th:src="|/file/display?folder=thumbnails&filename=${basketPay.product.thumbnail[0].sysname}|" style="max-width: 50px;"></td>
+                <td><!-- 상품명 -->
+                	<input th:id="|name_${loop.index}|" type="text" readonly 
+	                th:value="${basketPay.product.name}" />
+                </td>
+                <td><!-- 원가 -->
+                    <input th:id="|sellPrice_${loop.index}|" type="text" readonly 
+	                th:value="${basketPay.product.sellPrice}" />
+                </td>
+                <td><!-- 할인금액 -->
+                    <input th:id="|discount_${loop.index}|" type="text" readonly 
+	                th:value="${basketPay.product.sellPrice * (basketPay.product.discount / 100)}" />
+	            </td>
+                <td><!-- 할인적용금액 -->
+	                <input th:id="|payPrice_${loop.index}|" type="text" readonly 
+	                th:value="${basketPay.product.sellPrice * (1 - basketPay.product.discount / 100)}" />
+                </td>              
+                <td><!-- 수량 -->
+                    <input th:id="|quantity_${loop.index}|" type="text" readonly 
+	                th:value="${basketPay.quantity}" />
+                </td>
+            </tr>
+        </table>
+        <hr>
+        
+        <h4>배송지 정보</h4>
+        <input type="checkbox" id="sameDelivery"><span> 주문자 정보와 동일</span>
+        <table>
+            <tr>
+                <th>이름</th>
+                <td><input type="text" name="realName"></td>
+            </tr>
+            <tr>
+                <th>전화번호</th>
+                <td><input type="text" name="phone"></td>
+            </tr>
+            <tr>
+                <th>주소</th>
+                <td><input type="text" name="adress"></td>
+            </tr>
+            <tr>
+                <th>배송메모</th>
+                <td><input type="text" name="memo"></td>
+            </tr>
+        </table>
+        <hr>
 
-<h3>주문상품<spanth:text="'('+'${#lists.size(selectedProducts)}'+')'">상품개수표시</span></h3>
-	<tr>
-		<th>상품사진</th>
-		<th>상품명</th>
-		<th>할인가</th>
-		<th>수량</th>
-	</tr>
-	
-	<tr th:each=" basketPay : ${expectPay}">
-			<td><img th:src="|/file/display?folder=thumbnails&filename=${basketPay.product.thumbnail[0].sysname}|" style="max-width: 50px;"></td>
-			<td th:text="${basketPay.product.name}">상품명</td>
-			<td th:text="${basketPay.product.sellPrice*(1-basketPay.product.discount/100)}">할인가</td>
-			<td th:text="${basketPay.quantity}">수량</td>
-	</tr>
+        <span>원가 </span><input id="sellPrice" readonly type="text"><span> - </span>
+        <span>할인금액</span><input id="discount" readonly type="text"><span> = </span>
+        <span>할인적용금액</span><input id="payPrice" readonly type="text">
 
-<h3>주문서 작성</h3>
-	<span>주문자 정보</span>
-
-
-	<span>배송 정보</span>
-		<th>이름</th>
-		<td><input type="text" name="realName"></td><br>
-		<th>전화번호</th>
-		<td><input type="text" name="phone"></td><br>
-		<th>주소</th>
-		<td><input type="text" name="adress"></td><br>
-		<th>배송메모</th>
-		<td><input type="text" name="memo"></td>
-		
-	<span>결제금액</span>
-		총상품금액
-		배송료
-		총할인금액
-		총 결제금액
-		
-	<span>결제수단</span>
-</div>
+        <hr>
+        <h4>결제 방법 선택</h4>
+    </div>
+</body>
 </html>
+
+<script>
+
+</script>

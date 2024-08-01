@@ -8,7 +8,7 @@
 <tbody>
 
 <div>
-<input type="checkbox" id="selectAll">전체상품 선택
+<input type="checkbox" id="selectAll"><span>전체상품 선택</span>
 <!-- 선택상품 장바구니 삭제  -->
 <form id="removeBasket" action="/product/removeBasket" method="post"> 
 	<input type="hidden" id="removeSelected" name="removeSelected"> <!-- 숨겨진 필드, 선택된 장바구니 항목 저장 -->
@@ -40,8 +40,12 @@
 <!-- 선택상품 결제 페이지로 제출 -->
 <form id="basketForm" action="/product/paymentPage" method="post"> 
 	<input type="hidden" id="selectProduct" name="selectProduct"> <!-- 숨겨진 필드, 선택된 장바구니 항목 저장 -->
-	<button type="submit">주문하기</button> 	
+	<button type="submit">선택상품주문하기</button> 	
 </form>
+<!-- 전체상품 결제 페이지로 제출 -->
+<button id="allOrderButton" type="button">전체상품주문하기</button>
+
+
 <a href="/main" type="submit">쇼핑계속하기</a>
 </tbody>
 </div>
@@ -62,6 +66,19 @@ document.getElementById('basketForm').addEventListener('submit', function(event)
     const selectedValues = Array.from(checkboxes).map(cb => cb.value); // 각 체크박스의 값을 추출하여 배열로 만듭니다.
     document.getElementById('selectProduct').value = selectedValues.join(','); // 배열을 콤마로 구분된 문자열로 변환하여 히든 필드에 설정합니다.
     this.submit(); // 폼을 다시 제출합니다.
+});
+
+//전체 상품 주문 버튼 클릭 시 전체 선택 후 제출
+document.getElementById('allOrderButton').addEventListener('click', function() {
+    // 전체 상품 선택
+    const checkboxes = document.querySelectorAll('.basket-check');
+    checkboxes.forEach(cb => cb.checked = true);
+    
+    // 선택된 상품을 결제 페이지로 제출
+    const basketForm = document.getElementById('basketForm');
+    const allValues = Array.from(checkboxes).map(cb => cb.value);
+    document.getElementById('selectProduct').value = allValues.join(',');
+    basketForm.submit();
 });
 
 //"선택 삭제"
