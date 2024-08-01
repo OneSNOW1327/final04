@@ -33,7 +33,7 @@ public class MainController {
  
 	@GetMapping("/main")
 	public String mainPage(Model model) {    	
-		model.addAttribute("productDTO", productService.allProduct());
+		model.addAttribute("typeList", productService.getAllProductTypes());
 		return "main";
 	}
 
