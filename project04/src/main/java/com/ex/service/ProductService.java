@@ -196,21 +196,21 @@ public class ProductService {
 		sorts.add(Sort.Order.desc("registrationDate"));
 		return productRepository.findByTypeId(id, PageRequest.of(page,12,Sort.by(sorts)));
 	}
-
-	//장바구니 선택상품 삭제
+	
+//(가은) 장바구니 현황_로그인유저에 대한 BasketEntity
+  	public List<BasketEntity> userBasket(String userName) {
+  		UserEntity ue = this.userService.findByUserName(userName);
+  		List<BasketEntity> userBasket = ue.getBasketList(); // 유저의 장바구니 리스트
+  	    return userBasket;
+  	}
+//(가은) 장바구니 선택상품 삭제
 	@Transactional//데이터베이스 작업의 원자성, 일관성, 격리성, 내구성을 보장하기 위해 사용
 	public void removeSelectedBaskets(List<Integer> basketIds) {
 		List<BasketEntity> basketsToRemove = basketRepository.findAllById(basketIds);
 		basketRepository.deleteAll(basketsToRemove);
 	}
-
-	//결제페이지 결제예정 상품리스트
-  	public List<BasketEntity> expectPay(List<Integer> basketIds) {  		
-  		List<BasketEntity> basketsToPay = basketRepository.findAllById(basketIds);         		
-		 return basketRepository.saveAll(basketsToPay);		 
-  	}
-
-	//장바구니 추가
+	
+//(가은) 장바구니 추가
   	public void addToBasket(Integer productId, String userName, int quantity) {
   		Optional<ProductEntity> pop = this.productRepository.findById(productId);
   		UserEntity ue = this.userService.findByUserName(userName);
@@ -222,14 +222,25 @@ public class ProductService {
   		basketRepository.save(be);		
   		}
   	
-  //장바구니 현황_로그인유저에 대한 BasketEntity
-  	public List<BasketEntity> userBasket(String userName) {
-  		UserEntity ue = this.userService.findByUserName(userName);
-  		List<BasketEntity> userBasket = ue.getBasketList(); // 유저의 장바구니 리스트
-  	    return userBasket;
-  	}  	
+//(가은) 장바구니 수량 변경 ♣0802♣
+  	public void updateQuantity(int basketIds,int quantity) {
+  		Optional<BasketEntity> bop = basketRepository.findById(basketIds);
+  		BasketEntity basketEntity= bop.get();
+  		basketEntity.setQuantity(quantity);
+  		basketRepository.save(basketEntity);
+  	}
+  	
+//(가은) 결제페이지 결제예정 상품리스트
+  	public List<BasketEntity> expectPay(List<Integer> basketIds) {  		
+  		List<BasketEntity> basketsToPay = basketRepository.findAllById(basketIds);         		
+		 return basketRepository.saveAll(basketsToPay);		 
+  	}
 
-	//찜♥ 추가
+
+  	
+  	
+
+//(가은) 찜♥ 추가
 	public void addToWish(Integer productId, String userName) {
 		Optional<ProductEntity> pop = this.productRepository.findById(productId);
 		Optional<UserEntity> uop = this.userRepository.findByUsername(userName);

@@ -2,98 +2,130 @@
 <html xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout" layout:decorate="~{layout}">
 <head>
     <title>결제페이지</title>
-    
-    <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        var size = document.getElementById('size').value;
-        var sumSellPrice = 0; // 원가
-        var sumDiscount = 0; // 할인금액
-        var sumPayprice = 0; // 할인적용금액
-        for (var i = 0; i < size; i++) {
-        	sumSellPrice += parseFloat(document.getElementById('sellPrice_' + i).value) || 0;
-        	sumDiscount += parseFloat(document.getElementById('discount_' + i).value) || 0;
-        }
-        document.getElementById('sellPrice').value = sumSellPrice;
-        document.getElementById('discount').value = sumDiscount;
-        document.getElementById('payPrice').value = sumSellPrice - sumDiscount;
-    });
-    </script>
-    
 </head>
 <body>
     <div class="container my-3" layout:fragment="content">
         <h1>주문서 작성</h1>
-
-        <h4>주문상품</h4>
-        <span th:text="'주문상품 (' + ${#lists.size(expectPay)} + ')'"></span>
-        <input type="hidden" th:value="${#lists.size(expectPay)}" id="size">
-        <table>
-            <tr>
-                <th> 상품사진 </th>
-                <th> 상품명 </th>
-                <th> 원가 </th>
-                <th> 할인금액 </th>
-                <th> 할인적용금액 </th>
-                <th> 수량 </th>
-            </tr>
-            <tr th:each="basketPay,loop : ${expectPay}">
-                <td><img th:src="|/file/display?folder=thumbnails&filename=${basketPay.product.thumbnail[0].sysname}|" style="max-width: 50px;"></td>
-                <td><!-- 상품명 -->
-                	<input th:id="|name_${loop.index}|" type="text" readonly 
-	                th:value="${basketPay.product.name}" />
-                </td>
-                <td><!-- 원가 -->
-                    <input th:id="|sellPrice_${loop.index}|" type="text" readonly 
-	                th:value="${basketPay.product.sellPrice}" />
-                </td>
-                <td><!-- 할인금액 -->
-                    <input th:id="|discount_${loop.index}|" type="text" readonly 
-	                th:value="${basketPay.product.sellPrice * (basketPay.product.discount / 100)}" />
-	            </td>
-                <td><!-- 할인적용금액 -->
-	                <input th:id="|payPrice_${loop.index}|" type="text" readonly 
-	                th:value="${basketPay.product.sellPrice * (1 - basketPay.product.discount / 100)}" />
-                </td>              
-                <td><!-- 수량 -->
-                    <input th:id="|quantity_${loop.index}|" type="text" readonly 
-	                th:value="${basketPay.quantity}" />
-                </td>
-            </tr>
-        </table>
-        <hr>
-        
-        <h4>배송지 정보</h4>
-        <input type="checkbox" id="sameDelivery"><span> 주문자 정보와 동일</span>
-        <table>
-            <tr>
-                <th>이름</th>
-                <td><input type="text" name="realName"></td>
-            </tr>
-            <tr>
-                <th>전화번호</th>
-                <td><input type="text" name="phone"></td>
-            </tr>
-            <tr>
-                <th>주소</th>
-                <td><input type="text" name="adress"></td>
-            </tr>
-            <tr>
-                <th>배송메모</th>
-                <td><input type="text" name="memo"></td>
-            </tr>
-        </table>
-        <hr>
-
-        <span>원가 </span><input id="sellPrice" readonly type="text"><span> - </span>
-        <span>할인금액</span><input id="discount" readonly type="text"><span> = </span>
-        <span>할인적용금액</span><input id="payPrice" readonly type="text">
-
-        <hr>
-        <h4>결제 방법 선택</h4>
+        <form id="paymentForm" action="/product/requestPay" method="post">
+            <h4>주문상품</h4>
+            <span th:text="'주문상품 (' + ${#lists.size(expectPay)} + ')'"></span>
+            <input type="hidden" th:value="${#lists.size(expectPay)}" id="size">
+            <table>
+                <tr>
+                    <th>상품사진</th>
+                    <th>상품명</th>
+                    <th>원가</th>
+                    <th>할인금액</th>
+                    <th>할인적용금액</th>
+                    <th>수량</th>
+                </tr>
+                <tr th:each="basketPay,loop : ${expectPay}">
+                    <td><img th:src="|/file/display?folder=thumbnails&filename=${basketPay.product.thumbnail[0].sysname}|" style="max-width: 50px;"></td>
+                    <td><input th:id="|name_${loop.index}|" type="text" name="products[${loop.index}].name" readonly th:value="${basketPay.product.name}" /></td>
+                    <td><input th:id="|sellPrice_${loop.index}|" type="text" name="products[${loop.index}].sellPrice" readonly th:value="${basketPay.product.sellPrice}" /></td>
+                    <td><input th:id="|discount_${loop.index}|" type="text" name="products[${loop.index}].discount" readonly th:value="${basketPay.product.sellPrice * (basketPay.product.discount / 100)}" /></td>
+                    <td><input th:id="|payPrice_${loop.index}|" type="text" name="products[${loop.index}].payPrice" readonly th:value="${basketPay.product.sellPrice * (1 - basketPay.product.discount / 100)}" /></td>
+                    <td><input th:id="|quantity_${loop.index}|" type="text" name="products[${loop.index}].quantity" readonly th:value="${basketPay.quantity}" /></td>
+                    <input type="hidden" name="basketId" th:value="${basketPay.id}">
+                </tr>
+            </table>
+            <hr>
+            <h4>배송지 정보</h4>
+            <input type="checkbox" id="sameDelivery"><span> 주문자 정보와 동일</span>
+            <table>
+                <tr>
+                    <th>이름</th>
+                    <td><input type="text" id="realName" name="delivery.realName"></td>
+                </tr>
+                <tr>
+                    <th>전화번호</th>
+                    <td><input type="text" id="phone" name="delivery.phone"></td>
+                </tr>
+                <tr>
+                    <th>주소</th>
+                    <td><input type="text" id="adress" name="delivery.address"></td>
+                </tr>
+                <tr>
+                    <th>배송메모</th>
+                    <td><input type="text" name="delivery.memo"></td>
+                </tr>
+            </table>
+            <div th:each="user,loop : ${principalUser}">
+                <input th:id="userName" type="hidden" th:value="${user.realName}" />
+                <input th:id="userPhone" type="hidden" th:value="${user.phone}" />
+                <input th:id="userAdress" type="hidden" th:value="${user.adress}" />
+            </div>
+            <hr>
+            <span>원가 </span><input id="sellPrice" readonly type="text"><span> - </span>
+            <span>할인금액</span><input id="discount" readonly type="text"><span> = </span>
+            <span>총 결제금액</span><input id="payPrice" readonly type="text">
+            <hr>
+            <h4>결제 방법 선택</h4>
+            <select name="paymentOption">
+                <option value="bankTransfer">무통장입금</option>
+                <option value="creditCard">신용카드</option>
+                <option value="kakaoPay">카카오페이</option>
+            </select>
+            <br>
+            <input type="button" value="결제하기" onclick="submitForm()">
+        </form>
     </div>
+
+
 </body>
 </html>
 
-<script>
+    <script>
+ 
+            // 금액 총합 계산
+            var size = document.getElementById('size').value;
+            var sumSellPrice = 0;
+            var sumDiscount = 0;
+            for (var i = 0; i < size; i++) {
+                sumSellPrice += parseFloat(document.getElementById('sellPrice_' + i).value) || 0;
+                sumDiscount += parseFloat(document.getElementById('discount_' + i).value) || 0;
+            }
+            document.getElementById('sellPrice').value = sumSellPrice;
+            document.getElementById('discount').value = sumDiscount;
+            document.getElementById('payPrice').value = sumSellPrice - sumDiscount;
 
-</script>
+            // 배송지정보_주문자정보와 동일 체크
+            var sameDeliveryCheckbox = document.getElementById('sameDelivery');
+            sameDeliveryCheckbox.addEventListener('change', function() {
+                var realNameInput = document.getElementById('realName');
+                var phoneInput = document.getElementById('phone');
+                var adressInput = document.getElementById('adress');
+
+                var userName = document.getElementById('userName').value;
+                var userPhone = document.getElementById('userPhone').value;
+                var userAdress = document.getElementById('userAdress').value;
+
+                if (this.checked) {
+                    realNameInput.value = userName;
+                    phoneInput.value = userPhone;
+                    adressInput.value = userAdress;
+                } else {
+                    realNameInput.value = '';
+                    phoneInput.value = '';
+                    adressInput.value = '';
+                }
+            });
+            //
+            function submitForm() {
+                const basketIds = [];
+                document.querySelectorAll('input[name="basketId"]').forEach(input => {
+                    basketIds.push(input.value);
+                });
+
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'basketIds';
+                hiddenInput.value = basketIds.join(',');
+
+                const form = document.getElementById('orderForm');
+                form.appendChild(hiddenInput);
+
+                form.submit();
+            }
+
+    </script>

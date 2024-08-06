@@ -1,93 +1,106 @@
 <!DOCTYPE html>
 <html layout:decorate="~{layout}">
     <div class="container my-3" layout:fragment="content">
+        <h1>장바구니</h1>
+        <thead>
+        </thead>
+        <tbody>
+            <div>
+                <input type="checkbox" id="selectAll"><span>전체상품 선택</span>
+                <!-- 선택상품 장바구니 삭제  -->
+                <form id="removeBasket" action="/product/removeBasket" method="post"> 
+                    <input type="hidden" id="removeSelected" name="removeSelected"> <!-- 숨겨진 필드, 선택된 장바구니 항목 저장 -->
+                    <button type="submit">선택 삭제</button> 
+                </form>
+            </div> 
 
-<h1>장바구니</h1>
-<thead>
-</thead> 
-<tbody>
+            <table border="1">
+                <tr>
+                    <th>선택</th> 
+                    <th>상품사진</th>
+                    <th>상품명</th>
+                    <th>판매가</th>
+                    <th>수량</th>
+                </tr>
+                <tr th:each=" basket,loop : ${userBasket}">
+                    <td><input th:id="|id_${loop.index}|" type="checkbox" class="basket-check" name="check" th:value="${basket.id}"/></td>
+                    <td><img th:src="|/file/display?folder=thumbnails&filename=${basket.product.thumbnail[0].sysname}|" style="max-width: 100px;"></td>
+                    <td  th:text="${basket.product.name}">상품명</td>
+                    <td class="price" th:text="${basket.product.sellPrice*(1-basket.product.discount/100)}">할인가</td>
+                    <td><!-- 수량 -->
+                        <input th:data-basketId="${basket.id}" class="quantity" type="number" th:value="${basket.quantity}" min="1" />
+                        
+                    </td>
+                </tr>
+            </table>
 
-<div>
-<input type="checkbox" id="selectAll"><span>전체상품 선택</span>
-<!-- 선택상품 장바구니 삭제  -->
-<form id="removeBasket" action="/product/removeBasket" method="post"> 
-	<input type="hidden" id="removeSelected" name="removeSelected"> <!-- 숨겨진 필드, 선택된 장바구니 항목 저장 -->
-	<button type="submit">선택 삭제</button> 
-</form>
-</div> 
+            <h5>
+                <p id="totalQuantity">선택한 상품 0개</p>
+                <p id="totalPrice">결제예정금액: 0원</p>
+            </h5><br>
+            
+            <!-- 상품수량변경시 --> 
+            <form id="quantityForm" action="/product/updateQuantity" method="post" style="display:none;">
+   				<input type="hidden" id="updatedBasketId" name="updatedBasketId"> <!-- 수량 변경된 장바구니 항목 ID 저장 -->
+                <input type="hidden" id="updatedQuantity" name="updatedQuantity"> <!-- 변경된 수량 저장 -->
+			</form>
+			
+            <!-- 선택상품 결제 페이지로 제출 -->
+            <form id="basketForm" action="/product/paymentPage" method="post"> 
+                <input type="hidden" id="selectProduct" name="selectProduct"> <!-- 숨겨진 필드, 선택된 장바구니 항목 저장 -->
+                <button type="submit">선택상품주문하기</button> 	
+            </form>
+            
+            <!-- 전체상품 결제 페이지로 제출 -->
+            <button id="allOrderButton" type="button">전체상품주문하기</button>
 
-<table>
-<tr>
-	<th>선택</th> 
-	<th>상품사진</th>
-	<th>상품명</th>
-	<th>판매가</th>
-	<th>수량</th>
-</tr>
-<tr th:each=" basket : ${userBasket}">
-		<td><input type="checkbox" class="basket-check" name="check" th:value="${basket.id}"/></td>
-		<td><img th:src="|/file/display?folder=thumbnails&filename=${basket.product.thumbnail[0].sysname}|" style="max-width: 100px;"></td>
-		<td th:text="${basket.product.name}">상품명</td>
-		<td class="price" th:text="${basket.product.sellPrice*(1-basket.product.discount/100)}">할인가</td>
-		<td class="quantity" th:text="${basket.quantity}">수량</td><br>
-</tr>
-
-</table>
-
-<h5><p id="totalQuantity">선택한 상품 0개</p>
-<p id="totalPrice">결제예정금액:  0</p></h5><br>
-
-<!-- 선택상품 결제 페이지로 제출 -->
-<form id="basketForm" action="/product/paymentPage" method="post"> 
-	<input type="hidden" id="selectProduct" name="selectProduct"> <!-- 숨겨진 필드, 선택된 장바구니 항목 저장 -->
-	<button type="submit">선택상품주문하기</button> 	
-</form>
-<!-- 전체상품 결제 페이지로 제출 -->
-<button id="allOrderButton" type="button">전체상품주문하기</button>
-
-
-<a href="/main" type="submit">쇼핑계속하기</a>
-</tbody>
-</div>
+            <a href="/main" type="submit">쇼핑계속하기</a>
+        </tbody>
+    </div>
 </html>
 
 <script>
-//"전체상품 선택" 체크박스
+// "전체상품 선택" 체크박스
 document.getElementById('selectAll').addEventListener('change', function() {
-    const checkboxes = document.querySelectorAll('.basket-check'); // "basket-check" 각각의 상품에 대한 체크박스
-    checkboxes.forEach(cb => cb.checked = this.checked); // "전체상품 선택" 체크박스의 체크 상태를 각 상품의 체크박스에 적용
-    updateTotals(); // 선택 상태가 변경될 때 총합 업데이트
-});
-
-//선택한 제품만 결제 페이지로 보내기
-document.getElementById('basketForm').addEventListener('submit', function(event) {
-    event.preventDefault(); // 기본 폼 제출 동작을 막습니다.
-    const checkboxes = document.querySelectorAll('.basket-check:checked'); // 선택된 체크박스들을 모두 선택합니다.
-    const selectedValues = Array.from(checkboxes).map(cb => cb.value); // 각 체크박스의 값을 추출하여 배열로 만듭니다.
-    document.getElementById('selectProduct').value = selectedValues.join(','); // 배열을 콤마로 구분된 문자열로 변환하여 히든 필드에 설정합니다.
-    this.submit(); // 폼을 다시 제출합니다.
-});
-
-//전체 상품 주문 버튼 클릭 시 전체 선택 후 제출
-document.getElementById('allOrderButton').addEventListener('click', function() {
-    // 전체 상품 선택
     const checkboxes = document.querySelectorAll('.basket-check');
-    checkboxes.forEach(cb => cb.checked = true);
-    
-    // 선택된 상품을 결제 페이지로 제출
+    checkboxes.forEach(cb => cb.checked = this.checked);
+    updateTotals();
+});
+
+// 선택한 제품만 결제 페이지로 보내기
+document.getElementById('basketForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const checkboxes = document.querySelectorAll('.basket-check:checked');
+    if (checkboxes.length > 0) {
+        const selectedValues = Array.from(checkboxes).map(cb => cb.value);
+        document.getElementById('selectProduct').value = selectedValues.join(',');
+        this.submit();
+    } else {
+        alert('선택된 상품이 없습니다.');
+    }
+});
+
+// 전체 상품 주문 버튼 클릭 시 전체 선택 후 제출
+document.getElementById('allOrderButton').addEventListener('click', function() {
+    const checkboxes = document.querySelectorAll('.basket-check');
+    checkboxes.forEach(cb => cb.checked = true);    
     const basketForm = document.getElementById('basketForm');
     const allValues = Array.from(checkboxes).map(cb => cb.value);
     document.getElementById('selectProduct').value = allValues.join(',');
     basketForm.submit();
 });
 
-//"선택 삭제"
+// "선택 삭제"
 document.getElementById('removeBasket').addEventListener('submit', function(event) {
-    event.preventDefault(); // 기본 폼 제출 동작을 막습니다.
-    const checkboxes = document.querySelectorAll('.basket-check:checked'); // 체크된 체크박스들을 모두 선택
-    const selectedValues = Array.from(checkboxes).map(cb => cb.value); // 각 체크박스의 값을 추출하여 배열로 만듭니다.
-    document.getElementById('removeSelected').value = selectedValues.join(','); // 배열을 콤마로 구분된 문자열로 변환하여 히든 필드에 설정합니다.
-    this.submit(); // 폼을 다시 제출합니다.
+    event.preventDefault();
+    const checkboxes = document.querySelectorAll('.basket-check:checked');
+    if (checkboxes.length > 0) {
+        const selectedValues = Array.from(checkboxes).map(cb => cb.value);
+        document.getElementById('removeSelected').value = selectedValues.join(',');
+        this.submit();
+    } else {
+        alert('선택된 상품이 없습니다.');
+    }
 });
 
 // 총합 업데이트 함수
@@ -97,10 +110,8 @@ function updateTotals() {
     let totalPrice = 0;
     checkboxes.forEach(cb => {
         const row = cb.parentNode.parentNode;
-        const quantityText = row.querySelector('.quantity').textContent.replace('수량 ', '').trim();
-        const priceText = row.querySelector('.price').textContent.trim();
-        const quantity = parseInt(quantityText, 10);
-        const price = parseFloat(priceText);
+        const quantity = parseInt(row.querySelector('.quantity').value, 10);
+        const price = parseFloat(row.querySelector('.price').textContent.trim());
         if (!isNaN(quantity) && !isNaN(price)) {
             totalQuantity += quantity;
             totalPrice += quantity * price;
@@ -110,13 +121,30 @@ function updateTotals() {
     document.getElementById('totalPrice').textContent = '결제예정금액: ' + totalPrice.toLocaleString() + '원';
 }
 
-// 체크박스 변경 시 총합 업데이트
-document.querySelectorAll('.basket-check').forEach(cb => {
-    cb.addEventListener('change', updateTotals);
+//수량 변경 시 폼 제출 및 총합 업데이트
+document.querySelectorAll('.quantity').forEach(input => {
+    input.addEventListener('change', function() {
+        const basketId = this.getAttribute('data-basketId');
+        const updatedQuantity = this.value;
+
+        // 폼에 값 설정
+        document.getElementById('updatedBasketId').value = basketId;
+        document.getElementById('updatedQuantity').value = updatedQuantity;
+
+        // 폼 제출
+        document.getElementById('quantityForm').submit();
+        
+        // 총합 업데이트
+        updateTotals();
+    });
 });
 
-// 페이지 로드 시 초기 총합 계산
-window.addEventListener('load', updateTotals);
+//페이지 로드 시 초기 총합 계산 및 체크박스 선택
+window.addEventListener('load', function() {
+    // 모든 체크박스 선택
+    document.getElementById('selectAll').checked = true;
+    const checkboxes = document.querySelectorAll('.basket-check');
+    checkboxes.forEach(cb => cb.checked = true);
+    updateTotals();
+});
 </script>
-
-<!-- ★★결제 완료 상품 장바구니에서 삭제★★ -->

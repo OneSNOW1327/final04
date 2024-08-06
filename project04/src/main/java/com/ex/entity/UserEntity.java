@@ -60,5 +60,8 @@ public class UserEntity {
     
     @OneToMany(mappedBy = "user", cascade=CascadeType.REMOVE)
     private List<OrderlistEntity> orderlist; //주문내역, 결제
+    
+    @OneToMany(mappedBy = "user", cascade=CascadeType.REMOVE)
+    private List<DeliveryEntity> delivery; //배송상태
 
 }
