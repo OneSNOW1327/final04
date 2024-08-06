@@ -128,6 +128,7 @@ public class ProductService {
 					.stock(pe.getStock())
 					.registrationDate(pe.getRegistrationDate())
 					.orderEmail(pe.getOrderEmail())
+					.review(pe.getReview())
 					.build();
 			return productDTO;
 		} else {

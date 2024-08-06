@@ -100,7 +100,7 @@ public class ProductController {
 		return "redirect:/main";
 	}
 
-	@GetMapping("list/{id}")
+	@GetMapping("/list/{id}")
 	public String list(@PathVariable("id")Integer id,Model model,
 			@RequestParam(value="page", defaultValue="1")  int page) {			
 		model.addAttribute("productList", productService.typeList(id, page-1));
@@ -109,7 +109,7 @@ public class ProductController {
 	}
 
 //0801 성진추가
-	@PostMapping("search")
+	@PostMapping("/search")
 	public String search(@RequestParam(value="kw", defaultValue="") String kw, Model model,
 										@RequestParam(value="page", defaultValue="1")  int page) {			
 		model.addAttribute("productList", productService.productSearch(page-1, kw));
