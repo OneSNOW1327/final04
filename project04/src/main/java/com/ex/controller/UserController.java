@@ -15,8 +15,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @Controller
 @RequestMapping("/user/*")
@@ -98,4 +100,11 @@ public class UserController {
 	      model.addAttribute("userDTO", userDTO);
 	      return "userinfo";
 	   }
+	   
+	   @GetMapping("/mypage")
+	    public String myPage(@AuthenticationPrincipal UserDetails userDetails, Model model) {
+	        UserEntity user = userService.findByUserName(userDetails.getUsername());
+	        model.addAttribute("user", user);
+	        return "mypage";
+	    }
 }

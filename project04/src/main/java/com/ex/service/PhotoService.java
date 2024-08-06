@@ -4,8 +4,12 @@ import com.ex.data.PhotoDTO;
 import com.ex.entity.ProductEntity;
 import com.ex.entity.ProductImgEntity;
 import com.ex.entity.ProductThumbnailEntity;
+import com.ex.entity.ReviewEntity;
+import com.ex.entity.ReviewImgEntity;
 import com.ex.repository.ProductImgRepository;
 import com.ex.repository.ProductThumbnailRepository;
+import com.ex.repository.ReviewImgRepository;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,9 +27,11 @@ public class PhotoService {
   
     private final ProductThumbnailRepository productThumbnailRepository;
     private final ProductImgRepository productImgRepository;
+    private final ReviewImgRepository reviewImgRepository;
 
     private final String THUMBNAIL_DIR = "F:/img/thumbnails/";
     private final String DESCRIPTION_DIR = "F:/img/descriptions/";
+    private final String REVIEW_DIR = "F:/img/reviews/";
 
     public void saveThumbnails(ProductEntity productEntity, MultipartFile[] thumbnails) throws IOException {
         for (MultipartFile file : thumbnails) {
@@ -51,6 +57,21 @@ public class PhotoService {
                         .sysname(storedFilename)
                         .build();
                 productImgRepository.save(descriptionImage);
+            }
+        }
+    }
+    
+ // <--제성 08/02 사진 저장--> 
+    public void saveReviewImages(ReviewEntity reviewEntity, MultipartFile[] images) throws IOException {
+        for (MultipartFile file : images) {
+            String storedFilename = saveFile(file, REVIEW_DIR);
+            if (storedFilename != null) {
+                ReviewImgEntity reviewImg = ReviewImgEntity.builder()
+                        .review(reviewEntity)
+                        .orgname(file.getOriginalFilename())
+                        .sysname(storedFilename)
+                        .build();
+                reviewImgRepository.save(reviewImg);
             }
         }
     }

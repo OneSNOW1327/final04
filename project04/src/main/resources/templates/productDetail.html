@@ -91,6 +91,28 @@
             </form>
         </div>
     </div>
+    <!-- 리뷰 목록 표시 -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <h3>리뷰 목록</h3>
+            <div th:if="${productDTO.review != null}" th:each="review : ${productDTO.review}" class="p-1">
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${review.writer.username}">작성자</h5>
+                    <p class="card-text" th:text="${review.content}">리뷰 내용</p>
+                    <div th:if="${review.reviewImages != null}" th:each="reviewImg : ${review.reviewImages}">
+                        <img th:src="|/file/display?folder=reviews&filename=${reviewImg.sysname}|" alt="Review Image" class="img-thumbnail" style="max-width: 100px;">
+                    </div>
+                    <p class="text-muted" th:text="${#temporals.format(review.writeDate,'yyyy-MM-dd HH:mm')}">작성 날짜</p>
+                    <!-- 좋아요 버튼 -->
+					<button th:if="${#authentication.name != null}" class="btn btn-sm btn-outline-primary" 
+					        th:attr="onclick='toggleLike(${review.id}, this)'"
+					        th:text="${review.likedUsers.contains(#authentication.principal) ? '좋아요 취소' : '좋아요'}"></button>
+					<p th:if="${#authentication.name == null}" class="text-muted">로그인 후 좋아요를 누를 수 있습니다.</p>
+					<span>좋아요 수: <span id="likecount-[[${review.id}]]" th:text="${review.likecount}">0</span></span>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
@@ -159,6 +181,32 @@
         document.getElementById('mainImage').src = thumbnails[currentIndex].src;
         updateThumbnailSelection();
         scrollToThumbnail();
+    }
+    
+ // 좋아요 토글 함수
+    function toggleLike(reviewId, button) {
+        fetch(`/review/${reviewId}/like`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // 좋아요 수 업데이트
+                document.getElementById(`likecount-${reviewId}`).innerText = data.likecount;
+                // 버튼 텍스트 업데이트
+                button.innerText = data.message;
+            } else {
+                alert(data.message || '좋아요를 처리할 수 없습니다. 나중에 다시 시도해 주세요.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('좋아요를 처리할 수 없습니다. 나중에 다시 시도해 주세요.');
+        });
     }
 </script>
 </html>

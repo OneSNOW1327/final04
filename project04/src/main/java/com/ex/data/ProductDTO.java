@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.ex.entity.BasketEntity;
 import com.ex.entity.OrderlistEntity;
+import com.ex.entity.ProductEntity;
 import com.ex.entity.ProductImgEntity;
 import com.ex.entity.ProductThumbnailEntity;
 import com.ex.entity.ProducttypeEntity;
@@ -63,6 +64,22 @@ public class ProductDTO {
     
     private List<PhotoDTO> thumbnailPaths; // 썸네일 이미지 경로
     private List<PhotoDTO> descriptionImagePaths; // 설명 이미지 경로
+    
+    public static ProductDTO entityToDTO(ProductEntity pe) {
+		return  ProductDTO.builder()
+				.id(pe.getId())
+				.type(pe.getType())
+				.name(pe.getName())
+				.description(pe.getDescription())
+				.discount(pe.getDiscount())
+				.buyPrice(pe.getBuyPrice())
+				.sellPrice(pe.getSellPrice())
+				.stock(pe.getStock())
+				.review(pe.getReview())
+				.registrationDate(pe.getRegistrationDate())
+				.orderEmail(pe.getOrderEmail())
+				.build();
+    }
 
 
 }

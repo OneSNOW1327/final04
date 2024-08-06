@@ -4,8 +4,11 @@ import com.ex.entity.UserEntity;
 import com.ex.service.ReviewService;
 import com.ex.repository.UserRepository;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/review")
@@ -52,5 +56,16 @@ public class ReviewController {
         reviewService.addReviewWithImages(productId, content, principal.getName(), images);
 
         return "redirect:/product/detail/" + productId; // 해당 상품 상세 페이지로 리다이렉트
+    }
+    
+    // 리뷰 좋아요 처리 메서드
+    @PostMapping("/{id}/like")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> likeReview(@PathVariable Integer id, @AuthenticationPrincipal UserDetails userDetails) {
+        Optional<UserEntity> optionalUser = userRepository.findByUsername(userDetails.getUsername());
+        if (optionalUser.isPresent()) {
+            return reviewService.toggleLikeReview(id, optionalUser.get());
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("사용자를 찾을 수 없습니다."); // 사용자 정보가 없을 때
     }
 }
