@@ -5,12 +5,14 @@ import com.ex.entity.ProductEntity;
 import com.ex.entity.ProductImgEntity;
 import com.ex.entity.ProductThumbnailEntity;
 import com.ex.entity.ProducttypeEntity;
+import com.ex.entity.SalesVolumeEntity;
 import com.ex.entity.UserEntity;
 import com.ex.repository.BasketRepository;
 import com.ex.repository.ProductImgRepository;
 import com.ex.repository.ProductRepository;
 import com.ex.repository.ProductThumbnailRepository;
 import com.ex.repository.ProducttypeRepository;
+import com.ex.repository.SalesVolumeRepository;
 import com.ex.repository.UserRepository;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -30,6 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +48,7 @@ public class ProductService {
 	private final ProducttypeRepository producttypeRepository;
 	private final ProductImgRepository productImgRepository;
 	private final ProductThumbnailRepository productThumbnailRepository;
+	private final SalesVolumeRepository salesVolumeRepository;
 	private final PhotoService photoService;
 
 	public List<ProductEntity> allProduct() {
@@ -253,5 +257,51 @@ public class ProductService {
 			}
 		}  		
 	}
+	
+	//0802 성진 테스트
+	public List<SalesVolumeEntity> salesVolume(Integer id) {
+		//상품의 판매기록 검색
+		List<SalesVolumeEntity> sopl = salesVolumeRepository.findByProductIdOrderByRecordDateDesc(id);
+		if(sopl.isEmpty()) {
+			sopl.add(SalesVolumeEntity.builder()
+					.salesPrice(0).salesRate(0)
+					.product(productRepository.findById(id).get())
+					.build());
+		}
+		//없을경우 0을 리턴
+		return sopl;
+	}
+	
+	//0802 성진 테스트
+	public void sales(Integer id, int rate, List<SalesVolumeEntity> svel) {
+		SalesVolumeEntity sve = null;
+		ProductEntity pe = this.productRepository.findById(id).get();
+		// 원래 갯수가 0일경우 새로 db에 등록
+		if(svel.get(0).getSalesRate() == 0) {
+			sve = SalesVolumeEntity.builder()
+					.product(pe)
+					.recordDate(LocalDate.now())
+					.salesRate(rate)
+					.salesPrice((long)(rate*pe.getSellPrice() * (1-pe.getDiscount()/100)))
+					.build();
+		}else{
+			//0이 아닐경우 날짜를 함께 검색하여 검색값이 있을경우 업데이트
+			Optional<SalesVolumeEntity> sop = salesVolumeRepository.findByProductIdAndRecordDate(id, LocalDate.now());
+			if(sop.isPresent()) {
+				sve= sop.get();
+				sve.setSalesRate(rate+sve.getSalesRate());
+				sve.setSalesPrice(svel.get(0).getSalesPrice() + (long)(rate*pe.getSellPrice() * (1-pe.getDiscount()/100)));
+			}else {
+				sve = SalesVolumeEntity.builder()
+						.product(this.productRepository.findById(id).get())
+						.recordDate(LocalDate.now())
+						.salesRate(svel.get(0).getSalesRate() +rate)
+						.salesPrice(svel.get(0).getSalesPrice() + (long)(rate*pe.getSellPrice() * (1-pe.getDiscount()/100)))
+						.build();
+			}
+		}
+		salesVolumeRepository.save(sve);
+	}
+	
 
 }

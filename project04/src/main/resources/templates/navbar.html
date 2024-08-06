@@ -11,6 +11,9 @@
 						<input type="submit" value="검색" class="btn btn-outline-light">
 					</div>
 				</form>
+				<a class="btn btn-dark d-flex align-items-center justify-content-center text-center" 
+					sec:authorize="hasRole('ROLE_ADMIN')" th:href="@{/admin/main}" style="font-size:23px;">관리자
+				</a>
 			</div>
 			<div class="d-flex justify-content-end">
 				<a class="btn btn-dark d-flex align-items-center justify-content-center text-center" th:href="@{/user/userinfo}"

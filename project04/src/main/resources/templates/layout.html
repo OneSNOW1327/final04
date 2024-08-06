@@ -5,7 +5,50 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<title>B N</title>
 	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+	   <style>
+        .product-main-image-container {
+            position: relative;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        .product-main-image {
+            width: 100%;
+            height: auto;
+        }  
+        .thumbnail {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            cursor: pointer;
+        } 
+        .thumbnail.selected {
+            border: 2px solid red;
+        }
+        .description-image {
+            display: block;
+            margin: 0 auto;
+            max-width: 400px;
+        }
+        .nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 24px;
+            color: #fff;
+            background: rgba(0, 0, 0, 0.5);
+            border: none;
+            cursor: pointer;
+            z-index: 1;
+        }
+        .nav-arrow-prev {
+            left: 0;
+        }
+        .nav-arrow-next {
+            right: 0;
+        }
+    </style>
 </head>
+
 <body>
 	<nav th:replace="~{navbar::navbarFragment}"></nav>
 	<th:block layout:fragment="content"></th:block>

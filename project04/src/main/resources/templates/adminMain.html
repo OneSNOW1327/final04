@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout}">
+<head>
+	<meta charset="UTF-8">
+	<title>관리자</title>
+</head>
+<body>
+	<div class="container my-3" layout:fragment="content">
+		
+		<div th:each="type : ${typeList}">
+			<a th:text="${type.typename}" th:href="@{|/admin/type/${type.id}|}" class="btn btn-primary my-1"></a>
+		</div>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	</div>
+</body>

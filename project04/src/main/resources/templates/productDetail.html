@@ -1,55 +1,6 @@
-<!DOCTYPE html> 
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Detail</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        .product-main-image-container {
-            position: relative;
-            max-width: 400px;
-            margin: 0 auto;
-        }
-        .product-main-image {
-            width: 100%;
-            height: auto;
-        }  
-        .thumbnail {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            cursor: pointer;
-        } 
-        .thumbnail.selected {
-            border: 2px solid red;
-        }
-        .description-image {
-            display: block;
-            margin: 0 auto;
-            max-width: 400px;
-        }
-        .nav-arrow {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 24px;
-            color: #fff;
-            background: rgba(0, 0, 0, 0.5);
-            border: none;
-            cursor: pointer;
-            z-index: 1;
-        }
-        .nav-arrow-prev {
-            left: 0;
-        }
-        .nav-arrow-next {
-            right: 0;
-        }
-    </style>
-</head>
-<body>
-<div class="container mt-5">
+<!DOCTYPE html>
+<html lang="ko" layout:decorate="~{layout}">
+<div class="container my-3" layout:fragment="content">
     <div class="row">
         <div class="col-md-6">
             <div class="product-main-image-container">
@@ -210,5 +161,4 @@
         scrollToThumbnail();
     }
 </script>
-</body>
 </html>
