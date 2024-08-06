@@ -30,4 +30,5 @@ public class SalesVolumeEntity {
 	
 	private int salesRate;
 	
+	private long salesPrice;
 }

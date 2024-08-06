@@ -37,7 +37,7 @@ public class UserEntity {
     @Column(nullable = false)
     private String password; // 비밀번호
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email; // 이메일 주소
 
     private String realName;

@@ -120,7 +120,7 @@
         </div>
 
         <div class="text-center mt-4">
-            <button id="submit-button" class="btn btn-primary"  onclick="window.location='/user/register' " disabled>동의하고 회원가입</button>
+            <button id="submit-button" class="btn btn-primary"  onclick="submitForm()" disabled>동의하고 회원가입</button>
         </div>
     </div>
 	</div>
@@ -132,5 +132,14 @@
 	        const checkbox2 = document.getElementById('agreement2');
 	        const submitButton = document.getElementById('submit-button');
 	        submitButton.disabled = !(checkbox1.checked && checkbox2.checked);
+	    }
+	    function submitForm() {
+	        const urlParams = new URLSearchParams(window.location.search);
+	        const email = urlParams.get('email');
+	        if (email) {
+	            window.location.href = `/user/register?email=${encodeURIComponent(email)}`;
+	        } else {
+	            window.location.href = '/user/register';
+	        }
 	    }
 	</script>

@@ -1,15 +1,22 @@
 package com.ex.controller;
 
 import com.ex.data.UserDTO;
+import com.ex.entity.UserEntity;
 import com.ex.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 
 import java.security.Principal;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @Controller
 @RequestMapping("/user/*")
@@ -17,26 +24,37 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
 	private final UserService userService;    
-
+    private final PasswordEncoder passwordEncoder;
+    
 	@GetMapping("login")
 	public String loginPage() {
 		return "login";
 	}
 
 	@GetMapping("register")
-	public String registerPage() {
-		return "register";
+	public String registerPage(@RequestParam(value = "email", required = false) String email, Model model) {
+	    if (email != null && !email.isEmpty()) {
+	        model.addAttribute("email", email);
+	        model.addAttribute("password", "qlalfqjsgh");
+	    }
+	    return "register";
 	}
+
 	@PostMapping("register")
 	public String registerUser( UserDTO userDTO) {
 		this.userService.registerUser(userDTO);
-		return "redirect:/";
+		return "redirect:/user/login";
 	}
 
 	@GetMapping("agreement")
-	public String agreement() {
-		return "agreement";
+	public String agreement(@RequestParam(value = "email", required = false) String email, Model model) {
+	    if (email != null && !email.isEmpty()) {
+	        model.addAttribute("email", email);
+	        model.addAttribute("password", "qlalfqjsgh");
+	    }
+	    return "agreement";
 	}
+
 	
 	@GetMapping("findid")
 	public String findid() {

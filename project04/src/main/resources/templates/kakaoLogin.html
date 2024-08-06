@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+</head>
+<body>
+    <form method="post" th:action="@{/user/login}" id="loginForm">
+        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+        <input type="hidden" id="username" name="username" th:value="${username}" />
+        <input type="hidden" id="password" name="password" th:value="${password}" />
+        <button type="submit" style="display: none;"></button>
+    </form>
+    <script th:inline="javascript">
+        // 자동 로그인 처리
+        window.onload = function() {
+            var username = /*[[${username}]]*/ 'null';
+            var password = /*[[${password}]]*/ 'null';
+
+            if (username !== 'null' && password !== 'null') {
+                document.getElementById('username').value = username;
+                document.getElementById('password').value = password;
+                document.getElementById('loginForm').submit();
+            }
+        }
+    </script>
+</body>
+</html>
