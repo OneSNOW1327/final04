@@ -104,19 +104,28 @@
                     </div>
                     <p class="text-muted" th:text="${#temporals.format(review.writeDate,'yyyy-MM-dd HH:mm')}">작성 날짜</p>
                     <!-- 좋아요 버튼 -->
-					<button th:if="${#authentication.name != null}" class="btn btn-sm btn-outline-primary" 
-					        th:attr="onclick='toggleLike(${review.id}, this)'"
-					        th:text="${review.likedUsers.contains(#authentication.principal) ? '좋아요 취소' : '좋아요'}"></button>
-					<p th:if="${#authentication.name == null}" class="text-muted">로그인 후 좋아요를 누를 수 있습니다.</p>
-					<span>좋아요 수: <span id="likecount-[[${review.id}]]" th:text="${review.likecount}">0</span></span>
-                </div>
-            </div>
-        </div>
+					<div th:if="${#authentication.getPrincipal() != null}">
+						<a href="javascript:void(0)" style="font-size:16px;"  class="recommend btn btn-sm btn-outline-primary" sec:authorize="isAuthenticated()" 
+							th:data-uri="@{|/review/like/${review.id}|}" th:unless="${#lists.contains(review.voter.![username], #authentication.principal.username)}" >
+							추천 <span class="badge rounded-pill bg-primary text-white" th:text="${#lists.size(review.voter)}"></span>
+						</a>
+						<a href="javascript:void(0)" style="font-size:16px;"  class="recommendcancel btn btn-sm btn-outline-primary"  sec:authorize="isAuthenticated()" 
+							th:data-uri="@{|/review/like/${review.id}|}" th:if="${#lists.contains(review.voter.![username], #authentication.principal.username)}">
+							추천 취소 <span class="badge rounded-pill bg-primary text-white" th:text="${#lists.size(review.voter)}"></span>
+						</a>
+					</div>
+					<div sec:authorize="isAnonymous()">
+						<a href="javascript:void(0)" style="font-size:16px;"  class="logincommend btn btn-sm btn-outline-primary" 
+							th:data-uri="@{|/user/login|}" >
+							추천 <span class="badge rounded-pill bg-primary text-white" th:text="${#lists.size(review.voter)}"></span>
+						</a>
+					</div>
+				</div>
+			</div>
+    	</div>
     </div>
 </div>
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<th:block layout:fragment="script">
 <script>
     // 현재 선택된 이미지 인덱스
     let currentIndex = 0;
@@ -182,31 +191,31 @@
         updateThumbnailSelection();
         scrollToThumbnail();
     }
-    
- // 좋아요 토글 함수
-    function toggleLike(reviewId, button) {
-        fetch(`/review/${reviewId}/like`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // 좋아요 수 업데이트
-                document.getElementById(`likecount-${reviewId}`).innerText = data.likecount;
-                // 버튼 텍스트 업데이트
-                button.innerText = data.message;
-            } else {
-                alert(data.message || '좋아요를 처리할 수 없습니다. 나중에 다시 시도해 주세요.');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('좋아요를 처리할 수 없습니다. 나중에 다시 시도해 주세요.');
-        });
-    }
+ // 좋아요 함수
+			const recommend_elements = document.getElementsByClassName("recommend");
+			Array.from(recommend_elements).forEach(function(element){
+				element.addEventListener("click",function(){
+					if(confirm("추천 확인")){
+						location.href=this.dataset.uri;
+					}
+				});
+			});
+			const recommendcancel_elements = document.getElementsByClassName("recommendcancel");
+			Array.from(recommendcancel_elements).forEach(function(element){
+				element.addEventListener("click",function(){
+					if(confirm("추천 취소 확인")){
+						location.href=this.dataset.uri;
+					}
+				});
+			});
+			const logincommend_elements = document.getElementsByClassName("logincommend");
+			Array.from(logincommend_elements).forEach(function(element){
+				element.addEventListener("click",function(){
+					if(confirm("로그인 필요")){
+						location.href=this.dataset.uri;
+					}
+				});
+			});
 </script>
+</th:block>
 </html>

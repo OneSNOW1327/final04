@@ -68,4 +68,13 @@ public class ReviewController {
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("사용자를 찾을 수 없습니다."); // 사용자 정보가 없을 때
     }
+    
+	
+	@GetMapping("/like/{id}")
+	@PreAuthorize("isAuthenticated()")
+	public String voteAnswer(@PathVariable("id") Integer id, Principal principal) {
+		reviewService.likeReview(id, principal.getName());
+		return String.format("redirect:/product/detail/%s", reviewService.findByReviewId(id).getId());
+	}
+	
 }

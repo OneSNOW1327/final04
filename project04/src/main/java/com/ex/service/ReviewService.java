@@ -114,4 +114,20 @@ public class ReviewService {
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("리뷰를 찾을 수 없습니다."); // 리뷰 정보가 없을 때
     }
+    
+    public ProductEntity findByReviewId(Integer id) {
+    	return reviewRepository.findById(id).get().getProduct();
+    }
+    
+	public void likeReview(Integer id, String username) {
+		ReviewEntity re = reviewRepository.findById(id).get();
+		UserEntity ue = userRepository.findByUsername(username).get();
+		if(re.getVoter().contains(ue)) {
+			re.getVoter().remove(ue);
+		}else {
+			re.getVoter().add(ue);			
+		}		
+		reviewRepository.save(re);
+	}
+    
 }
