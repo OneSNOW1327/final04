@@ -1,55 +1,5 @@
 <!DOCTYPE html>
 <html layout:decorate="~{layout}">
-<head>
-    <script>
-        window.onload = function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const emailParam = urlParams.get('email');
-            
-            // 이메일 파라미터가 있으면 이메일 필드와 라벨을 숨기고 읽기 전용으로 설정
-            if (emailParam) {
-                document.getElementById('email').value = emailParam;
-                document.getElementById('email').setAttribute('readonly', true);
-                document.getElementById('email').style.display = 'none';
-                document.getElementById('emailLabel').style.display = 'none'; // 라벨 숨기기
-
-                document.getElementById('password').value = "qlalfqjsgh";
-                document.getElementById('password').setAttribute('readonly', true);
-                document.getElementById('password').style.display = 'none';
-                document.getElementById('passwordLabel').style.display = 'none'; // 라벨 숨기기
-            } else {
-                document.getElementById('email').removeAttribute('readonly');
-                document.getElementById('emailLabel').style.display = 'block'; // 라벨 보이기
-                document.getElementById('passwordLabel').style.display = 'block'; // 라벨 보이기
-            }
-            
-            // 폼 제출 시 전화번호를 올바른 형식으로 변환
-            document.getElementById('registerForm').addEventListener('submit', function(event) {
-                phoneNum();
-                const realName = document.getElementById('realName').value.trim();
-                const username = document.getElementById('username').value.trim();
-                const password = document.getElementById('password').value.trim();
-                const email = document.getElementById('email').value.trim();
-                const adress = document.getElementById('adress').value.trim();
-                const phone = document.getElementById('phone').value.trim();
-                
-                if (!realName || !username || !password || !email || !adress || !phone) {
-                    alert("* 은 필수입력항목입니다.");
-                    event.preventDefault(); // 폼 제출 막기
-                }
-            });
-        };
-
-        function phoneNum() {
-            var phone1 = document.getElementById("phone1").value;
-            var phone2 = document.getElementById("phone2").value;
-            var phone3 = document.getElementById("phone3").value;
-            var phone = phone1 + "-" + phone2 + "-" + phone3;
-            document.getElementById("phone").value = phone;
-        }
-    </script>
-</head>
-<body>
     <div class="container my-3" layout:fragment="content">
         <div class="container">
             <div class="row justify-content-center">
@@ -98,6 +48,56 @@
                 </div>
             </div>
         </div>
-    </div>
-</body>
+
+<th:block layout:fragment="script">
+
+   <script>
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const emailParam = urlParams.get('email');
+            
+            // 이메일 파라미터가 있으면 이메일 필드와 라벨을 숨기고 읽기 전용으로 설정
+            if (emailParam) {
+                document.getElementById('email').value = emailParam;
+                document.getElementById('email').setAttribute('readonly', true);
+                document.getElementById('email').style.display = 'none';
+                document.getElementById('emailLabel').style.display = 'none'; // 라벨 숨기기
+
+                document.getElementById('password').value = "qlalfqjsgh";
+                document.getElementById('password').setAttribute('readonly', true);
+                document.getElementById('password').style.display = 'none';
+                document.getElementById('passwordLabel').style.display = 'none'; // 라벨 숨기기
+            } else {
+                document.getElementById('email').removeAttribute('readonly');
+                document.getElementById('emailLabel').style.display = 'block'; // 라벨 보이기
+                document.getElementById('passwordLabel').style.display = 'block'; // 라벨 보이기
+            }
+            
+            // 폼 제출 시 전화번호를 올바른 형식으로 변환
+            document.getElementById('registerForm').addEventListener('submit', function(event) {
+                phoneNum();
+                const realName = document.getElementById('realName').value.trim();
+                const username = document.getElementById('username').value.trim();
+                const password = document.getElementById('password').value.trim();
+                const email = document.getElementById('email').value.trim();
+                const adress = document.getElementById('adress').value.trim();
+                const phone = document.getElementById('phone').value.trim();
+                
+                if (!realName || !username || !password || !email || !adress || !phone) {
+                    alert("* 은 필수입력항목입니다.");
+                    event.preventDefault(); // 폼 제출 막기
+                }
+            });
+        };
+
+        function phoneNum() {
+            var phone1 = document.getElementById("phone1").value;
+            var phone2 = document.getElementById("phone2").value;
+            var phone3 = document.getElementById("phone3").value;
+            var phone = phone1 + "-" + phone2 + "-" + phone3;
+            document.getElementById("phone").value = phone;
+        }
+    </script>
+    
+</th:block>
 </html>

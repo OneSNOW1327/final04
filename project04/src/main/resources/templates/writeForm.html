@@ -1,36 +1,5 @@
 <!DOCTYPE html>
-<html layout:decorate="~{layout}">
-<head> 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>제품 등록/수정 폼</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        .img-thumbnail {
-            max-width: 100px;
-            margin: 5px;
-            position: relative;
-        }
-        .btn-delete {
-            position: absolute;
-            top: 0;
-            right: 0;
-            background-color: red;
-            color: white;
-            border: none;
-            padding: 2px 5px;
-            cursor: pointer;
-        }  
-    </style>
-    <script>
-        function confirmDelete(event) {
-            if (!confirm("정말로 이 이미지를 삭제하시겠습니까?")) {
-                event.preventDefault();
-            }
-        }
-    </script>
-</head>
-<body>
+<html lang="ko" layout:decorate="~{layout}">
     <div class="container my-3" layout:fragment="content">
         <div class="container mt-5">
             <div class="card shadow">
@@ -138,5 +107,13 @@
             </div>
         </div>
     </div>
-</body>
+<th:block layout:fragment="script">
+    <script>
+        function confirmDelete(event) {
+            if (!confirm("정말로 이 이미지를 삭제하시겠습니까?")) {
+                event.preventDefault();
+            }
+        }
+    </script>
+</th:block>
 </html>
