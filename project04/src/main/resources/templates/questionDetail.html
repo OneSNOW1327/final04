@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>문의 상세</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2 class="mb-4">문의 상세</h2>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">제목: <span th:text="${question.title}"></span></h5>
+                <h6 class="card-subtitle mb-2 text-muted">작성자: <span th:text="${question.username}"></span></h6>
+                <h6 class="card-subtitle mb-2 text-muted">작성 날짜: <span th:text="${#temporals.format(question.createdDate, 'yyyy-MM-dd HH:mm:ss')}"></span></h6>
+                <hr>
+                <p class="card-text"><strong>내용:</strong></p>
+                <p class="card-text" th:text="${question.content}"></p>
+                <hr>
+                <p class="card-text"><strong>답변:</strong></p>
+                <p class="card-text" th:text="${question.answer ?: '답변이 없습니다.'}"></p>
+                <p class="card-text"><strong>답변 날짜:</strong> <span th:text="${#temporals.format(question.answeredDate, 'yyyy-MM-dd HH:mm:ss')}"></span></p>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <h4>답변 작성</h4>
+            <form th:action="@{/question/detail/{id}/answer(id=${question.id})}" method="post">
+                <div class="form-group">
+                    <label for="answer">답변 내용</label>
+                    <textarea class="form-control" id="answer" name="answer" rows="5"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">답변 등록하기</button>
+            </form>
+        </div>
+
+        <div class="mt-4">
+            <a th:href="@{/question/questionList}" class="btn btn-secondary">목록으로 돌아가기</a>
+        </div>
+    </div>
+</body>
+</html>

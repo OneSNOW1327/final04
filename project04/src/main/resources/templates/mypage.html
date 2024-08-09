@@ -18,6 +18,7 @@
                             <p><strong>전화번호:</strong> <span th:text="${user.phone}"></span></p>
                             <p><strong>등급:</strong> <span th:text="${user.grade}"></span></p>
                             <p><strong>포인트:</strong> <span th:text="${user.point}"></span></p>
+                            <a th:href="@{/user/userUpdateForm}" class="btn btn-primary mt-3">회원정보 변경</a>
                         </div>
                     </div>
                 </div>
@@ -28,32 +29,24 @@
                         </div>
                         <div class="card-body">
                             <div th:if="${user.orderlist != null and !#lists.isEmpty(user.orderlist)}">
-								<table class="table table-bordered">
-								    <thead>
-								        <tr>
-								            <th>주문 ID</th>
-								            <th>상품명</th>
-								            <th>주문 날짜</th>
-								            <th>상태</th>
-								        </tr>
-								    </thead>
-								    <tbody>
-								        <tr th:each="delivery : ${user.delivery}" th:if="${user.delivery != null}">
-								            <td colspan="4">
-								                <table class="table table-bordered">
-								                    <tbody>
-								                        <tr th:each="order : ${delivery.orderlist}">
-								                            <td th:text="${order.id}"></td>
-								                            <td th:text="${order.product.name}"></td>
-								                            <td th:text="${#temporals.format(order.orderDate, 'yyyy-MM-dd HH:mm')}"></td>
-								                            <td th:text="${order.status}"></td>
-								                        </tr>
-								                    </tbody>
-								                </table>
-								            </td>
-								        </tr>
-								    </tbody>
-								</table>
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>주문 ID</th>
+                                            <th>상품명</th>
+                                            <th>주문 날짜</th>
+                                            <th>상태</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="order : ${user.orderlist}">
+                                            <td th:text="${order.id}"></td>
+                                            <td th:text="${order.product.name}"></td>
+                                            <td th:text="${#temporals.format(order.orderDate, 'yyyy-MM-dd HH:mm')}"></td>
+                                            <td th:text="${order.status}"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
                             <div th:if="${user.orderlist == null or #lists.isEmpty(user.orderlist)}">
                                 <p>주문 내역이 없습니다.</p>

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -106,5 +107,21 @@ public class UserController {
 	        UserEntity user = userService.findByUserName(userDetails.getUsername());
 	        model.addAttribute("user", user);
 	        return "mypage";
+	    }
+	   
+	   // <-- 제성 회원정보 변경 -->
+	   @GetMapping("/userUpdateForm") // 회원정보 변경 폼 요청
+	    @PreAuthorize("isAuthenticated()") // 인증된 사용자만 접근 가능
+	    public String showUserUpdateForm(Principal principal, Model model) {
+	        UserEntity user = userService.findByUserName(principal.getName()); // 사용자 정보 가져오기
+	        model.addAttribute("user", user); // 사용자 정보 설정
+	        return "userUpdateForm"; // userUpdateForm.html 뷰 반환
+	    }
+
+	    @PostMapping("/update") // 회원정보 변경 처리
+	    @PreAuthorize("isAuthenticated()") // 인증된 사용자만 접근 가능
+	    public String updateUser(UserDTO userDTO, Principal principal) {
+	        userService.updateUser(principal.getName(), userDTO); // 회원정보 변경 로직 실행
+	        return "redirect:/user/mypage"; // 변경 후 마이페이지로 리다이렉트
 	    }
 }

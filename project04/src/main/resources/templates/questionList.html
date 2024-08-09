@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>문의 목록</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2 class="mb-4">문의 목록</h2>
+        <div class="mb-3">
+            <a class="btn btn-primary" th:href="@{/question/create}" th:if="${#authentication.principal != null}">문의 작성하기</a>
+        </div>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>제목</th>
+                    <th>작성자</th>
+                    <th>작성일</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="question : ${questionList}">
+                    <td>
+                        <a th:href="@{/question/detail/{id}(id=${question.id})}" th:text="${question.title}">제목</a>
+                    </td>
+                    <td th:text="${question.username}">작성자</td>
+          		    <td th:text="${#temporals.format(question.createdDate, 'yyyy-MM-dd HH:mm')}"></td>
+                    <td th:if="${question.username == #authentication.name}">
+                        <form th:action="@{/question/delete/{id}(id=${question.id})}" method="post">
+                            <button type="submit" class="btn btn-danger">삭제</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

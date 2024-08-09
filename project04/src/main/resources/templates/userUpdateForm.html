@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원정보 변경</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2 class="mb-4">회원정보 변경</h2>
+        <form th:action="@{/user/update}" method="post">
+            <div class="form-group">
+                <label for="username">아이디</label>
+                <input type="text" class="form-control" id="username" name="username" th:value="${user.username}" readonly>
+            </div>
+            <div class="form-group">
+                <label for="email">이메일</label>
+                <input type="email" class="form-control" id="email" name="email" th:value="${user.email}" readonly>
+            </div>
+            <div class="form-group">
+                <label for="realName">이름</label>
+                <input type="text" class="form-control" id="realName" name="realName" th:value="${user.realName}">
+            </div>
+            <div class="form-group">
+                <label for="adress">주소</label>
+                <input type="text" class="form-control" id="adress" name="adress" th:value="${user.adress}">
+            </div>
+            <div class="form-group">
+                <label for="phone">전화번호</label>
+                <input type="text" class="form-control" id="phone" name="phone" th:value="${user.phone}">
+            </div>
+            <button type="submit" class="btn btn-primary">변경 사항 저장</button>
+        </form>
+    </div>
+</body>
+</html>

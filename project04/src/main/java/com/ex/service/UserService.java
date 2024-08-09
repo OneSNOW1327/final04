@@ -101,5 +101,20 @@ public class UserService{
 	            return null;
 	        }
 	    }
+	    
+	 //  <-- 제성 회원정보 변경 -->
+	    public void updateUser(String username, UserDTO userDTO) {
+	        Optional<UserEntity> op = userRepository.findByUsername(username);
+	        if (op.isPresent()) {
+	            UserEntity user = op.get();
+	            user.setEmail(userDTO.getEmail());
+	            user.setRealName(userDTO.getRealName());
+	            user.setAdress(userDTO.getAdress());
+	            user.setPhone(userDTO.getPhone());
+	            userRepository.save(user);
+	        } else {
+	            throw new RuntimeException("존재하지 않는 사용자입니다.");
+	        }
+	    }
 
 }
