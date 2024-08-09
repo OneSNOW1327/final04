@@ -1,23 +1,84 @@
 <!DOCTYPE html>
 <html layout:decorate="~{layout}">
-<head>
-	<meta charset="UTF-8">
-	<title>관리자</title>
-</head>
-<body>
 	<div class="container my-3" layout:fragment="content">
 		
 		<div th:each="type : ${typeList}">
 			<a th:text="${type.typename}" th:href="@{|/admin/type/${type.id}|}" class="btn btn-primary my-1"></a>
 		</div>
+		<br/>
+		<div>
+			<form th:action="@{/admin/amount}" method="post">
+				<input type="number" name="amount">
+				<select name="reason">
+					<option value="deposit">입금</option>
+					<option  value="withdraw">출금</option>
+				</select>
+				<input type="submit" value="확인">
+			</form>
+		
+		</div>
 	
-	
-	
-	
-	
-	
-	
-	
-	
+	<div th:if="${allAmount!=null}" th:each="total : ${allAmount}">
+		<span th:text="${total.reason}"></span>
+		<span th:text="${total.totalAmount}"></span>
 	</div>
-</body>
+	<br/>
+	<div th:if="${totalSell != null}" th:each="sells : ${totalSell}">
+		<span th:text="${sells.totalAmount}"></span>
+		<span th:text="${sells.recordDate}"></span>
+	</div>
+	
+	<div>
+	<h2>매출액 그래프</h2>
+	<canvas id="amountChart" width="400" height="200"></canvas>
+	</div>
+	<br/>
+	</div>
+	
+<th:block layout:fragment="script">
+<script th:inline="javascript">
+document.addEventListener('DOMContentLoaded', function() {
+
+    const amountList = /*[[${totalSell}]]*/ []; // Thymeleaf에서 JSON 데이터로 변환
+    
+    // 데이터 준비: 날짜별 amount 값 추출
+    const labels = amountList.map(amount => amount.recordDate.split('T')[0]);
+    const data = amountList.map(amount => amount.amount);
+
+    const ctx = document.getElementById('amountChart').getContext('2d');
+    const amountChart = new Chart(ctx, {
+        type: 'bar', // 'line' 또는 다른 차트 유형으로 변경 가능
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Amount',
+                data: data,
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Amount'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Date'
+                    }
+                }
+            }
+        }
+    });
+
+});
+
+</script>
+</th:block>
+</html>

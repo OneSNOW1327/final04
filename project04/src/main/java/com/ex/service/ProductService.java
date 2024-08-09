@@ -1,4 +1,6 @@
 package com.ex.service;
+
+import com.ex.data.AmountDTO;
 import com.ex.data.DeliveryDTO;
 import com.ex.data.ProductDTO;
 import com.ex.entity.BasketEntity;
@@ -42,11 +44,13 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
   
 @Service
 @RequiredArgsConstructor
 public class ProductService {
+
+	private final AdminService adminService;
+	private final PhotoService photoService;
 	private final UserService userService;
 	private final UserRepository userRepository;
 	private final BasketRepository basketRepository;
@@ -55,7 +59,6 @@ public class ProductService {
 	private final ProductImgRepository productImgRepository;
 	private final ProductThumbnailRepository productThumbnailRepository;
 	private final SalesVolumeRepository salesVolumeRepository;
-	private final PhotoService photoService;
 	private final OrderlistRepository orderlistRepository;
 	private final DeliveryRepository deliveryRepository;
 
@@ -124,21 +127,7 @@ public class ProductService {
 	public ProductDTO findById(Integer id) {
 		Optional<ProductEntity> op = productRepository.findById(id);
 		if (op.isPresent()) {
-			ProductEntity pe = op.get();
-			ProductDTO productDTO = ProductDTO.builder()
-					.id(pe.getId())
-					.type(pe.getType())
-					.name(pe.getName())
-					.description(pe.getDescription())
-					.discount(pe.getDiscount())
-					.buyPrice(pe.getBuyPrice())
-					.sellPrice(pe.getSellPrice())
-					.stock(pe.getStock())
-					.registrationDate(pe.getRegistrationDate())
-					.orderEmail(pe.getOrderEmail())
-					.review(pe.getReview())
-					.build();
-			return productDTO;
+			return ProductDTO.entityToDTO(op.get());
 		} else {
 			throw new RuntimeException("Product not found");
 		}
@@ -324,8 +313,8 @@ public class ProductService {
 		}  		
 	}
 	
-	//0802 성진 테스트
-	public List<SalesVolumeEntity> salesVolume(Integer id) {
+	//0808 성진 테스트
+	public List<SalesVolumeEntity> salesVolumeDesc(Integer id) {
 		//상품의 판매기록 검색
 		List<SalesVolumeEntity> sopl = salesVolumeRepository.findByProductIdOrderByRecordDateDesc(id);
 		if(sopl.isEmpty()) {
@@ -339,16 +328,18 @@ public class ProductService {
 	}
 	
 	//0802 성진 테스트
+	//0808 성진 수정
 	public void sales(Integer id, int rate, List<SalesVolumeEntity> svel) {
 		SalesVolumeEntity sve = null;
 		ProductEntity pe = this.productRepository.findById(id).get();
+		long sellprice = (long)(rate*pe.getSellPrice() * (1-pe.getDiscount()/100));
 		// 원래 갯수가 0일경우 새로 db에 등록
 		if(svel.get(0).getSalesRate() == 0) {
 			sve = SalesVolumeEntity.builder()
 					.product(pe)
 					.recordDate(LocalDate.now())
 					.salesRate(rate)
-					.salesPrice((long)(rate*pe.getSellPrice() * (1-pe.getDiscount()/100)))
+					.salesPrice(sellprice)
 					.build();
 		}else{
 			//0이 아닐경우 날짜를 함께 검색하여 검색값이 있을경우 업데이트
@@ -356,16 +347,20 @@ public class ProductService {
 			if(sop.isPresent()) {
 				sve= sop.get();
 				sve.setSalesRate(rate+sve.getSalesRate());
-				sve.setSalesPrice(svel.get(0).getSalesPrice() + (long)(rate*pe.getSellPrice() * (1-pe.getDiscount()/100)));
+				sve.setSalesPrice(svel.get(0).getSalesPrice() + sellprice);
 			}else {
 				sve = SalesVolumeEntity.builder()
 						.product(this.productRepository.findById(id).get())
 						.recordDate(LocalDate.now())
 						.salesRate(svel.get(0).getSalesRate() +rate)
-						.salesPrice(svel.get(0).getSalesPrice() + (long)(rate*pe.getSellPrice() * (1-pe.getDiscount()/100)))
+						.salesPrice(svel.get(0).getSalesPrice() + sellprice)
 						.build();
 			}
 		}
+		AmountDTO amountDTO = adminService.total().get(0);
+		amountDTO.setAmount(sellprice);
+		amountDTO.setReason("sell");
+		adminService.amount(amountDTO, LocalDate.now());
 		salesVolumeRepository.save(sve);
 	}
 	

@@ -11,10 +11,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Data
 @NoArgsConstructor
@@ -31,24 +34,32 @@ public class ProductEntity {
     private ProducttypeEntity type; //상품타입
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
+	@JsonIgnore // 직렬화에서 제외
     private List<ReviewEntity> review; // 리뷰
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
+	@JsonIgnore // 직렬화에서 제외
     private List<ProductImgEntity> detail; // 상품이미지
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
+	@JsonIgnore // 직렬화에서 제외
     private List<ProductThumbnailEntity> thumbnail; //썸네일
     
     @ManyToMany
+	@JsonIgnore // 직렬화에서 제외
     private List<DeliveryEntity> delivery;
 
     @ManyToMany
+	@JsonIgnore // 직렬화에서 제외
     private List<BasketEntity> basketlist; // 장바구니
 
     @ManyToMany
+	@JsonIgnore // 직렬화에서 제외
     private List<UserEntity> wishUser; //유저의 위시리스트
     
     @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
+	@JsonIgnore // 직렬화에서 제외
+	@OrderBy("recordDate ASC")
     private List<SalesVolumeEntity> salesVolume; //판매량ID
 
     private String name; //상품명

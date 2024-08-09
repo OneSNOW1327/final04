@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.ex.entity.BasketEntity;
-import com.ex.entity.OrderlistEntity;
+import com.ex.entity.DeliveryEntity;
 import com.ex.entity.ProductEntity;
 import com.ex.entity.ProductImgEntity;
 import com.ex.entity.ProductThumbnailEntity;
@@ -33,7 +33,7 @@ public class ProductDTO {
     
     private List<ProductThumbnailEntity> thumbnail; // 썸네일
     
-    private List<OrderlistEntity> orderlist; // 주문 내역
+    private List<DeliveryEntity> delivery; // 주문 내역
     
     private List<BasketEntity> basketlist; // 장바구니
     
@@ -78,6 +78,7 @@ public class ProductDTO {
 				.review(pe.getReview())
 				.registrationDate(pe.getRegistrationDate())
 				.orderEmail(pe.getOrderEmail())
+				.salesVolume(pe.getSalesVolume())
 				.build();
     }
 

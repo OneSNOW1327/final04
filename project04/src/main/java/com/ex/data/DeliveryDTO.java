@@ -4,11 +4,8 @@ import java.util.List;
 
 import com.ex.entity.DeliveryEntity;
 import com.ex.entity.OrderlistEntity;
-import com.ex.entity.ProductEntity;
 import com.ex.entity.UserEntity;
 
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

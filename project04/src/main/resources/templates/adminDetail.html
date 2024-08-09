@@ -1,163 +1,248 @@
 <!DOCTYPE html>
 <html lang="ko" layout:decorate="~{layout}">
 	<div class="container my-3" layout:fragment="content">
-    <div class="row">
-        <div class="col-md-6">
-            <div class="product-main-image-container">
-                <!-- 메인 이미지 -->
-                <img id="mainImage" th:src="|/file/display?folder=thumbnails&filename=${productDTO.thumbnailPaths[0].sysname}|" alt="Product Image" class="product-main-image">
-                <!-- 이전 이미지로 이동하는 화살표 버튼 -->
-                <button class="nav-arrow nav-arrow-prev" onclick="changeImage(-1)">&#8249;</button>
-                <!-- 다음 이미지로 이동하는 화살표 버튼 -->
-                <button class="nav-arrow nav-arrow-next" onclick="changeImage(1)">&#8250;</button>
-            </div>
-            <div class="d-flex justify-content-center align-items-center mt-3">
-                <!-- 썸네일 이전 버튼 -->
-                <button onclick="moveThumbnail(-1)" style="border: none; background: none; cursor: pointer;">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="sr-only">Previous</span>
-                </button>
-                <div class="d-flex" id="thumbnailContainer" style="overflow: hidden;">
-                    <!-- 썸네일 이미지들 반복문 -->
-                    <div th:each="img, stat : ${productDTO.thumbnailPaths}" class="p-1">
-                        <img th:src="|/file/display?folder=thumbnails&filename=${img.sysname}|" alt="Thumbnail" class="thumbnail" data-index="[[${stat.index}]]">
-                    </div>
-                </div>
-                <!-- 썸네일 다음 버튼 -->
-                <button onclick="moveThumbnail(1)" style="border: none; background: none; cursor: pointer;">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="sr-only">Next</span>
-                </button>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <!-- 상품 정보 표시 -->
-            <div>
-            <!-- 그래프 들어갈 자리 -->
-            <div th:each="sales : ${salesList}">
-            <div class="d-flex justify-content-start">
-            <p class="">판매량: <span th:text="${sales.salesRate}"></span></p>, &nbsp;
-            <p>날짜: <span th:text="${sales.recordDate}"></span></p>, &nbsp;
-            <p>상품 매출: <span th:text="${sales.salesPrice}"></span></p>
-            </div>
-            </div>
-            <form th:action="@{|/product/sales/${productDTO.id}|}" method="post">
-            <input type="number" name="rate">
-            <input type="submit" value="구매">
-            </form>
-            </div>
-            <div>
-            <h2 th:text="${productDTO.name}">상품명</h2>
-            <p class="text-muted">가격: <span th:text="|${productDTO.sellPrice}원|">가격</span></p>
-            <p class="text-danger">할인가: <span th:text="|${productDTO.sellPrice - (productDTO.sellPrice * (productDTO.discount / 100))}원|">할인가</span></p>
-            <p class="text-info">할인률: <span th:text="|${productDTO.discount}%|">할인률</span></p>
-            <!-- 수정 및 삭제 버튼 추가 -->
-            <a th:href="@{/product/writeForm(id=${productDTO.id})}" class="btn btn-warning mt-2" sec:authorize="hasRole('ROLE_ADMIN')">수정</a>
-            <form th:action="@{/product/delete/{id}(id=${productDTO.id})}" method="post" style="display: inline;">
-                <button type="submit" class="btn btn-danger mt-2">삭제</button>
-            </form>
-            </div>
-        </div>
-    </div>
-    <form th:action="@{|/product/basketAdd|}" method="post">
-        <input type="hidden" name="productId" th:value="${productDTO.id}">
-        <label th:text="수량"></label>
-        <input type="number" name="quantity" min="1" value="1">
-        <input type="submit" value="장바구니"> 
-    </form> 
-    <form th:attr="id='form-' + ${productDTO.id}" th:action="@{|/바로구매/|}" method="post">
-        <input type="hidden" name="productId" th:value="${productDTO.id}">
-        <input type="submit" value="바로구매"> 
-    </form>
-    <form th:attr="id='form-' + ${productDTO.id}" th:action="@{|/찜♥/|}" method="post">
-        <input type="hidden" name="productId" th:value="${productDTO.id}">
-        <input type="submit" value="찜♥"> 
-    </form> 
-    
-    <div class="row mt-5">
-        <div class="col-12">
-            <!-- 상품 상세 이미지 표시 -->
-            <h3>상품 상세 이미지</h3>
-            <div th:each="img : ${productDTO.descriptionImagePaths}">
-                <img th:src="|/file/display?folder=descriptions&filename=${img.sysname}|" class="description-image mb-3">
-            </div>
-        </div>
-    </div>
-    
-     <!-- 리뷰 작성 폼 -->
-    <div class="row mt-5">
-        <div class="col-12">
+		<div class="row">
+			<div class="col-md-6">
+				<div class="product-main-image-container">
+					<!-- 메인 이미지 -->
+					<img id="mainImage" th:src="|/file/display?folder=thumbnails&filename=${productDTO.thumbnailPaths[0].sysname}|" alt="Product Image" class="product-main-image">
+					<!-- 이전 이미지로 이동하는 화살표 버튼 -->
+					<button class="nav-arrow nav-arrow-prev" onclick="changeImage(-1)">&#8249;</button>
+					<!-- 다음 이미지로 이동하는 화살표 버튼 -->
+					<button class="nav-arrow nav-arrow-next" onclick="changeImage(1)">&#8250;</button>
+				</div>
+				<div class="d-flex justify-content-center align-items-center mt-3">
+					<!-- 썸네일 이전 버튼 -->
+					<button onclick="moveThumbnail(-1)" style="border: none; background: none; cursor: pointer;">
+						<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+						<span class="sr-only">Previous</span>
+					</button>
+					<div class="d-flex" id="thumbnailContainer" style="overflow: hidden;">
+						<!-- 썸네일 이미지들 반복문 -->
+						<div th:each="img, stat : ${productDTO.thumbnailPaths}" class="p-1">
+							<img th:src="|/file/display?folder=thumbnails&filename=${img.sysname}|" alt="Thumbnail" class="thumbnail" data-index="[[${stat.index}]]">
+						</div>
+					</div>
+					<!-- 썸네일 다음 버튼 -->
+					<button onclick="moveThumbnail(1)" style="border: none; background: none; cursor: pointer;">
+						<span class="carousel-control-next-icon" aria-hidden="true"></span>
+						<span class="sr-only">Next</span>
+					</button>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<!-- 상품 정보 표시 -->
+				<div>
+					<!-- 그래프 들어갈 자리 -->
+					<h2>판매량 그래프</h2>
+					<canvas id="salesChart" width="400" height="200"></canvas>
+				</div>
+				
+				<div th:each="sales : ${salesList}">
+					<div class="d-flex justify-content-start">
+						<p class="">총 판매량: <span th:text="${sales.salesRate}"></span></p>, &nbsp;
+						<p>날짜: <span th:text="${sales.recordDate}"></span></p>, &nbsp;
+						<p>상품 매출: <span th:text="${sales.salesPrice}"></span></p>
+					</div>
+				</div>
+				
+				<form th:action="@{|/product/sales/${productDTO.id}|}" method="post">
+					<input type="number" name="rate" min="1">
+					<input type="submit" value="구매">
+				</form>
+				
+				<h2 th:text="${productDTO.name}">상품명</h2>
+				<p class="text-muted">가격: <span th:text="|${productDTO.sellPrice}원|">가격</span></p>
+				<p class="text-danger">할인가: <span th:text="|${productDTO.sellPrice - (productDTO.sellPrice * (productDTO.discount / 100))}원|">할인가</span></p>
+				<p class="text-info">할인률: <span th:text="|${productDTO.discount}%|">할인률</span></p>
+				<!-- 수정 및 삭제 버튼 추가 -->
+				<a th:href="@{/product/writeForm(id=${productDTO.id})}" class="btn btn-warning mt-2" sec:authorize="hasRole('ROLE_ADMIN')">수정</a>
+				<form th:action="@{/product/delete/{id}(id=${productDTO.id})}" method="post" style="display: inline;">
+					<button type="submit" class="btn btn-danger mt-2">삭제</button>
+				</form>
+			</div>
+		</div>
+		<form th:action="@{|/product/basketAdd|}" method="post">
+			<input type="hidden" name="productId" th:value="${productDTO.id}">
+			<label th:text="수량"></label>
+			<input type="number" name="quantity" min="1" value="1">
+			<input type="submit" value="장바구니"> 
+		</form> 
+		<form th:attr="id='form-' + ${productDTO.id}" th:action="@{|/바로구매/|}" method="post">
+			<input type="hidden" name="productId" th:value="${productDTO.id}">
+			<input type="submit" value="바로구매"> 
+		</form>
+		<form th:attr="id='form-' + ${productDTO.id}" th:action="@{|/찜♥/|}" method="post">
+			<input type="hidden" name="productId" th:value="${productDTO.id}">
+			<input type="submit" value="찜♥"> 
+		</form> 
+		
+		<div class="row mt-5">
+			<div class="col-12">
+				<!-- 상품 상세 이미지 표시 -->
+				<h3>상품 상세 이미지</h3>
+				<div th:each="img : ${productDTO.descriptionImagePaths}">
+					<img th:src="|/file/display?folder=descriptions&filename=${img.sysname}|" class="description-image mb-3">
+				</div>
+			</div>
+		</div>
+		
+		<div class="row mt-5">
+			<div class="col-12">
+				<h3>리뷰 목록</h3>
+				<div th:if="${productDTO.review != null}" th:each="review : ${productDTO.review}" class="p-1">
+					<div class="card-body">
+						<h5 class="card-title" th:text="${review.writer.username}">작성자</h5>
+						<p class="card-text" th:text="${review.content}">리뷰 내용</p>
+						<div th:if="${review.reviewImages != null}" th:each="reviewImg : ${review.reviewImages}">
+							<img th:src="|/file/display?folder=reviews&filename=${reviewImg.sysname}|" alt="Review Image" class="img-thumbnail" style="max-width: 100px;">
+						</div>
+						<p class="text-muted" th:text="${#temporals.format(review.writeDate,'yyyy-MM-dd HH:mm')}">작성 날짜</p>
+						<!-- 좋아요 버튼 -->
+						<div th:if="${#authentication.getPrincipal() != null}">
+							<a href="javascript:void(0)" style="font-size:16px;"  class="recommend btn btn-sm btn-outline-primary" sec:authorize="isAuthenticated()" 
+								th:data-uri="@{|/review/like/${review.id}|}" th:unless="${#lists.contains(review.voter.![username], #authentication.principal.username)}" >
+								추천 <span class="badge rounded-pill bg-primary text-white" th:text="${#lists.size(review.voter)}"></span>
+							</a>
+							<a href="javascript:void(0)" style="font-size:16px;"  class="recommendcancel btn btn-sm btn-outline-primary"  sec:authorize="isAuthenticated()" 
+								th:data-uri="@{|/review/like/${review.id}|}" th:if="${#lists.contains(review.voter.![username], #authentication.principal.username)}">
+								추천 취소 <span class="badge rounded-pill bg-primary text-white" th:text="${#lists.size(review.voter)}"></span>
+							</a>
+						</div>
+						<div sec:authorize="isAnonymous()">
+							<a href="javascript:void(0)" style="font-size:16px;"  class="logincommend btn btn-sm btn-outline-primary" 
+								th:data-uri="@{|/user/login|}" >
+								추천 <span class="badge rounded-pill bg-primary text-white" th:text="${#lists.size(review.voter)}"></span>
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<th:block layout:fragment="script">
+<script th:inline="javascript">
+	// 현재 선택된 이미지 인덱스
+	let currentIndex = 0;
+	// 썸네일 이미지 요소들
+	let thumbnails = [];
 
-        </div>
-    </div>
-</div>
-<th:block layout:fragment="script">
-<script>
-    // 현재 선택된 이미지 인덱스
-    let currentIndex = 0;
-    // 썸네일 이미지 요소들
-    let thumbnails = [];
+	// 페이지 로드 완료 시 썸네일 이미지 요소들을 배열에 저장하고 이벤트 리스너를 추가
+	document.addEventListener('DOMContentLoaded', function() {
+		thumbnails = [...document.querySelectorAll('.thumbnail')];
+		thumbnails.forEach((thumbnail, index) => {
+			thumbnail.addEventListener('click', function() {
+				selectImage(index);
+			});
+		});
+		updateThumbnailSelection();
+		
+		// Chart.js 데이터 준비 및 생성
+		const salesList = /*[[${productDTO.salesVolume}]]*/ []; // Thymeleaf에서 JSON 데이터로 변환
 
-    // 페이지 로드 완료 시 썸네일 이미지 요소들을 배열에 저장하고 이벤트 리스너를 추가
-    document.addEventListener('DOMContentLoaded', function() {
-        thumbnails = [...document.querySelectorAll('.thumbnail')];
-        thumbnails.forEach((thumbnail, index) => {
-            thumbnail.addEventListener('click', function() {
-                selectImage(index);
-            });
-        });
-        updateThumbnailSelection();
-    });
+		// 데이터 준비: salesRate의 증가량 계산
+		// 날짜를 기준으로 salesList 정렬
+		salesList.sort((a, b) => new Date(a.recordDate) - new Date(b.recordDate));
 
-    // 방향에 따라 메인 이미지를 변경하는 함수
-    function changeImage(direction) {
-        currentIndex = (currentIndex + direction + thumbnails.length) % thumbnails.length;
-        document.getElementById('mainImage').src = thumbnails[currentIndex].src;
-        updateThumbnailSelection();
-        scrollToThumbnail();
-    }
+		const labels = salesList.map(sale => sale.recordDate);
+		const data = [];
 
-    // 썸네일 이미지를 클릭하여 메인 이미지를 변경하는 함수
-    function selectImage(index) {
-        currentIndex = index;
-        document.getElementById('mainImage').src = thumbnails[currentIndex].src;
-        updateThumbnailSelection();
-        scrollToThumbnail();
-    }
+		// 첫 번째 데이터 포인트의 증가량을 0으로 설정하지 않고 그대로 표시
+		for (let i = 0; i < salesList.length; i++) {
+			if (i === 0) {
+				// 첫 번째 날짜의 값은 그대로 사용
+				data.push(salesList[i].salesRate);
+			} else {
+				const previousRate = salesList[i - 1].salesRate;
+				const currentRate = salesList[i].salesRate;
+				const rateChange = currentRate - previousRate;
+				data.push(rateChange);
+			}
+		}
 
-    // 현재 선택된 썸네일에 스타일을 적용하는 함수
-    function updateThumbnailSelection() {
-        thumbnails.forEach((thumbnail, index) => {
-            if (index === currentIndex) {
-                thumbnail.classList.add('selected');
-            } else {
-                thumbnail.classList.remove('selected');
-            }
-        });
-    }
+		const ctx = document.getElementById('salesChart').getContext('2d');
+		const salesChart = new Chart(ctx, {
+			type: 'bar', // 'line' 또는 다른 차트 유형으로 변경 가능
+			data: {
+				labels: labels,
+				datasets: [{
+					label: 'Sales Rate Change',
+					data: data,
+					backgroundColor: 'rgba(75, 192, 192, 0.2)',
+					borderColor: 'rgba(75, 192, 192, 1)',
+					borderWidth: 1
+				}]
+			},
+			options: {
+				scales: {
+					y: {
+						beginAtZero: true,
+						title: {
+							display: true,
+							text: 'Change in Sales Rate'
+						}
+					},
+					x: {
+						title: {
+							display: true,
+							text: 'Date'
+						}
+					}
+				}
+			}
+		});
 
-    // 현재 선택된 썸네일로 스크롤하는 함수
-    function scrollToThumbnail() {
-        const container = document.getElementById('thumbnailContainer');
-        const selectedThumbnail = thumbnails[currentIndex];
-        const containerRect = container.getBoundingClientRect();
-        const thumbnailRect = selectedThumbnail.getBoundingClientRect();
+	});
 
-        if (thumbnailRect.left < containerRect.left) {
-            container.scrollBy({ left: thumbnailRect.left - containerRect.left - container.clientWidth / 2, behavior: 'smooth' });
-        } else if (thumbnailRect.right > containerRect.right) {
-            container.scrollBy({ left: thumbnailRect.right - containerRect.right + container.clientWidth / 2, behavior: 'smooth' });
-        }
-    }
+	// 방향에 따라 메인 이미지를 변경하는 함수
+	function changeImage(direction) {
+		currentIndex = (currentIndex + direction + thumbnails.length) % thumbnails.length;
+		document.getElementById('mainImage').src = thumbnails[currentIndex].src;
+		updateThumbnailSelection();
+		scrollToThumbnail();
+	}
 
-    // 썸네일 이동 함수
-    function moveThumbnail(direction) {
-        currentIndex = (currentIndex + direction + thumbnails.length) % thumbnails.length;
-        document.getElementById('mainImage').src = thumbnails[currentIndex].src;
-        updateThumbnailSelection();
-        scrollToThumbnail();
-    }
-    
+	// 썸네일 이미지를 클릭하여 메인 이미지를 변경하는 함수
+	function selectImage(index) {
+		currentIndex = index;
+		document.getElementById('mainImage').src = thumbnails[currentIndex].src;
+		updateThumbnailSelection();
+		scrollToThumbnail();
+	}
+
+	// 현재 선택된 썸네일에 스타일을 적용하는 함수
+	function updateThumbnailSelection() {
+		thumbnails.forEach((thumbnail, index) => {
+			if (index === currentIndex) {
+				thumbnail.classList.add('selected');
+			} else {
+				thumbnail.classList.remove('selected');
+			}
+		});
+	}
+
+	// 현재 선택된 썸네일로 스크롤하는 함수
+	function scrollToThumbnail() {
+		const container = document.getElementById('thumbnailContainer');
+		const selectedThumbnail = thumbnails[currentIndex];
+		const containerRect = container.getBoundingClientRect();
+		const thumbnailRect = selectedThumbnail.getBoundingClientRect();
+
+		if (thumbnailRect.left < containerRect.left) {
+			container.scrollBy({ left: thumbnailRect.left - containerRect.left - container.clientWidth / 2, behavior: 'smooth' });
+		} else if (thumbnailRect.right > containerRect.right) {
+			container.scrollBy({ left: thumbnailRect.right - containerRect.right + container.clientWidth / 2, behavior: 'smooth' });
+		}
+	}
+
+	// 썸네일 이동 함수
+	function moveThumbnail(direction) {
+		currentIndex = (currentIndex + direction + thumbnails.length) % thumbnails.length;
+		document.getElementById('mainImage').src = thumbnails[currentIndex].src;
+		updateThumbnailSelection();
+		scrollToThumbnail();
+	}
 </script>
-</th:block>
+	</th:block>
+</body>
 </html>

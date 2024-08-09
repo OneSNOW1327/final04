@@ -44,12 +44,8 @@ public class ReviewEntity {
 	
 	private String content;
 	
-	 @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	    private List<ReviewImgEntity> reviewImages; // 리뷰 이미지 리스트 추가
+	@OneToMany(mappedBy = "review", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private List<ReviewImgEntity> reviewImages; // 리뷰 이미지 리스트 추가
 
-	    private int likecount = 0; // 좋아요 수 추가
-
-	    @ManyToMany
-	    private Set<UserEntity> likedUsers; // 좋아요를 누른 사용자들 추가
 	
 }

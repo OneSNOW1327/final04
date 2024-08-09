@@ -2,6 +2,8 @@ package com.ex.entity;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -24,6 +26,7 @@ public class SalesVolumeEntity {
 	private Integer id;
 
 	@ManyToOne
+	@JsonIgnore // 직렬화에서 제외
 	private ProductEntity product;
 	
 	private LocalDate recordDate;
@@ -31,4 +34,5 @@ public class SalesVolumeEntity {
 	private int salesRate;
 	
 	private long salesPrice;
+
 }

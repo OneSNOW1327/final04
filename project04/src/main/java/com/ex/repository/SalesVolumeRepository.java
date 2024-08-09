@@ -15,4 +15,6 @@ public interface SalesVolumeRepository extends JpaRepository<SalesVolumeEntity, 
 	
 	List<SalesVolumeEntity> findByProductIdOrderByRecordDateDesc(Integer productId);
 	
+	List<SalesVolumeEntity> findByProductIdOrderByRecordDateAsc(Integer productId);
+	
 }

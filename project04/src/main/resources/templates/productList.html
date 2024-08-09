@@ -11,7 +11,7 @@
 						<span th:text="${product.name}" class="text-dark link-offset-2 link-underline link-underline-opacity-0"></span>
 						<div>
 							<span th:if="${product.discount == 0}" th:text="${#numbers.formatDecimal(product.sellPrice, 0, 'COMMA', 3, 'POINT').replace('.000', '')} + '원'"></span>
-							<span th:unless="${product.discount == 0}" th:text="${#numbers.formatDecimal(product.sellPrice * product.discount, 0, 'COMMA', 3, 'POINT').replace('.000', '')} + '원'"></span>
+							<span th:unless="${product.discount == 0}" th:text="${#numbers.formatDecimal(product.sellPrice * (100-product.discount)/100, 0, 'COMMA', 3, 'POINT').replace('.000', '')} + '원'"></span>
 						</div>
 					</div>
 				</div>

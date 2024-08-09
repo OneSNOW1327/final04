@@ -5,7 +5,6 @@ import com.ex.data.UserDTO;
 import com.ex.service.KakaoService;
 import com.ex.service.UserService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
