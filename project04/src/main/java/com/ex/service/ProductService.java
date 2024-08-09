@@ -44,11 +44,12 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
   
 @Service
 @RequiredArgsConstructor
 public class ProductService {
-
+	
 	private final AdminService adminService;
 	private final PhotoService photoService;
 	private final UserService userService;
@@ -214,15 +215,27 @@ public class ProductService {
 	
 //(가은) 장바구니 추가
   	public void addToBasket(Integer productId, String userName, int quantity) {
-  		Optional<ProductEntity> pop = this.productRepository.findById(productId);
-  		UserEntity ue = this.userService.findByUserName(userName);
-  		BasketEntity be = BasketEntity.builder()
-  				.product(pop.get())
-  				.user(ue)
-  				.quantity(quantity)
-  				.build();
-  		basketRepository.save(be);		
-  		}
+  		
+		Optional<ProductEntity> pop = this.productRepository.findById(productId);
+		Optional<UserEntity> uop = this.userRepository.findByUsername(userName);
+		if(pop.isPresent()&&uop.isPresent()) {
+			ProductEntity pe = pop.get();
+			UserEntity ue = uop.get();
+			Optional<BasketEntity> bop = basketRepository.findByUserIdAndProductId(ue.getId(), productId);
+			if(!bop.isPresent()) {  		
+				BasketEntity be = BasketEntity.builder()
+					.product(pop.get())
+	  				.user(ue)
+	  				.quantity(quantity)
+	  				.build();
+	  		basketRepository.save(be);
+			}else {
+				BasketEntity be = basketRepository.findByUserIdAndProductId(ue.getId(), productId).get();
+				be.setQuantity(be.getQuantity()+quantity);
+				basketRepository.save(be);
+			}
+		}
+  	}
   	
 //(가은) 장바구니 수량 변경 
   	public void updateQuantity(int basketIds,int quantity) {
@@ -238,7 +251,7 @@ public class ProductService {
 		 return basketRepository.saveAll(basketsToPay);		 
   	}
 
-//(가은) 결제정보(상품정보,결제수단) 주문테이블저장 ♣0807♣
+//(가은) 결제정보(상품정보,결제수단) 주문테이블저장 
   	@Transactional
     public void saveOrderInfo(List<Integer> basketIds, String payOption,DeliveryEntity delivery) {
         for (Integer basketId : basketIds) {
@@ -256,12 +269,12 @@ public class ProductService {
         }
     }
   	
-//(가은) 배송정보 저장 ♣0807♣
+//(가은) 배송정보 저장 
   	public DeliveryEntity saveDelivery(DeliveryDTO delivery,
-  								String user) {
+  								String username) {
   		
   		String completePay = "결제완료";
-  		
+  		UserEntity ue = userService.findByUserName(username);
   		//운송장번호12자리
   		StringBuilder sb = new StringBuilder();
         for (int i = 0; i < 12; i++) {
@@ -275,7 +288,7 @@ public class ProductService {
         												.receivePhone(delivery.getReceivePhone())
         												.waybill(waybillNum)
         												.situation(completePay)
-        												.user(userService.findByUserName(user))
+        												.user(ue)
         												.build();
   		deliveryRepository.save(de);
         return de;
@@ -299,7 +312,7 @@ public class ProductService {
 //(가은) 유저 배송내역 꺼내기
   	
   	
-//(가은) 찜♥ 추가
+//(가은) 찜 추가
 	public void addToWish(Integer productId, String userName) {
 		Optional<ProductEntity> pop = this.productRepository.findById(productId);
 		Optional<UserEntity> uop = this.userRepository.findByUsername(userName);
@@ -309,12 +322,21 @@ public class ProductService {
 			if(!ue.getWishList().contains(pe)) {
 				ue.getWishList().add(pe);
 				userRepository.save(ue);
+			}else {
+				ue.getWishList().remove(pe);
+				userRepository.save(ue);
 			}
 		}  		
 	}
+//(가은) 찜리스트 조회
+	public List<ProductEntity> getUserWishList(int userId) {
+        return userRepository.findById(userId)
+                             .map(UserEntity::getWishList)
+                             .orElse(new ArrayList<>());
+    }
 	
-	//0808 성진 테스트
-	public List<SalesVolumeEntity> salesVolumeDesc(Integer id) {
+	//0802 성진 테스트
+	public List<SalesVolumeEntity> salesVolume(Integer id) {
 		//상품의 판매기록 검색
 		List<SalesVolumeEntity> sopl = salesVolumeRepository.findByProductIdOrderByRecordDateDesc(id);
 		if(sopl.isEmpty()) {
@@ -327,42 +349,41 @@ public class ProductService {
 		return sopl;
 	}
 	
-	//0802 성진 테스트
 	//0808 성진 수정
-	public void sales(Integer id, int rate, List<SalesVolumeEntity> svel) {
-		SalesVolumeEntity sve = null;
-		ProductEntity pe = this.productRepository.findById(id).get();
-		long sellprice = (long)(rate*pe.getSellPrice() * (1-pe.getDiscount()/100));
-		// 원래 갯수가 0일경우 새로 db에 등록
-		if(svel.get(0).getSalesRate() == 0) {
-			sve = SalesVolumeEntity.builder()
-					.product(pe)
-					.recordDate(LocalDate.now())
-					.salesRate(rate)
-					.salesPrice(sellprice)
-					.build();
-		}else{
-			//0이 아닐경우 날짜를 함께 검색하여 검색값이 있을경우 업데이트
-			Optional<SalesVolumeEntity> sop = salesVolumeRepository.findByProductIdAndRecordDate(id, LocalDate.now());
-			if(sop.isPresent()) {
-				sve= sop.get();
-				sve.setSalesRate(rate+sve.getSalesRate());
-				sve.setSalesPrice(svel.get(0).getSalesPrice() + sellprice);
-			}else {
+		public void sales(Integer id, int rate, List<SalesVolumeEntity> svel) {
+			SalesVolumeEntity sve = null;
+			ProductEntity pe = this.productRepository.findById(id).get();
+			long sellprice = (long)(rate*pe.getSellPrice() * (1-pe.getDiscount()/100));
+			// 원래 갯수가 0일경우 새로 db에 등록
+			if(svel.get(0).getSalesRate() == 0) {
 				sve = SalesVolumeEntity.builder()
-						.product(this.productRepository.findById(id).get())
+						.product(pe)
 						.recordDate(LocalDate.now())
-						.salesRate(svel.get(0).getSalesRate() +rate)
-						.salesPrice(svel.get(0).getSalesPrice() + sellprice)
+						.salesRate(rate)
+						.salesPrice(sellprice)
 						.build();
+			}else{
+				//0이 아닐경우 날짜를 함께 검색하여 검색값이 있을경우 업데이트
+				Optional<SalesVolumeEntity> sop = salesVolumeRepository.findByProductIdAndRecordDate(id, LocalDate.now());
+				if(sop.isPresent()) {
+					sve= sop.get();
+					sve.setSalesRate(rate+sve.getSalesRate());
+					sve.setSalesPrice(svel.get(0).getSalesPrice() + sellprice);
+				}else {
+					sve = SalesVolumeEntity.builder()
+							.product(this.productRepository.findById(id).get())
+							.recordDate(LocalDate.now())
+							.salesRate(svel.get(0).getSalesRate() +rate)
+							.salesPrice(svel.get(0).getSalesPrice() + sellprice)
+							.build();
+				}
 			}
+			AmountDTO amountDTO = adminService.total().get(0);
+			amountDTO.setAmount(sellprice);
+			amountDTO.setReason("sell");
+			adminService.amount(amountDTO, LocalDate.now());
+			salesVolumeRepository.save(sve);
 		}
-		AmountDTO amountDTO = adminService.total().get(0);
-		amountDTO.setAmount(sellprice);
-		amountDTO.setReason("sell");
-		adminService.amount(amountDTO, LocalDate.now());
-		salesVolumeRepository.save(sve);
-	}
-	
+		
 
-}
+	}

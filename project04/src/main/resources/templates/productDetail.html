@@ -54,7 +54,7 @@
         <input type="hidden" name="productId" th:value="${productDTO.id}">
         <input type="submit" value="바로구매"> 
     </form>
-    <form th:attr="id='form-' + ${productDTO.id}" th:action="@{|/찜♥/|}" method="post">
+    <form th:attr="id='form-' + ${productDTO.id}" th:action="@{|/product/wishadd|}" method="post">
         <input type="hidden" name="productId" th:value="${productDTO.id}">
         <input type="submit" value="찜♥"> 
     </form> 

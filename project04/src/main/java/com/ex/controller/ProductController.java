@@ -1,11 +1,15 @@
 package com.ex.controller;
 
+import com.ex.data.BasketDTO;
 import com.ex.data.DeliveryDTO;
 import com.ex.data.ProductDTO;
 import com.ex.entity.BasketEntity;
 import com.ex.entity.DeliveryEntity;
+import com.ex.entity.OrderlistEntity;
+import com.ex.entity.ProductEntity;
 import com.ex.entity.ProducttypeEntity;
 import com.ex.entity.UserEntity;
+import com.ex.repository.OrderlistRepository;
 import com.ex.service.ProductService;
 import com.ex.service.UserService;
 import com.ex.service.PhotoService;
@@ -24,9 +28,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @Controller
 @RequiredArgsConstructor
@@ -116,6 +123,7 @@ public class ProductController {
 
 //(가은)장바구니담기 버튼 눌렀을때 
 	@PostMapping("/basketAdd")
+	@PreAuthorize("isAuthenticated()")
 	public String addToBasket(Principal principal, @RequestParam("quantity") int quantity,
 			@RequestParam("productId") Integer productId) {
 		productService.addToBasket(productId, principal.getName(), quantity);
@@ -157,14 +165,22 @@ public class ProductController {
 		return "redirect:/product/basketList";
 	}
 
-//(가은) 찜 버튼 눌렀을때
-	@PostMapping("/wishadd/{id}")
+//(가은) 찜 버튼 눌렀을때 ■■■■■
+	@PostMapping("/wishadd")
 	@PreAuthorize("isAuthenticated()")
-	public String addToWish(Principal principal, @PathVariable("id") Integer id) {
-		productService.addToWish(id, principal.getName());
-		return "redirect:/product/Detail/" + id;
+	public String addToWish(Principal principal, @RequestParam("productId") Integer productId) {
+		productService.addToWish(productId, principal.getName());
+		return "redirect:/product/detail/" + productId;
 	}
-
+//(가은) 찜리스트 ■■■■
+	@GetMapping("/wishlist")
+    public String wishlist(Model model, Principal principal) {		
+        List<ProductEntity> wishList = 
+        productService.getUserWishList(userService.findByUserName(principal.getName()).getId());
+        model.addAttribute("wishList", wishList);
+        return "wishlist";
+    }
+	
 //(가은) 결제페이지
 	@PostMapping("/paymentPage") // 선택된 장바구니 항목이 넘어옴
 	@PreAuthorize("isAuthenticated()")
@@ -210,7 +226,6 @@ public class ProductController {
 
 
 //(가은) 상세 주문내역 fullPayResult
-
 	@GetMapping("/fullPayResult")
 	@PreAuthorize("isAuthenticated()") 
 	public String fullPayResult(Principal principal, Model model,

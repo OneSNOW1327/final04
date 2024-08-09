@@ -24,33 +24,41 @@
                 </div>
                 <div class="col-md-8">
                     <div class="card order-history-card">
-                        <div class="card-header">
+                        <a class="card-header" href="/product/simplePayResult">
                             주문 내역
-                        </div>
+                        </a>
                         <div class="card-body">
-                            <div th:if="${user.orderlist != null and !#lists.isEmpty(user.orderlist)}">
-                                <table class="table table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <th>주문 ID</th>
-                                            <th>상품명</th>
-                                            <th>주문 날짜</th>
-                                            <th>상태</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr th:each="order : ${user.orderlist}">
-                                            <td th:text="${order.id}"></td>
-                                            <td th:text="${order.product.name}"></td>
-                                            <td th:text="${#temporals.format(order.orderDate, 'yyyy-MM-dd HH:mm')}"></td>
-                                            <td th:text="${order.status}"></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div th:if="${user.orderlist == null or #lists.isEmpty(user.orderlist)}">
-                                <p>주문 내역이 없습니다.</p>
-                            </div>
+                            <div th:if="${user.delivery != null and !#lists.isEmpty(user.delivery)}">
+			<table class="table table-bordered">
+				<thead>
+					<tr>
+						<th>주문 ID</th>
+						<th>상품명</th>
+						<th>주문 날짜</th>
+						<th>상태</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="delivery : ${user.delivery}" th:if="${user.delivery != null}">
+						<td colspan="4">
+							<table class="table table-bordered">
+								<tbody>
+									<tr th:each="order : ${delivery.order}">
+										<td th:text="${order.id}"></td>
+										<td th:text="${order.product.name}"></td>
+										<td th:text="${#temporals.format(order.orderTime, 'yyyy-MM-dd HH:mm')}"></td>
+										<td th:text="${delivery.situation}"></td>
+									</tr>
+								</tbody>
+							</table>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
+		<div th:if="${user.delivery == null or #lists.isEmpty(user.delivery)}">
+			<p>주문 내역이 없습니다.</p>
+		</div>
                         </div>
                     </div>
                     <div class="card review-card">
@@ -92,12 +100,14 @@
                                 <table class="table table-bordered">
                                     <thead>
                                         <tr>
+                                       		<th>상품사진</th>
                                             <th>상품명</th>
                                             <th>가격</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr th:each="wish : ${user.wishList}">
+                                       		<td><img th:src="|/file/display?folder=thumbnails&filename=${wish.thumbnail[0].sysname}|" style="max-width: 100px;"></td>
                                             <td th:text="${wish.name}"></td>
                                             <td th:text="${wish.sellPrice}"></td>
                                         </tr>

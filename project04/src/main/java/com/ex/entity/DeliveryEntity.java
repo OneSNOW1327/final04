@@ -2,6 +2,7 @@ package com.ex.entity;
 
 import java.util.List;
 
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -25,7 +26,7 @@ public class DeliveryEntity {
 	
 	private Integer id; //pk
 
-	@OneToMany
+	@OneToMany(mappedBy = "delivery")
 	private List<OrderlistEntity> order; //주문 내역 OrderlistEntity
 	
 	@ManyToOne

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout}">
+<div class="container my-3" layout:fragment="content">
+
+<!--   -->
+	<h4>주문상품</h4>
+		<div th:if="${user.orderlist != null and !#lists.isEmpty(user.orderlist)}">
+			<table border="1">
+				<tr>
+					<th>주문 ID</th>
+					<th>상품명</th>
+					<th>결제금액</th>
+					<th>주문 날짜</th>
+					<th>상태</th>
+					<th> </th>
+				</tr>
+				<tr th:each="order : ${order}">
+					<td th:text="${order.id}"></td>
+					<td th:text="${order.product.name}"></td>
+					<td th:text="${order.product.sellPrice * (1 - order.product.discount / 100)}"></td>
+					<td th:text="${#temporals.format(order.orderTime, 'yyyy-MM-dd HH:mm')}"></td>
+					<td th:text="${order.delivery.situation}"></td>
+					<td><a th:text="상세보기" th:href="/product/fullPayResult?orderId=${order.id}"></a></td>
+					</tr>
+			</table>
+		</div>
+	<h4>결제정보</h4>
+		<table>
+			<tr>
+				<th>결제수단</th>				
+				<td th:text="${order.payOption}"></td>
+			</tr>
+			<tr>
+				<th>총 상품금액</th>
+				<td th:text="${order.product.}"></td>
+			</tr>
+			
+			<tr>
+				<th>총 할인금액</th>
+				<td><input type="text" name="discount" readonly th:value="${orderList.product.sellPrice * (orderList.product.discount / 100)}" /></td>
+			</tr>
+			<tr>
+				<th>총 결제금액</th>
+				<td><input type="text" name="payPrice" readonly th:value="${orderList.product.sellPrice * (1 - orderList.product.discount / 100)}" /></td>
+			</tr>
+
+            </table><br>
+	<h4>배송지정보</h4>
+		<table>
+			<tr>
+				<th>받으시는분</th>
+				<td><input type="text" id="realName" name="receiveName"></td>
+			</tr>
+			<tr>
+				<th>전화번호</th>
+				<td><input type="text" id="phone" name="receivePhone"></td>
+			</tr>
+			<tr>
+				<th>주소</th>
+				<td><input type="text" id="phone" name="receivePhone"></td>
+			</tr>
+			<tr>
+				<th>배송메세지</th>
+				<td><input type="text" id="phone" name="receivePhone"></td>
+			</tr>
+</div>
+
+<th:block layout:fragment="script">
+	<script>
+	
+	
+	
+		<!-- 스크 립트 -->
+	
+   </script>
+</th:block>
+</html>
