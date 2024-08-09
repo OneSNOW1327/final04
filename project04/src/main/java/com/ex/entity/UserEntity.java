@@ -32,7 +32,7 @@ public class UserEntity {
     private Integer id;
 
     @Column(nullable = false, unique = true)
-    private String username; // 사용자 이름 (중복 불가)
+    private String username; // 사용자 ID (중복 불가)
 
     @Column(nullable = false)
     private String password; // 비밀번호
@@ -40,7 +40,7 @@ public class UserEntity {
     @Column(nullable = false, unique = true)
     private String email; // 이메일 주소
 
-    private String realName;
+    private String realName; //사용자이름
 
     private String adress;
     
@@ -59,11 +59,8 @@ public class UserEntity {
     private List<ProductEntity> wishList; //찜목록
     
     @OneToMany(mappedBy = "user", cascade=CascadeType.REMOVE)
-    private List<OrderlistEntity> orderlist; //주문내역, 결제
+    private List<DeliveryEntity> delivery; //주문내역, 결제
     
-    @OneToMany(mappedBy = "user", cascade=CascadeType.REMOVE)
-    private List<DeliveryEntity> delivery; //배송상태
-
     @OneToMany(mappedBy = "writer", cascade = CascadeType.REMOVE)
     private List<ReviewEntity> review;
 }

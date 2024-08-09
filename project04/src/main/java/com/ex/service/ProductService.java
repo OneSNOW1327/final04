@@ -1,6 +1,9 @@
 package com.ex.service;
+import com.ex.data.DeliveryDTO;
 import com.ex.data.ProductDTO;
 import com.ex.entity.BasketEntity;
+import com.ex.entity.DeliveryEntity;
+import com.ex.entity.OrderlistEntity;
 import com.ex.entity.ProductEntity;
 import com.ex.entity.ProductImgEntity;
 import com.ex.entity.ProductThumbnailEntity;
@@ -8,6 +11,8 @@ import com.ex.entity.ProducttypeEntity;
 import com.ex.entity.SalesVolumeEntity;
 import com.ex.entity.UserEntity;
 import com.ex.repository.BasketRepository;
+import com.ex.repository.DeliveryRepository;
+import com.ex.repository.OrderlistRepository;
 import com.ex.repository.ProductImgRepository;
 import com.ex.repository.ProductRepository;
 import com.ex.repository.ProductThumbnailRepository;
@@ -37,6 +42,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
   
 @Service
 @RequiredArgsConstructor
@@ -50,6 +56,8 @@ public class ProductService {
 	private final ProductThumbnailRepository productThumbnailRepository;
 	private final SalesVolumeRepository salesVolumeRepository;
 	private final PhotoService photoService;
+	private final OrderlistRepository orderlistRepository;
+	private final DeliveryRepository deliveryRepository;
 
 	public List<ProductEntity> allProduct() {
 		return productRepository.findAll();
@@ -227,7 +235,7 @@ public class ProductService {
   		basketRepository.save(be);		
   		}
   	
-//(가은) 장바구니 수량 변경 ♣0802♣
+//(가은) 장바구니 수량 변경 
   	public void updateQuantity(int basketIds,int quantity) {
   		Optional<BasketEntity> bop = basketRepository.findById(basketIds);
   		BasketEntity basketEntity= bop.get();
@@ -241,10 +249,67 @@ public class ProductService {
 		 return basketRepository.saveAll(basketsToPay);		 
   	}
 
-
+//(가은) 결제정보(상품정보,결제수단) 주문테이블저장 ♣0807♣
+  	@Transactional
+    public void saveOrderInfo(List<Integer> basketIds, String payOption,DeliveryEntity delivery) {
+        for (Integer basketId : basketIds) {
+        	BasketEntity be = basketRepository.findById(basketId).get();
+        	OrderlistEntity ole = OrderlistEntity.builder().quantity(be.getQuantity())
+        													.product(be.getProduct())
+        													.delivery(delivery)
+        													.orderTime(LocalDateTime.now())
+        													.payOption(payOption)
+        													.discount(be.getProduct().getDiscount())
+        													.build();
+        	orderlistRepository.save(ole);
+            // 장바구니에서 주문한 상품 제거
+        	basketRepository.deleteById(basketId);
+        }
+    }
+  	
+//(가은) 배송정보 저장 ♣0807♣
+  	public DeliveryEntity saveDelivery(DeliveryDTO delivery,
+  								String user) {
+  		
+  		String completePay = "결제완료";
+  		
+  		//운송장번호12자리
+  		StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 12; i++) {
+            int digit = (int) (Math.random() * 10); // 0부터 9까지의 랜덤 숫자 생성
+            sb.append(digit);
+        }
+        String waybillNum = sb.toString();
+        DeliveryEntity de = DeliveryEntity.builder().memo(delivery.getMemo())
+        												.receiveAddress(delivery.getReceiveAddress())
+        												.receiveName(delivery.getReceiveName())
+        												.receivePhone(delivery.getReceivePhone())
+        												.waybill(waybillNum)
+        												.situation(completePay)
+        												.user(userService.findByUserName(user))
+        												.build();
+  		deliveryRepository.save(de);
+        return de;
+  	}
+  	
+//(가은) 유저 주문내역 꺼내기
+  	public OrderlistEntity orders(int orderId){
+  		Optional<OrderlistEntity> oop = orderlistRepository.findById(orderId);
+  		return oop.get();
+  	}
+  	
+	//♣가은♣ username으로 user 요소 모두 꺼내기
+	public UserEntity findByUserName(String username) {
+		Optional<UserEntity> op = this.userRepository.findByUsername(username);
+		if(op.isPresent()) {
+			return op.get();
+		}else {
+			throw new RuntimeException("user not found");
+		}
+	}
+//(가은) 유저 배송내역 꺼내기
   	
   	
-
 //(가은) 찜♥ 추가
 	public void addToWish(Integer productId, String userName) {
 		Optional<ProductEntity> pop = this.productRepository.findById(productId);

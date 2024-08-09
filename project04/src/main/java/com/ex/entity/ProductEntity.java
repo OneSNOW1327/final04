@@ -38,9 +38,9 @@ public class ProductEntity {
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
     private List<ProductThumbnailEntity> thumbnail; //썸네일
-
+    
     @ManyToMany
-    private List<OrderlistEntity> orderlist; // 주문내역
+    private List<DeliveryEntity> delivery;
 
     @ManyToMany
     private List<BasketEntity> basketlist; // 장바구니
@@ -48,7 +48,7 @@ public class ProductEntity {
     @ManyToMany
     private List<UserEntity> wishUser; //유저의 위시리스트
     
-    @OneToMany
+    @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
     private List<SalesVolumeEntity> salesVolume; //판매량ID
 
     private String name; //상품명

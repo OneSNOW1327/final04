@@ -1,10 +1,14 @@
 package com.ex.entity;
 
+import java.util.List;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,12 +24,14 @@ public class DeliveryEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	
 	private Integer id; //pk
 
-	@OneToOne
-	private OrderlistEntity order; //주문 내역 OrderlistEntity
+	@OneToMany
+	private List<OrderlistEntity> order; //주문 내역 OrderlistEntity
+	
 	@ManyToOne
-	private UserEntity user; //회원 UserEntity
+	private UserEntity user;
 	
 	private String receiveName; // 받는사람 이름
 	
