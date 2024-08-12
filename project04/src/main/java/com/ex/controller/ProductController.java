@@ -1,12 +1,15 @@
 package com.ex.controller;
 
+import com.ex.data.BasketDTO;
 import com.ex.data.DeliveryDTO;
 import com.ex.data.ProductDTO;
 import com.ex.entity.BasketEntity;
 import com.ex.entity.DeliveryEntity;
+import com.ex.entity.OrderlistEntity;
 import com.ex.entity.ProductEntity;
 import com.ex.entity.ProducttypeEntity;
 import com.ex.entity.UserEntity;
+import com.ex.repository.OrderlistRepository;
 import com.ex.service.ProductService;
 import com.ex.service.UserService;
 import com.ex.service.PhotoService;
@@ -25,9 +28,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @Controller
 @RequiredArgsConstructor
@@ -159,14 +165,14 @@ public class ProductController {
 		return "redirect:/product/basketList";
 	}
 
-//(가은) 찜 버튼 눌렀을때 ■■■■■
+//(가은) 찜 버튼 눌렀을때
 	@PostMapping("/wishadd")
 	@PreAuthorize("isAuthenticated()")
 	public String addToWish(Principal principal, @RequestParam("productId") Integer productId) {
 		productService.addToWish(productId, principal.getName());
 		return "redirect:/product/detail/" + productId;
 	}
-//(가은) 찜리스트 ■■■■
+//(가은) 찜리스트
 	@GetMapping("/wishlist")
     public String wishlist(Model model, Principal principal) {		
         List<ProductEntity> wishList = 
@@ -190,25 +196,36 @@ public class ProductController {
 //(가은) (구매상품 장바구니,결제수단)주문테이블저장, 배송정보저장 0807
 	@PostMapping("/requestPay")
 	@PreAuthorize("isAuthenticated()")
-	public String requestPay(@RequestParam("basketId") String basketId, @ModelAttribute DeliveryDTO deliveryDTO,
-			@RequestParam("paymentOption") String payOption, Model model, Principal principal) {
-		// "removeSelected"라는 이름의 파라미터 basket의ID를 "ID,ID,.."형식으로 가지고있음
+	public String requestPay(@RequestParam("basketId") String basketId, 
+							@ModelAttribute DeliveryDTO deliveryDTO,
+							@RequestParam("paymentOption") String payOption, 
+							Model model, Principal principal) {
+		// basket의ID를 "ID,ID,.."형식으로 가지고있음
 		List<Integer> basketIds = Arrays.stream(basketId.split(","))// 콤마를 기준으로 분리
 				.map(Integer::parseInt)// 스트림의 요소를 정수로 변환
-				.collect(Collectors.toList());// 스트림의 모든 요소를 새로운 리스트로 만들어 반환
-		
+				.collect(Collectors.toList());// 스트림의 모든 요소를 새로운 리스트로 만들어 반환		
 		// 배송정보 저장
-		DeliveryEntity delivery = productService.saveDelivery(deliveryDTO,principal.getName());
-		
+		DeliveryEntity delivery = productService.saveDelivery(deliveryDTO,principal.getName());		
 		// 주문테이블저장
 		productService.saveOrderInfo(basketIds, payOption,delivery);
-
-		// 주문상세페이지로 정보 보내기
-		model.addAttribute("delivery", delivery);
-		model.addAttribute("payOption", payOption);
-		return "fullPayResult";
+		// 주문상세페이지로 정보 보내기		
+		int deliveryId = delivery.getId();
+		productService.findDeliveryById(deliveryId);
+        model.addAttribute("delivery", delivery);
+		return "redirect:/product/fullPayResult?deliveryId="+deliveryId;
 	}
-
+	
+//(가은) 상세 주문내역 fullPayResult
+	@GetMapping("/fullPayResult")
+	@PreAuthorize("isAuthenticated()") 
+	public String fullPayResult(Principal principal, Model model,
+								@RequestParam("deliveryId") Integer deliveryId) { 		
+		DeliveryEntity delivery = productService.findDeliveryById(deliveryId);
+        model.addAttribute("delivery", delivery);
+		
+	 return "fullPayResult"; 
+	 }
+		
 //(가은)	간략 주문내역 
 	@GetMapping("/simplePayResult")
 	@PreAuthorize("isAuthenticated()")
@@ -218,20 +235,10 @@ public class ProductController {
 		return "simplePayResult";
 	}
 
-
-//(가은) 상세 주문내역 fullPayResult
-	@GetMapping("/fullPayResult")
-	@PreAuthorize("isAuthenticated()") 
-	public String fullPayResult(Principal principal, Model model, @RequestParam("orderId") int orderId) { 		
-		//오더아이디로 오더에 관한것 들		
-		model.addAttribute("order", productService.orders(orderId));
-		return "fullPayResult"; 
-	 }
-	
 	//0802성진 테스트
-	@PostMapping("/sales/{id}")
-	public String slaes(@PathVariable("id")Integer id,@RequestParam("rate")int rate) {
-		productService.sales(id,rate,productService.salesVolumeDesc(id));
-		return "redirect:/admin/product/"+id;
+		@PostMapping("/sales/{id}")
+		public String slaes(@PathVariable("id")Integer id,@RequestParam("rate")int rate) {
+			productService.sales(id,rate,productService.salesVolumeDesc(id));
+			return "redirect:/admin/product/"+id;
+		}
 	}
-}

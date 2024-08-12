@@ -3,6 +3,7 @@
 <div class="container my-3" layout:fragment="content">
 	<div th:if="${user.delivery != null}">
      	<h2 th:text="${#lists.size(user.delivery)}"></h2>
+     	
 			<table class="table table-bordered" th:each="delivery : ${user.delivery}" th:if="${user.delivery != null}">
 				<thead>
 					<tr>
@@ -10,11 +11,14 @@
 						<th>상품명</th>
 						<th>주문 날짜</th>
 						<th>상태</th>
+						
 					</tr>
 				</thead>
 				<tbody>
 					<tr >
-					<a href="/product/fullPayResult">주문 상세</a>
+					
+					<p th:text="${#temporals.format(delivery.order[0].orderTime, 'yyyy-MM-dd HH:mm')}"></p>
+					<a th:href="@{|/product/fullPayResult?deliveryId=${delivery.id}|}">주문 상세</a>
 						<td colspan="4">
 							<table class="table table-bordered">
 								<tbody>
@@ -22,14 +26,14 @@
 										<td><img th:src="|/file/display?folder=thumbnails&filename=${order.product.thumbnail[0].sysname}|" style="max-width: 100px;"></td>
 										<td th:text="${order.product.name}"></td>
 										<td th:text="${#temporals.format(order.orderTime, 'yyyy-MM-dd HH:mm')}"></td>
-										<td th:text="${delivery.situation}"></td>
+										<td th:text="${delivery.situation}"></td>										
 									</tr>
 								</tbody>
 							</table>
 						</td>
 					</tr>
 				</tbody>
-			</table>
+			</table><br><hr><br>
 
 		<div th:if="${user.delivery == null or #lists.isEmpty(user.delivery)}">
 			<p>주문 내역이 없습니다.</p>

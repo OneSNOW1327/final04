@@ -58,9 +58,9 @@
             <hr>
             <h4>결제 방법 선택</h4>
             <select name="paymentOption">
-                <option value="bankTransfer">무통장입금</option>
-                <option value="creditCard">신용카드</option>
-                <option value="kakaoPay">카카오페이</option>
+                <option value="bankTransfer" th:onclick="kg_request_pay()">무통장입금</option>
+                <option value="creditCard" th:onclick="kg_request_pay()">신용카드</option>
+                <option value="kakaoPay" th:onclick="ka_request_pay()">카카오페이</option>
             </select>
             <br>
             <input type="button" value="결제하기" onclick="submitForm()">
@@ -105,24 +105,61 @@
 					adressInput.value = '';
 				}
 			});
+
+			var IMP = window.IMP; // 생략가능
+		  	IMP.init('imp32764806'); // <-- 본인 가맹점 식별코드 삽입
+		  	
 //basketId 리스트로 만들고 orderForm제출
 			function submitForm() {
-				const basketIds = [];
-				document.querySelectorAll('input[name="basketId"]').forEach(input => {
-					basketIds.push(input.value);
-				});
-		
-				const hiddenInput = document.createElement('input');
-				hiddenInput.type = 'hidden';
-				hiddenInput.name = 'basketIds';
-				hiddenInput.value = basketIds.join(',');
-			
-				const form = document.getElementById('orderForm');
-				form.appendChild(hiddenInput);
-			
-				form.submit();
+				IMP.init('imp32764806'); //iamport 대신 자신의 "가맹점 식별코드"를 사용
+				  IMP.request_pay({
+				    pg: "{inicis}.{INIpayTest}",
+				    pay_method: "card",
+				    merchant_uid : 'merchant_'+new Date().getTime(),
+				    name : '결제테스트',
+				    amount : 100,
+				    buyer_email : 'gaeun2323@naver.com',
+				    buyer_name : '구매자',
+				    buyer_tel : '010-4342-6938',
+				    buyer_addr : '서울특별시 강남구 삼성동',
+				    buyer_postcode : '123-456'
+				  }, function (rsp) { // callback
+				      if (rsp.success) {// 결제 성공 시 로직,
+				          alert('결제가 완료되었습니다.');
+				          const basketIds = [];
+							document.querySelectorAll('input[name="basketId"]').forEach(input => {
+								basketIds.push(input.value);
+							});
+					
+							const hiddenInput = document.createElement('input');
+							hiddenInput.type = 'hidden';
+							hiddenInput.name = 'basketIds';
+							hiddenInput.value = basketIds.join(',');
+						
+							const form = document.getElementById('orderForm');
+							form.appendChild(hiddenInput);
+						
+							form.submit();       				        
+				       
+				      } else {// 결제 실패 시 로직,
+				    	  var msg = '결제에 실패하였습니다.';
+				          msg += '에러내용 : ' + rsp.error_msg;
+				          alert(msg);				        
+				      }
+				  });
+				
+				
 			}
 		
 		</script>
+	<!-- JS 라이브러리를 추가 -->	
+	<script src="https://cdn.iamport.kr/v1/iamport.js"></script>	
+	<!-- jQuery -->
+	<script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js" ></script>
+	<!-- iamport.payment.js -->
+	<script type="text/javascript" src="https://cdn.iamport.kr/js/iamport.payment-{SDK-최신버전}.js"></script>
+	<!-- SDK Library 로드 -->
+	<script src="https://cdn.iamport.kr/v1/iamport.js"></script>	
+	
 	</th:block>
 </html>

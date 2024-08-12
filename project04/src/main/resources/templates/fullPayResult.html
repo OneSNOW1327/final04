@@ -3,74 +3,75 @@
 <div class="container my-3" layout:fragment="content">
 
 <!--   -->
-	<h4>주문상품</h4>
-		<div th:if="${user.orderlist != null and !#lists.isEmpty(user.orderlist)}">
-			<table border="1">
-				<tr>
-					<th>주문 ID</th>
-					<th>상품명</th>
-					<th>결제금액</th>
-					<th>주문 날짜</th>
-					<th>상태</th>
-					<th> </th>
-				</tr>
-				<tr th:each="order : ${order}">
-					<td th:text="${order.id}"></td>
-					<td th:text="${order.product.name}"></td>
-					<td th:text="${order.product.sellPrice * (1 - order.product.discount / 100)}"></td>
-					<td th:text="${#temporals.format(order.orderTime, 'yyyy-MM-dd HH:mm')}"></td>
-					<td th:text="${order.delivery.situation}"></td>
-					<td><a th:text="상세보기" th:href="/product/fullPayResult?orderId=${order.id}"></a></td>
-					</tr>
-			</table>
-		</div>
-	<h4>결제정보</h4>
-		<table>
-			<tr>
-				<th>결제수단</th>				
-				<td th:text="${order.payOption}"></td>
-			</tr>
-			<tr>
-				<th>총 상품금액</th>
-				<td th:text="${order.product.}"></td>
-			</tr>
-			
-			<tr>
-				<th>총 할인금액</th>
-				<td><input type="text" name="discount" readonly th:value="${orderList.product.sellPrice * (orderList.product.discount / 100)}" /></td>
-			</tr>
-			<tr>
-				<th>총 결제금액</th>
-				<td><input type="text" name="payPrice" readonly th:value="${orderList.product.sellPrice * (1 - orderList.product.discount / 100)}" /></td>
-			</tr>
+	<h2>주문 상세 정보</h2>
+    <div th:if="${delivery != null}">
+        <div>
+			<p><span th:text="${#temporals.format(delivery.order[0].orderTime, 'yyyy-MM-dd HH:mm')}"></span> 
+			주문 번호: <span th:text="${delivery.id}"></span></p>
+        </div><br>
+            
+        <h4>주문 상품 목록</h4><hr>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>상품사진</th>
+                    <th>상품명</th>
+                    <th>수량</th>
+                    <th>판매가</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="order,loop : ${delivery.order}">
+                    <td><img th:src="|/file/display?folder=thumbnails&filename=${order.product.thumbnail[0].sysname}|" style="max-width: 100px;"></td>
+                    <td th:text="${order.product.name}"></td>
+                    <td th:id="|quantity_${loop.index}|" th:text="${order.quantity}"></td>
+                    <td th:id="|payPrice_${loop.index}|" th:text="${order.product.sellPrice*(1-order.product.discount/100)}"></td>
+                	<input th:id="|sellPrice_${loop.index}|" type="hidden" th:value="${order.product.sellPrice}" readonly/>
+                    <input th:id="|discount_${loop.index}|" type="hidden" th:value="${order.product.sellPrice * (order.product.discount / 100)}" readonly/>
+                </tr>
+            </tbody>
+        </table><br><br>
+        
+         <h4>받는사람 정보</h4><hr>
+        <table border="1">
+			<tr><td>받으시는분: </td> <td th:text="${delivery.receiveName}"></td></td></tr>
+			<tr><td> 주소: </td> <td th:text="${delivery.receiveAddress}"></td></td></tr>
+			<tr><td>전화번호: </td> <td th:text="${delivery.receivePhone}"></td></td></tr>
+        	<tr><td>배송메세지: </td> <td th:text="${delivery.memo}"></td></td></tr>
+        </table><br><br>
+        
+        <h4>결제 정보</h4><hr>
+        <table border="1">
+		    <tr><td>결제수단: </td><td th:text="${delivery.order[0].payOption}"></td></tr>
+		    <tr><td>총 상품금액: </td><td><span id="sellPrice"></span></td></tr>
+		    <tr><td>총 할인금액: </td><td><span id="discount"></span></td></tr>
+		    <tr><td>총 결제금액: </td><td><span id="payPrice"></span></td></tr>
+		</table>
+    <input type="hidden" th:value="${#lists.size(delivery.order)}" id="size">
+    </div>
 
-            </table><br>
-	<h4>배송지정보</h4>
-		<table>
-			<tr>
-				<th>받으시는분</th>
-				<td><input type="text" id="realName" name="receiveName"></td>
-			</tr>
-			<tr>
-				<th>전화번호</th>
-				<td><input type="text" id="phone" name="receivePhone"></td>
-			</tr>
-			<tr>
-				<th>주소</th>
-				<td><input type="text" id="phone" name="receivePhone"></td>
-			</tr>
-			<tr>
-				<th>배송메세지</th>
-				<td><input type="text" id="phone" name="receivePhone"></td>
-			</tr>
+    <div th:if="${delivery == null}">
+        <p>주문 상세 정보를 찾을 수 없습니다.</p>
+    </div>
 </div>
 
 <th:block layout:fragment="script">
 	<script>
-	
-	
-	
-		<!-- 스크 립트 -->
+	// 금액 총합 계산
+	var size = document.getElementById('size').value;
+var sumSellPrice = 0;
+var sumDiscount = 0;
+for (var i = 0; i < size; i++) {
+    var quantity = document.getElementById('quantity_'+i).textContent || 0;
+    var sellPrice = parseFloat(document.querySelector('#sellPrice_' + i).value) || 0;
+    var discount = parseFloat(document.querySelector('#discount_' + i).value) || 0;
+    
+    sumSellPrice += sellPrice * quantity;
+    sumDiscount += discount * quantity;
+}
+document.querySelector('#sellPrice').textContent = sumSellPrice.toLocaleString() + " 원";
+document.querySelector('#discount').textContent = sumDiscount.toLocaleString() + " 원";
+document.querySelector('#payPrice').textContent = (sumSellPrice - sumDiscount).toLocaleString() + " 원";
 	
    </script>
 </th:block>

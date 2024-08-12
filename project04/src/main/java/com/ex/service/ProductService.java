@@ -201,102 +201,115 @@ public class ProductService {
 		return productRepository.findByTypeId(id, PageRequest.of(page,12,Sort.by(sorts)));
 	}
 	
-	//(가은) 장바구니 현황_로그인유저에 대한 BasketEntity
-	public List<BasketEntity> userBasket(String userName) {
-		UserEntity ue = this.userService.findByUserName(userName);
-		List<BasketEntity> userBasket = ue.getBasketList(); // 유저의 장바구니 리스트
-		return userBasket;
-	}
-	//(가은) 장바구니 선택상품 삭제
+//(가은) 장바구니 현황_로그인유저에 대한 BasketEntity
+  	public List<BasketEntity> userBasket(String userName) {
+  		UserEntity ue = this.userService.findByUserName(userName);
+  		List<BasketEntity> userBasket = ue.getBasketList(); // 유저의 장바구니 리스트
+  	    return userBasket;
+  	}
+//(가은) 장바구니 선택상품 삭제
 	@Transactional//데이터베이스 작업의 원자성, 일관성, 격리성, 내구성을 보장하기 위해 사용
 	public void removeSelectedBaskets(List<Integer> basketIds) {
 		List<BasketEntity> basketsToRemove = basketRepository.findAllById(basketIds);
 		basketRepository.deleteAll(basketsToRemove);
 	}
 	
-	//(가은) 장바구니 추가
-	public void addToBasket(Integer productId, String userName, int quantity) {
+//(가은) 장바구니 추가
+  	public void addToBasket(Integer productId, String userName, int quantity) {
+  		
 		Optional<ProductEntity> pop = this.productRepository.findById(productId);
 		Optional<UserEntity> uop = this.userRepository.findByUsername(userName);
 		if(pop.isPresent()&&uop.isPresent()) {
 			ProductEntity pe = pop.get();
 			UserEntity ue = uop.get();
 			Optional<BasketEntity> bop = basketRepository.findByUserIdAndProductId(ue.getId(), productId);
-			if(!bop.isPresent()) {
+			if(!bop.isPresent()) {  		
 				BasketEntity be = BasketEntity.builder()
-						.product(pop.get())
-						.user(ue)
-						.quantity(quantity)
-						.build();
-				basketRepository.save(be);
+					.product(pop.get())
+	  				.user(ue)
+	  				.quantity(quantity)
+	  				.build();
+	  		basketRepository.save(be);
 			}else {
 				BasketEntity be = basketRepository.findByUserIdAndProductId(ue.getId(), productId).get();
 				be.setQuantity(be.getQuantity()+quantity);
 				basketRepository.save(be);
 			}
 		}
-	}
+  	}
   	
-	//(가은) 장바구니 수량 변경
-	public void updateQuantity(int basketIds,int quantity) {
-		Optional<BasketEntity> bop = basketRepository.findById(basketIds);
-		BasketEntity basketEntity= bop.get();
-		basketEntity.setQuantity(quantity);
-		basketRepository.save(basketEntity);
-	}
+//(가은) 장바구니 수량 변경 
+  	public void updateQuantity(int basketIds,int quantity) {
+  		Optional<BasketEntity> bop = basketRepository.findById(basketIds);
+  		BasketEntity basketEntity= bop.get();
+  		basketEntity.setQuantity(quantity);
+  		basketRepository.save(basketEntity);
+  	}
   	
-	//(가은) 결제페이지 결제예정 상품리스트
-	public List<BasketEntity> expectPay(List<Integer> basketIds) {
-		List<BasketEntity> basketsToPay = basketRepository.findAllById(basketIds);
-		return basketRepository.saveAll(basketsToPay);
-	}
+//(가은) 결제페이지 결제예정 상품리스트
+  	public List<BasketEntity> expectPay(List<Integer> basketIds) {  		
+  		List<BasketEntity> basketsToPay = basketRepository.findAllById(basketIds);         		
+		 return basketRepository.saveAll(basketsToPay);		 
+  	}
 
-	//(가은) 결제정보(상품정보,결제수단) 주문테이블저장
-	@Transactional
-	public void saveOrderInfo(List<Integer> basketIds, String payOption,DeliveryEntity delivery) {
-		for (Integer basketId : basketIds) {
-			BasketEntity be = basketRepository.findById(basketId).get();
-			OrderlistEntity ole = OrderlistEntity.builder().quantity(be.getQuantity())
-															.product(be.getProduct())
-															.delivery(delivery)
-															.orderTime(LocalDateTime.now())
-															.payOption(payOption)
-															.discount(be.getProduct().getDiscount())
-															.build();
-			orderlistRepository.save(ole);
-			// 장바구니에서 주문한 상품 제거
-			basketRepository.deleteById(basketId);
-		}
-	}
+//(가은) 결제정보(상품정보,결제수단) 주문테이블저장 
+  	@Transactional
+    public void saveOrderInfo(List<Integer> basketIds, String payOption,DeliveryEntity delivery) {
+        for (Integer basketId : basketIds) {
+        	BasketEntity be = basketRepository.findById(basketId).get();
+        	OrderlistEntity ole = OrderlistEntity.builder().quantity(be.getQuantity())
+        													.product(be.getProduct())
+        													.delivery(delivery)
+        													.orderTime(LocalDateTime.now())
+        													.payOption(payOption)
+        													.discount(be.getProduct().getDiscount())
+        													.build();
+        	orderlistRepository.save(ole);
+            // 장바구니에서 주문한 상품 제거
+        	basketRepository.deleteById(basketId);
+        }
+    }
   	
-	//(가은) 배송정보 저장
-	public DeliveryEntity saveDelivery(DeliveryDTO delivery, String username) {
-		String completePay = "결제완료";
-		UserEntity ue = userService.findByUserName(username);
-		//운송장번호12자리
-		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < 12; i++) {
-			int digit = (int) (Math.random() * 10); // 0부터 9까지의 랜덤 숫자 생성
-			sb.append(digit);
-		}
-		String waybillNum = sb.toString();
-		DeliveryEntity de = DeliveryEntity.builder().memo(delivery.getMemo())
-														.receiveAddress(delivery.getReceiveAddress())
-														.receiveName(delivery.getReceiveName())
-														.receivePhone(delivery.getReceivePhone())
-														.waybill(waybillNum)
-														.situation(completePay)
-														.user(ue)
-														.build();
-		deliveryRepository.save(de);
-		return de;
-		}
+//(가은) 배송정보 저장 
+  	public DeliveryEntity saveDelivery(DeliveryDTO delivery,
+  								String username) {
+  		
+  		String completePay = "결제완료";
+  		UserEntity ue = userService.findByUserName(username);
+  		//운송장번호12자리
+  		StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 12; i++) {
+            int digit = (int) (Math.random() * 10); // 0부터 9까지의 랜덤 숫자 생성
+            sb.append(digit);
+        }
+        String waybillNum = sb.toString();
+        DeliveryEntity de = DeliveryEntity.builder().memo(delivery.getMemo())
+        												.receiveAddress(delivery.getReceiveAddress())
+        												.receiveName(delivery.getReceiveName())
+        												.receivePhone(delivery.getReceivePhone())
+        												.waybill(waybillNum)
+        												.situation(completePay)
+        												.user(ue)
+        												.build();
+  		deliveryRepository.save(de);
+        return de;
+  	}
   	
-	//(가은) 유저 주문내역 꺼내기
-	public OrderlistEntity orders(int orderId){
-		Optional<OrderlistEntity> oop = orderlistRepository.findById(orderId);
-		return oop.get();
-	}
+  	
+ //(가은)  orderId로 DeliveryEntity를 찾기
+ 	public DeliveryEntity findDeliveryById(int deliveryId) {
+ 	    return deliveryRepository.findById(deliveryId) 	          
+ 	            .orElseThrow(() -> new RuntimeException("해당 주문을 찾을 수 없습니다. 주문 ID: " + deliveryId));
+ 	    		// DeliveryEntity를 찾지 못하면, 커스텀 메시지와 함께 RuntimeException을 던짐
+ 	}
+ 	
+ 	
+//(가은) 유저 주문내역 꺼내기
+  	public OrderlistEntity orders(int orderId){
+  		Optional<OrderlistEntity> oop = orderlistRepository.findById(orderId);
+  		return oop.get();
+  	}  	
+  	
   	
 //(가은) 찜 추가
 	public void addToWish(Integer productId, String userName) {
@@ -321,7 +334,7 @@ public class ProductService {
                              .orElse(new ArrayList<>());
     }
 	
-	//0808 성진 테스트
+//0808 성진 테스트
 	public List<SalesVolumeEntity> salesVolumeDesc(Integer id) {
 		//상품의 판매기록 검색
 		List<SalesVolumeEntity> sopl = salesVolumeRepository.findByProductIdOrderByRecordDateDesc(id);
