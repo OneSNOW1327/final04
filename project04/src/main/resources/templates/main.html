@@ -31,5 +31,14 @@
 			<a th:text="${type.typename}" th:href="@{|/product/list/${type.id}|}" class="btn btn-primary my-1"></a>
 		</div>
 		</div> 
+<div th:each="productType : ${productTypes}">
+	<h2 th:text="${productType.typename}"></h2>
+	<ul th:each="product : ${productType.product}">
+		<li>
+			<span th:text="${product.name}"></span>
+		</li>
+	</ul>
+</div>
+
 	</div> 
 </html>

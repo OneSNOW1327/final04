@@ -16,6 +16,7 @@ import com.ex.data.ProductDTO;
 import com.ex.service.AdminService;
 import com.ex.service.PhotoService;
 import com.ex.service.ProductService;
+import com.ex.service.ReviewService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,6 +27,7 @@ public class AdminController {
 	
 	private final ProductService productService;
 	private final PhotoService photoService;;
+	private final ReviewService reviewService;;
 	private final AdminService adminService;
 	
 	
@@ -69,6 +71,13 @@ public class AdminController {
 		amountDTO.setReason(reason);
 		adminService.amount(amountDTO, LocalDate.now());
 		return "redirect:/admin/main";
+	}
+	
+	@GetMapping("adopted/{id}")
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	public String adopted(@PathVariable("id") Integer id) {
+		reviewService.adopted(id);
+		return String.format("redirect:/product/detail/%s", reviewService.findByReviewId(id).getId());
 	}
 	
 }

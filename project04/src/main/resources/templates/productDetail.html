@@ -1,117 +1,123 @@
 <!DOCTYPE html>
 <html lang="ko" layout:decorate="~{layout}">
 <div class="container my-3" layout:fragment="content">
-    <div class="row">
-        <div class="col-md-6">
-            <div class="product-main-image-container">
-                <!-- 메인 이미지 -->
-                <img id="mainImage" th:src="|/file/display?folder=thumbnails&filename=${productDTO.thumbnailPaths[0].sysname}|" alt="Product Image" class="product-main-image">
-                <!-- 이전 이미지로 이동하는 화살표 버튼 -->
-                <button class="nav-arrow nav-arrow-prev" onclick="changeImage(-1)">&#8249;</button>
-                <!-- 다음 이미지로 이동하는 화살표 버튼 -->
-                <button class="nav-arrow nav-arrow-next" onclick="changeImage(1)">&#8250;</button>
-            </div>
-            <div class="d-flex justify-content-center align-items-center mt-3">
-                <!-- 썸네일 이전 버튼 -->
-                <button onclick="moveThumbnail(-1)" style="border: none; background: none; cursor: pointer;">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="sr-only">Previous</span>
-                </button>
-                <div class="d-flex" id="thumbnailContainer" style="overflow: hidden;">
-                    <!-- 썸네일 이미지들 반복문 -->
-                    <div th:each="img, stat : ${productDTO.thumbnailPaths}" class="p-1">
-                        <img th:src="|/file/display?folder=thumbnails&filename=${img.sysname}|" alt="Thumbnail" class="thumbnail" data-index="[[${stat.index}]]">
-                    </div>
-                </div>
-                <!-- 썸네일 다음 버튼 -->
-                <button onclick="moveThumbnail(1)" style="border: none; background: none; cursor: pointer;">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="sr-only">Next</span>
-                </button>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <!-- 상품 정보 표시 -->
-            <h2 th:text="${productDTO.name}">상품명</h2>
-            <p class="text-muted">가격: <span th:text="|${productDTO.sellPrice}원|">가격</span></p>
-            <p class="text-danger">할인가: <span th:text="|${productDTO.sellPrice - (productDTO.sellPrice * (productDTO.discount / 100))}원|">할인가</span></p>
-            <p class="text-info">할인률: <span th:text="|${productDTO.discount}%|">할인률</span></p>
-            <!-- 수정 및 삭제 버튼 추가 -->
-            <a th:href="@{/product/writeForm(id=${productDTO.id})}" class="btn btn-warning mt-2">수정</a>
-            <form th:action="@{/product/delete/{id}(id=${productDTO.id})}" method="post" style="display: inline;">
-                <button type="submit" class="btn btn-danger mt-2">삭제</button>
-            </form>
-        </div>
-    </div>
-    
-    <form th:action="@{|/product/basketAdd|}" method="post">
-        <input type="hidden" name="productId" th:value="${productDTO.id}">
-        <label th:text="수량"></label>
-        <input type="number" name="quantity" min="1" value="1">
-        <input type="submit" value="장바구니"> 
-    </form> 
-    <form th:attr="id='form-' + ${productDTO.id}" th:action="@{|/바로구매/|}" method="post">
-        <input type="hidden" name="productId" th:value="${productDTO.id}">
-        <input type="submit" value="바로구매"> 
-    </form>
-    <form th:attr="id='form-' + ${productDTO.id}" th:action="@{|/product/wishadd|}" method="post">
-        <input type="hidden" name="productId" th:value="${productDTO.id}">
-        <input type="submit" value="찜♥"> 
-    </form> 
-    
-    <div class="row mt-5">
-        <div class="col-12">
-            <!-- 상품 상세 이미지 표시 -->
-            <h3>상품 상세 이미지</h3>
-            <div th:each="img : ${productDTO.descriptionImagePaths}">
-                <img th:src="|/file/display?folder=descriptions&filename=${img.sysname}|" class="description-image mb-3">
-            </div>
-        </div>
-    </div>
-    
-     <!-- 리뷰 작성 폼 -->
-    <div class="row mt-5">
-        <div class="col-12">
-            <h3>리뷰 작성</h3>
-            <form th:action="@{|/review/${productDTO.id}|}" method="post" enctype="multipart/form-data">
-                <input type="hidden" name="productId" th:value="${productDTO.id}">
-                <div class="form-group">
-                    <label for="username">아이디</label>
-                    <input type="text" class="form-control" id="username" name="username" th:value="${#authentication.name}" readonly>
-                </div>
-                <div class="form-group">
-                    <label for="content">리뷰 내용</label>
-                    <textarea class="form-control" id="content" name="content" rows="4" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="images">이미지 업로드</label>
-                    <input type="file" class="form-control-file" id="images" name="images" multiple>
-                </div>
-                <button type="submit" class="btn btn-primary btn-block">리뷰 남기기</button>
-            </form>
-        </div>
-    </div>
-    <!-- 리뷰 목록 표시 -->
-    <div class="row mt-5">
-        <div class="col-12">
-            <h3>리뷰 목록</h3>
-            <div th:if="${productDTO.review != null}" th:each="review : ${productDTO.review}" class="p-1">
-                <div class="card-body">
-                    <h5 class="card-title" th:text="${review.writer.username}">작성자</h5>
-                    <p class="card-text" th:text="${review.content}">리뷰 내용</p>
-                    <div th:if="${review.reviewImages != null}" th:each="reviewImg : ${review.reviewImages}">
-                        <img th:src="|/file/display?folder=reviews&filename=${reviewImg.sysname}|" alt="Review Image" class="img-thumbnail" style="max-width: 100px;">
-                    </div>
-                    <p class="text-muted" th:text="${#temporals.format(review.writeDate,'yyyy-MM-dd HH:mm')}">작성 날짜</p>
-                    <!-- 좋아요 버튼 -->
+	<div class="row">
+		<div class="col-md-6">
+			<div class="product-main-image-container">
+				<!-- 메인 이미지 -->
+				<img id="mainImage" th:src="|/file/display?folder=thumbnails&filename=${productDTO.thumbnailPaths[0].sysname}|" alt="Product Image" class="product-main-image">
+				<!-- 이전 이미지로 이동하는 화살표 버튼 -->
+				<button class="nav-arrow nav-arrow-prev" onclick="changeImage(-1)">&#8249;</button>
+				<!-- 다음 이미지로 이동하는 화살표 버튼 -->
+				<button class="nav-arrow nav-arrow-next" onclick="changeImage(1)">&#8250;</button>
+			</div>
+			<div class="d-flex justify-content-center align-items-center mt-3">
+				<!-- 썸네일 이전 버튼 -->
+				<button onclick="moveThumbnail(-1)" style="border: none; background: none; cursor: pointer;">
+					<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+					<span class="sr-only">Previous</span>
+				</button>
+				<div class="d-flex" id="thumbnailContainer" style="overflow: hidden;">
+					<!-- 썸네일 이미지들 반복문 -->
+					<div th:each="img, stat : ${productDTO.thumbnailPaths}" class="p-1">
+						<img th:src="|/file/display?folder=thumbnails&filename=${img.sysname}|" alt="Thumbnail" class="thumbnail" data-index="[[${stat.index}]]">
+					</div>
+				</div>
+				<!-- 썸네일 다음 버튼 -->
+				<button onclick="moveThumbnail(1)" style="border: none; background: none; cursor: pointer;">
+					<span class="carousel-control-next-icon" aria-hidden="true"></span>
+					<span class="sr-only">Next</span>
+				</button>
+			</div>
+		</div>
+		<div class="col-md-6">
+			<!-- 상품 정보 표시 -->
+			<h2 th:text="${productDTO.name}">상품명</h2>
+			<p class="text-muted">가격: <span th:text="|${productDTO.sellPrice}원|">가격</span></p>
+			<p class="text-danger">할인가: <span th:text="|${productDTO.sellPrice - (productDTO.sellPrice * (productDTO.discount / 100))}원|">할인가</span></p>
+			<p class="text-info">할인률: <span th:text="|${productDTO.discount}%|">할인률</span></p>
+			<!-- 수정 및 삭제 버튼 추가 -->
+			<a th:href="@{/product/writeForm(id=${productDTO.id})}" class="btn btn-warning mt-2">수정</a>
+			<form th:action="@{/product/delete/{id}(id=${productDTO.id})}" method="post" style="display: inline;">
+				<button type="submit" class="btn btn-danger mt-2">삭제</button>
+			</form>
+		</div>
+	</div>
+	
+	<form th:action="@{|/product/basketAdd|}" method="post">
+		<input type="hidden" name="productId" th:value="${productDTO.id}">
+		<label th:text="수량"></label>
+		<input type="number" name="quantity" min="1" value="1">
+		<input type="submit" value="장바구니"> 
+	</form> 
+	<form th:attr="id='form-' + ${productDTO.id}" th:action="@{|/바로구매/|}" method="post">
+		<input type="hidden" name="productId" th:value="${productDTO.id}">
+		<input type="submit" value="바로구매">
+	</form>
+	<form th:attr="id='form-' + ${productDTO.id}" th:action="@{|/찜♥/|}" method="post">
+		<input type="hidden" name="productId" th:value="${productDTO.id}">
+		<input type="submit" value="찜♥"> 
+	</form> 
+	
+	<div class="row mt-5">
+		<div class="col-12">
+			<!-- 상품 상세 이미지 표시 -->
+			<h3>상품 상세 이미지</h3>
+			<div th:each="img : ${productDTO.descriptionImagePaths}">
+				<img th:src="|/file/display?folder=descriptions&filename=${img.sysname}|" class="description-image mb-3">
+			</div>
+		</div>
+	</div>
+	
+	<!-- 리뷰 작성 폼 -->
+	<div class="row mt-5">
+		<div class="col-12">
+			<h3>리뷰 작성</h3>
+			<form th:action="@{|/review/${productDTO.id}|}" method="post" enctype="multipart/form-data">
+				<input type="hidden" name="productId" th:value="${productDTO.id}">
+				<div class="form-group">
+					<label for="username">아이디</label>
+					<input type="text" class="form-control" id="username" name="username" th:value="${#authentication.name}" readonly>
+				</div>
+				<div class="form-group">
+					<label for="content">리뷰 내용</label>
+					<textarea class="form-control" id="content" name="content" rows="4" required></textarea>
+				</div>
+				<div class="form-group">
+					<label for="images">이미지 업로드</label>
+					<input type="file" class="form-control-file" id="images" name="images" multiple>
+				</div>
+				<button type="submit" class="btn btn-primary btn-block">리뷰 남기기</button>
+			</form>
+		</div>
+	</div>
+	<!-- 리뷰 목록 표시 -->
+	<div class="row mt-5">
+		<div class="col-12">
+			<h3>리뷰 목록</h3>
+			<div th:if="${productDTO.review != null}" th:each="review : ${productDTO.review}" class="p-1">
+				<div class="card-body">
+					<p th:if="${review.adopted == 1}" class="text-info">BEST</p>
+					<div class="d-flex justify-content-between">
+						<h5 class="card-title" th:text="${review.writer.username}">작성자</h5>
+						<div sec:authorize="hasRole('ROLE_ADMIN')">
+							<a href="javascript:void(0)" th:data-uri="@{|/admin/adopted/${review.id}|}"  
+								class="adopted btn btn-sm btn-outline-info" 	style="font-size:16px;" >채택
+							</a>
+						</div>
+					</div>
+					<div th:if="${review.reviewImages != null}" th:each="reviewImg : ${review.reviewImages}">
+						<img th:src="|/file/display?folder=reviews&filename=${reviewImg.sysname}|" alt="Review Image" class="img-thumbnail" style="max-width: 100px;">
+					</div>
+					<p class="card-text" th:text="${review.content}">리뷰 내용</p>
+					<p class="text-muted" th:text="${#temporals.format(review.writeDate,'yyyy-MM-dd HH:mm')}">작성 날짜</p>
+					<!-- 좋아요 버튼 -->
 					<div th:if="${#authentication.getPrincipal() != null}">
 						<a href="javascript:void(0)" style="font-size:16px;"  class="recommend btn btn-sm btn-outline-primary" sec:authorize="isAuthenticated()" 
-							th:data-uri="@{|/review/like/${review.id}|}" th:unless="${#lists.contains(review.voter.![username], #authentication.principal.username)}" >
-							추천 <span class="badge rounded-pill bg-primary text-white" th:text="${#lists.size(review.voter)}"></span>
-						</a>
-						<a href="javascript:void(0)" style="font-size:16px;"  class="recommendcancel btn btn-sm btn-outline-primary"  sec:authorize="isAuthenticated()" 
-							th:data-uri="@{|/review/like/${review.id}|}" th:if="${#lists.contains(review.voter.![username], #authentication.principal.username)}">
-							추천 취소 <span class="badge rounded-pill bg-primary text-white" th:text="${#lists.size(review.voter)}"></span>
+							th:data-uri="@{|/review/like/${review.id}|}" >
+							추천 
+							<span th:if="${#lists.contains(review.voter.![username], #authentication.principal.username)}">취소</span>
+							<span class="badge rounded-pill bg-primary text-white" th:text="${#lists.size(review.voter)}"></span>
 						</a>
 					</div>
 					<div sec:authorize="isAnonymous()">
@@ -122,8 +128,8 @@
 					</div>
 				</div>
 			</div>
-    	</div>
-    </div>
+		</div>
+	</div>
 </div>
 <th:block layout:fragment="script">
 <script>
@@ -200,18 +206,18 @@
 					}
 				});
 			});
-			const recommendcancel_elements = document.getElementsByClassName("recommendcancel");
-			Array.from(recommendcancel_elements).forEach(function(element){
-				element.addEventListener("click",function(){
-					if(confirm("추천 취소 확인")){
-						location.href=this.dataset.uri;
-					}
-				});
-			});
 			const logincommend_elements = document.getElementsByClassName("logincommend");
 			Array.from(logincommend_elements).forEach(function(element){
 				element.addEventListener("click",function(){
 					if(confirm("로그인 필요")){
+						location.href=this.dataset.uri;
+					}
+				});
+			});
+			const adopted_elements = document.getElementsByClassName("adopted");
+			Array.from(adopted_elements).forEach(function(element){
+				element.addEventListener("click",function(){
+					if(confirm("채택 확인")){
 						location.href=this.dataset.uri;
 					}
 				});

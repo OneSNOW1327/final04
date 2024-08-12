@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -108,4 +109,23 @@ public class ReviewService {
 		reviewRepository.save(re);
 	}
     
+	public void adopted(Integer id) {
+		Optional<ReviewEntity> op = reviewRepository.findByProduct_IdAndAdopted(findByReviewId(id).getId(), 1);
+		Integer rid = 0;
+		if(op.isPresent()) {
+			ReviewEntity re = op.get();
+			re.setAdopted(0);
+			reviewRepository.save(re);
+			rid = re.getId();
+		}
+		if(rid != id) {
+			ReviewEntity re = reviewRepository.findById(id).get();
+			UserEntity ue = re.getWriter();
+			re.setAdopted(1);
+			reviewRepository.save(re);
+			ue.setPoint(ue.getPoint()+1000);
+			userRepository.save(ue);
+		}
+	}
+	
 }

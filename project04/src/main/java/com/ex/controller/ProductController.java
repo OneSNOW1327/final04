@@ -1,15 +1,12 @@
 package com.ex.controller;
 
-import com.ex.data.BasketDTO;
 import com.ex.data.DeliveryDTO;
 import com.ex.data.ProductDTO;
 import com.ex.entity.BasketEntity;
 import com.ex.entity.DeliveryEntity;
-import com.ex.entity.OrderlistEntity;
 import com.ex.entity.ProductEntity;
 import com.ex.entity.ProducttypeEntity;
 import com.ex.entity.UserEntity;
-import com.ex.repository.OrderlistRepository;
 import com.ex.service.ProductService;
 import com.ex.service.UserService;
 import com.ex.service.PhotoService;
@@ -28,12 +25,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.springframework.web.bind.annotation.RequestBody;
 
 @Controller
 @RequiredArgsConstructor
@@ -228,10 +222,16 @@ public class ProductController {
 //(가은) 상세 주문내역 fullPayResult
 	@GetMapping("/fullPayResult")
 	@PreAuthorize("isAuthenticated()") 
-	public String fullPayResult(Principal principal, Model model,
-								@RequestParam("orderId") int orderId) { 		
+	public String fullPayResult(Principal principal, Model model, @RequestParam("orderId") int orderId) { 		
 		//오더아이디로 오더에 관한것 들		
 		model.addAttribute("order", productService.orders(orderId));
-	 return "fullPayResult"; }
-
+		return "fullPayResult"; 
+	 }
+	
+	//0802성진 테스트
+	@PostMapping("/sales/{id}")
+	public String slaes(@PathVariable("id")Integer id,@RequestParam("rate")int rate) {
+		productService.sales(id,rate,productService.salesVolumeDesc(id));
+		return "redirect:/admin/product/"+id;
+	}
 }

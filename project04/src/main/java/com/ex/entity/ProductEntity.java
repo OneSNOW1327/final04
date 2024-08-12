@@ -35,6 +35,7 @@ public class ProductEntity {
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
 	@JsonIgnore // 직렬화에서 제외
+	@OrderBy("adopted DESC, writeDate DESC")
     private List<ReviewEntity> review; // 리뷰
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)

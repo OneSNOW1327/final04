@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.ex.entity.ProductThumbnailEntity;
+import com.ex.entity.ProducttypeEntity;
 import com.ex.service.PhotoService;
 import com.ex.service.ProductService;
 
@@ -34,6 +35,8 @@ public class MainController {
 	@GetMapping("/main")
 	public String mainPage(Model model) {    	
 		model.addAttribute("typeList", productService.getAllProductTypes());
+		List<ProducttypeEntity> productTypes = productService.getSortedProductTypes();
+		model.addAttribute("productTypes", productTypes);
 		return "main";
 	}
 
