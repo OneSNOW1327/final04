@@ -63,4 +63,5 @@ public class UserEntity {
     
     @OneToMany(mappedBy = "writer", cascade = CascadeType.REMOVE)
     private List<ReviewEntity> review;
+    
 }
