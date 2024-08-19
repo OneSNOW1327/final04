@@ -29,7 +29,7 @@ public class UserDTO {
 
     private String realName;
 
-    private String adress;
+    private String address;
     
     private String phone;
     
@@ -50,7 +50,7 @@ public class UserDTO {
 				.username(ue.getUsername())
 				.email(ue.getEmail())
 				.realName(ue.getRealName())
-				.adress(ue.getAdress())
+				.address(ue.getAddress())
 				.phone(ue.getPhone())
 				.reg(ue.getReg())
 				.point(ue.getPoint())

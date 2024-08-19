@@ -38,6 +38,9 @@ public class OrderlistEntity {
     private String payOption; //결제방식
     
     private double discount;//할인률    
+    
+    private String tid;
 
+    
     
 }

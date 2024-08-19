@@ -23,7 +23,8 @@
             </div>
         </div>
 
-        <div class="mt-4">
+        <!-- 관리자 등급인 경우에만 답변 작성 폼을 표시 -->
+        <div class="mt-4" th:if="${isAdmin}">
             <h4>답변 작성</h4>
             <form th:action="@{/question/detail/{id}/answer(id=${question.id})}" method="post">
                 <div class="form-group">

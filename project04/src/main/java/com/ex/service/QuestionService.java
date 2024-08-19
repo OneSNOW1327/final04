@@ -16,8 +16,15 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class QuestionService {
 
-    private final QuestionRepository questionRepository; // 문의 리포지토리
-    private final UserRepository userRepository; // 사용자 리포지토리
+    private final QuestionRepository questionRepository;
+    private final UserRepository userRepository;
+
+    // 사용자별 문의 목록 가져오기
+    public List<QuestionDTO> findByUsername(String username) {
+        return questionRepository.findByUser_Username(username).stream()
+                .map(this::entityToDTO)
+                .collect(Collectors.toList());
+    }
 
     // 모든 문의 가져오기
     public List<QuestionDTO> findAll() {

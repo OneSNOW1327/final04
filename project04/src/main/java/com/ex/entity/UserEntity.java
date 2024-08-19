@@ -42,7 +42,7 @@ public class UserEntity {
 
     private String realName; //사용자이름
 
-    private String adress;
+    private String address; //기본주소
     
     private String phone;
     
