@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +19,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.ex.data.NoticeDTO;
+import com.ex.entity.NoticeEntity;
 import com.ex.entity.ProductThumbnailEntity;
 import com.ex.entity.ProducttypeEntity;
+import com.ex.service.NoticeService;
 import com.ex.service.PhotoService;
 import com.ex.service.ProductService;
 
@@ -29,14 +33,18 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MainController {
 
+	private final NoticeService noticeService;
 	private final ProductService productService;
 	private final PhotoService photoService;
  
 	@GetMapping("/main")
 	public String mainPage(Model model) {    	
+		
 		model.addAttribute("typeList", productService.getAllProductTypes());
 		List<ProducttypeEntity> productTypes = productService.getSortedProductTypes();
 		model.addAttribute("productTypes", productTypes);
+	     NoticeDTO notice = noticeService.getLatestNotice();
+	     model.addAttribute("notice", notice);
 		return "main";
 	}
 
@@ -83,5 +91,25 @@ public class MainController {
 				.collect(Collectors.toList());
 		return new ResponseEntity<>(imageList, HttpStatus.OK);
 	}
+	// 공지사항 상세 보기
+	 @GetMapping("/main/NoticeDetail/{id}")
+	 public String noticeDetail(@PathVariable("id") Integer id, Model model) {
+	     NoticeDTO noticeDTO = noticeService.findById(id); // 공지사항 정보 불러오기
+	     noticeDTO.setNoticePhotoPath(photoService.getNotice(id)); // 이미지 경로 설정
+	     model.addAttribute("NoticeDTO", noticeDTO); // 모델에 NoticeDTO 추가
+	     return "NoticeDetail"; // 템플릿 반환
+	 }
+	 
+	 @GetMapping("/main/noticeList")
+	    public String list(@RequestParam(value = "page", defaultValue = "1") int page, Model model) {
+	        if (page <= 0) {
+	            return "redirect:/main/noticeList?page=1";
+	        }
 
+	        Page<NoticeEntity> noticePage = noticeService.noticeAll(page - 1);
+	        model.addAttribute("noticeList", noticePage.getContent());
+	        model.addAttribute("currentPage", page);
+	        model.addAttribute("totalPages", noticePage.getTotalPages());
+	        return "NoticeList";
+	    }
 }

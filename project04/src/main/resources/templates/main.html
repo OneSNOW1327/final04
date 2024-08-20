@@ -1,50 +1,190 @@
-<!DOCTYPE html> 
-<html layout:decorate="~{layout}">
-	<div class="container my-3" layout:fragment="content" style="max-width:1600px;">
-		<div class="container mt-5">
-			<div class=" d-flex justify-content-center">
-			<div>
-			<h1>메인 페이지</h1>
-			 <h2 sec:authorize="isAuthenticated()" sec:authentication="name" class="text-center"></h2>
-			 </div>
-			 </div>
-			 <div class="d-flex justify-content-end">
-			 <a class="btn btn-black d-flex align-items-center justify-content-center text-center" 
-			 	th:href="@{/user/login}" sec:authorize="isAnonymous()" style="font-size:23px;">로그인
-			 </a>
-			 <a class="btn btn-black d-flex align-items-center justify-content-center text-center" 
-			 	th:href="@{/user/logout}" sec:authorize="isAuthenticated()" style="font-size:23px;">로그아웃
-			 </a>
-			 <a class="btn btn-black d-flex align-items-center justify-content-center text-center" 
-			 	th:href="@{/product/basketList}" sec:authorize="isAuthenticated()" style="font-size:23px;">장바구니
-			 </a>
-			 <a class="btn btn-black d-flex align-items-center justify-content-center text-center" 
-			 	th:href="@{/product/writeForm}"  style="font-size:23px;">상품등록
-			 </a>
-			 <a class="btn btn-black d-flex align-items-center justify-content-center text-center" 
-			 	th:href="@{/product/simplePayResult}"  style="font-size:23px;">주문내역
-			 </a>
-			 <a class="btn btn-black d-flex align-items-center justify-content-center text-center" 
-			 	th:href="@{question/questionList}"  style="font-size:23px;">문의 게시판
-			 </a>
-			 <a class="btn btn-black d-flex align-items-center justify-content-center text-center" 
-			 	th:href="@{/faq/faqList}"  style="font-size:23px;">FAQ
-			 </a>
-			 </div>
-		</div>
-		<div class="text-align">
-		<div th:each="type : ${typeList}">
-			<a th:text="${type.typename}" th:href="@{|/product/list/${type.id}|}" class="btn btn-primary my-1"></a>
-		</div>
-		</div> 
-<div th:each="productType : ${productTypes}">
-	<h2 th:text="${productType.typename}"></h2>
-	<ul th:each="product : ${productType.product}">
-		<li>
-			<span th:text="${product.name}"></span>
-		</li>
-	</ul>
-</div>
+<!DOCTYPE html>
+<html lang="ko" layout:decorate="~{layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>메인 페이지</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100%;
+        }
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        #popup-content {
+            position: relative;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        #overlay img {
+            max-width: 100%;
+            max-height: 70vh; /* 화면 높이의 70%로 제한 */
+            object-fit: contain;
+            margin-bottom: 20px;
+        }
+        #close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #dont-show {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #dont-show input {
+            margin-right: 5px;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>
+        function setCookie(name, value, days) {
+            var date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            var expires = "expires=" + date.toUTCString();
+            document.cookie = name + "=" + value + ";" + expires + ";path=/";
+        }
 
-	</div> 
+        function getCookie(name) {
+            var nameEQ = name + "=";
+            var ca = document.cookie.split(';');
+            for (var i = 0; i < ca.length; i++) {
+                var c = ca[i];
+                while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+                if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+            }
+            return null;
+        }
+
+        function openLayerPopup() {
+            if (getCookie("popupClosed") !== "true") {
+                $("#overlay").fadeIn();
+                $("html, body").css("overflow", "hidden");
+            }
+        }
+
+        function closeLayerPopup() {
+            if ($("#dont-show-checkbox").is(":checked")) {
+                setCookie("popupClosed", "true", 1);  // 하루 동안 팝업 안 보이게 설정
+            }
+            $("#overlay").fadeOut();
+            $("html, body").css("overflow", "auto");
+        }
+
+        $(document).ready(function() {
+            openLayerPopup();
+            $("#close-button").on('click', closeLayerPopup);
+
+            // 오버레이 클릭 시 팝업 닫기
+            $("#overlay").on('click', function(e) {
+                if ($(e.target).is("#overlay")) {
+                    closeLayerPopup();
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="container my-3" layout:fragment="content" style="max-width:1600px;">
+        <div class="container mt-5">
+            <div class="d-flex justify-content-center">
+                <div>
+                    <h1 class="text-center">메인 페이지</h1>
+                </div>
+            </div>
+            <div class="d-flex justify-content-end mb-4">
+                <a class="btn btn-primary mx-1" th:href="@{/user/login}" sec:authorize="isAnonymous()">로그인</a>
+                <a class="btn btn-secondary mx-1" th:href="@{/user/logout}" sec:authorize="isAuthenticated()">로그아웃</a>
+                <a class="btn btn-info mx-1" th:href="@{/product/basketList}" sec:authorize="isAuthenticated()">장바구니</a>
+                <a class="btn btn-success mx-1" th:href="@{/product/writeForm}">상품등록</a>
+                <a class="btn btn-warning mx-1" th:href="@{/product/simplePayResult}">주문내역</a>
+                <a class="btn btn-light mx-1" th:href="@{/admin/noticeList}">공지사항</a>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-2">
+                <h4>상품 카테고리</h4>
+                <div class="list-group">
+                    <a th:each="type : ${typeList}" th:text="${type.typename}" th:href="@{|/product/list/${type.id}|}" class="list-group-item list-group-item-action"></a>
+                </div>
+            </div>
+
+            <div class="col-md-10">
+                <div th:each="productType : ${productTypes}">
+                    <h2 th:text="${productType.typename}" class="mb-4"></h2>
+                    <div class="row">
+                        <div class="col-md-4" th:each="product : ${productType.product}">
+                            <div class="card mb-4">
+                                <a th:href="@{/product/detail/{id}(id=${product.id})}">
+                                    <img th:src="|/file/display?folder=thumbnails&filename=${product.thumbnail[0].sysname}|" alt="Product Image" class="card-img-top">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-dark" th:text="${product.name}"></h5>
+                                        <p class="card-text">
+                                            <span th:if="${product.discount > 0}">
+                                                <del class="text-muted" th:text="${#numbers.formatDecimal(product.sellPrice, 0, 'COMMA', 3, 'POINT').replace('.000', '')} + '원'"></del>
+                                                <br>
+                                                <strong class="text-danger" th:text="'쿠폰 최대할인: ' + ${product.discount} + '%'"></strong>
+                                                <br>
+                                                <strong class="text-primary" th:text="${#numbers.formatDecimal(product.sellPrice * (100-product.discount)/100, 0, 'COMMA', 3, 'POINT').replace('.000', '')} + '원'"></strong>
+                                            </span>
+                                            <span th:if="${product.discount == 0}">
+                                                <strong class="text-primary" th:text="${#numbers.formatDecimal(product.sellPrice, 0, 'COMMA', 3, 'POINT').replace('.000', '')} + '원'"></strong>
+                                            </span>
+                                        </p>
+                                    </div>
+                                </a>
+                                <div class="card-footer text-muted">
+                                    <small th:text="'리뷰 ' + ${product.review.size()}"></small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 레이어 팝업 오버레이 -->
+        <div id="overlay" th:if="${notice.noticePhotoPath != null and !#lists.isEmpty(notice.noticePhotoPath)}">
+            <div id="popup-content">
+                <button id="close-button">&times;</button>
+                <div id="popup-images">
+                    <img th:each="photo : ${notice.noticePhotoPath}"
+                         th:src="@{|/file/display?folder=notice&filename=${photo.sysname}|}" 
+                         alt="공지사항 이미지">
+                </div>
+                <div id="dont-show">
+                    <input type="checkbox" id="dont-show-checkbox">
+                    <label for="dont-show-checkbox">하루 동안 보지 않기</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </div>
+</body>
 </html>

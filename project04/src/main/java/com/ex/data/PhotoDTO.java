@@ -14,4 +14,8 @@ public class PhotoDTO {
     private String orgname;
     private String sysname;
     private String filePath;
+    
+    public PhotoDTO(String sysname) {
+        this.sysname = sysname;
+    }
 }

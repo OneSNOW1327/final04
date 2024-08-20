@@ -1,11 +1,13 @@
 package com.ex.service;
  
 import com.ex.data.PhotoDTO;
+import com.ex.entity.NoticePhotoEntity;
 import com.ex.entity.ProductEntity;
 import com.ex.entity.ProductImgEntity;
 import com.ex.entity.ProductThumbnailEntity;
 import com.ex.entity.ReviewEntity;
 import com.ex.entity.ReviewImgEntity;
+import com.ex.repository.NoticePhotoRepository;
 import com.ex.repository.ProductImgRepository;
 import com.ex.repository.ProductThumbnailRepository;
 import com.ex.repository.ReviewImgRepository;
@@ -27,6 +29,7 @@ public class PhotoService {
   
     private final ProductThumbnailRepository productThumbnailRepository;
     private final ProductImgRepository productImgRepository;
+    private final NoticePhotoRepository noticePhotoRepository;
     private final ReviewImgRepository reviewImgRepository;
 
     private final String THUMBNAIL_DIR = "F:/img/thumbnails/";
@@ -120,6 +123,20 @@ public class PhotoService {
         }
         return photoDTOList;
     }
+    
+    public List<PhotoDTO> getNotice(Integer Id) {
+        List<NoticePhotoEntity> notice = noticePhotoRepository.findByNoticeIdOrderByIdAsc(Id);
+        List<PhotoDTO> photoDTOList = new ArrayList<>();
+        for (NoticePhotoEntity noticephoto : notice) {
+            photoDTOList.add(new PhotoDTO(
+            		noticephoto.getId(),
+            		noticephoto.getOrgname(),
+            		noticephoto.getSysname(),
+                    "/file/display?filename=notice/" + noticephoto.getSysname()
+            ));
+        }
+        return photoDTOList;
+    }
 
     public void deleteThumbnail(Integer id) {
         ProductThumbnailEntity thumbnail = productThumbnailRepository.findById(id)
@@ -153,8 +170,9 @@ public class PhotoService {
         }
     }
     
-    public List<ProductThumbnailEntity> findSysname(Integer id){
-    	List<ProductThumbnailEntity> pes = productThumbnailRepository.findByProductIdOrderByIdAsc(id);
-    	return pes;
+    public List<ProductThumbnailEntity> findSysname(Integer id) {
+        List<ProductThumbnailEntity> pes = productThumbnailRepository.findByProductIdOrderByIdAsc(id);
+        return pes;
     }
+
 }

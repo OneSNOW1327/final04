@@ -1,24 +1,36 @@
 package com.ex.controller;
 
+import java.io.IOException;
 import java.time.LocalDate;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.view.RedirectView;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import com.ex.data.AmountDTO;
+import com.ex.data.NoticeDTO;
 import com.ex.data.ProductDTO;
 import com.ex.service.AdminService;
+import com.ex.service.NoticeService;
 import com.ex.service.PhotoService;
 import com.ex.service.ProductService;
 import com.ex.service.ReviewService;
 
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Page;
+import com.ex.entity.NoticeEntity;
 
 @Controller
 @RequiredArgsConstructor
@@ -26,6 +38,7 @@ import lombok.RequiredArgsConstructor;
 public class AdminController {
 	
 	private final ProductService productService;
+	private final NoticeService noticeService;
 	private final PhotoService photoService;;
 	private final ReviewService reviewService;;
 	private final AdminService adminService;
@@ -80,4 +93,25 @@ public class AdminController {
 		return String.format("redirect:/product/detail/%s", reviewService.findByReviewId(id).getId());
 	}
 	
+	@GetMapping("/NoticeWriteForm")
+	public String noticeWriteForm(@RequestParam(value = "id", required = false) Integer id, Model model) {
+	    if (id != null) {
+	        NoticeDTO noticeDTO = noticeService.findById(id);
+	        noticeDTO.setNoticePhotoPath(photoService.getNotice(id));  // 이미지 경로 설정
+	        model.addAttribute("noticeDTO", noticeDTO);
+	    } else {
+	        model.addAttribute("noticeDTO", new NoticeDTO());
+	    }
+	    return "NoticeWriteForm";
+	}
+
+		// 등록/수정 처리 메서드
+		@PostMapping("/NoticewritePro")
+		public String saveOrUpdateProduct(@ModelAttribute NoticeDTO noticeDTO,
+				@RequestParam("notice") MultipartFile[] notice)
+				throws IOException {
+			Integer id = noticeService.NoticecreateOrUpdate(noticeDTO, notice);
+			return String.format("redirect:/main/NoticeDetail/%d", id);
+		}
+
 }

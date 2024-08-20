@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout}">
+<head>
+    <title>공지사항 상세보기</title>
+</head>
+<body>
+    <div class="container my-3" layout:fragment="content">
+        <h1 th:text="${NoticeDTO.name}">공지사항 제목</h1>
+
+        <!-- 공지사항 사진 표시 -->
+        <div th:if="${NoticeDTO.noticePhotoPath != null and !#lists.isEmpty(NoticeDTO.noticePhotoPath)}">
+            <div th:each="photo : ${NoticeDTO.noticePhotoPath}">
+                <img th:src="@{|/file/display?folder=notice&filename=${photo.sysname}|}" 
+                     alt="공지사항 이미지" 
+                     style="max-width: 100%; margin-bottom: 10px;">
+            </div>
+        </div>
+
+        <!-- 공지사항 내용 표시 -->
+        <p th:text="${NoticeDTO.description}">공지사항 내용</p>
+
+        <!-- 목록으로 돌아가기 버튼 -->
+        <a href="/main/noticeList" class="btn btn-primary">목록으로</a>
+    </div>
+</body>
+</html>
