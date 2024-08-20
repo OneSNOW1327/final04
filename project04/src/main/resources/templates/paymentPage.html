@@ -2,7 +2,7 @@
 <html xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout" layout:decorate="~{layout}">
     <div class="container my-3" layout:fragment="content">
         <h1>주문서 작성</h1>
-        <form id="orderForm" action="/product/requestPay" method="post">
+        <form id="orderForm" action="/kakao/kakaoPay" method="post">
             <h4>주문상품</h4>
             <span th:text="'주문상품 (' + ${#lists.size(expectPay)} + ')'"></span>
             <input type="hidden" th:value="${#lists.size(expectPay)}" id="size">
@@ -39,127 +39,180 @@
                 </tr>
                 <tr>
                     <th>주소</th>
-                    <td><input type="text" id="adress" name="receiveAddress"></td>
+                    <td>
+                    <input type="text" id="sample6_postcode" name="receivePostcode" placeholder="우편번호">
+					<input type="button" onclick="sample6_execDaumPostcode()" value="우편번호 찾기"><br>
+					<input type="text" id="sample6_address" name="receiveAddress" placeholder="기본주소"><br>
+					<input type="text" id="sample6_detailAddress" name="receiveDetailAddress" placeholder="상세주소">
+					<input type="text" id="sample6_extraAddress" name="receiveExtraAddress" placeholder="참고항목">
+					</td>
                 </tr>
                 <tr>
-                    <th>배송메세지</th>
-                    <td><input type="text" name="memo"></td>
+                    <th>배송메모</th>
+                    <td><input type="text" id="memo" name="memo"></td>
                 </tr>
+
             </table>
             <div th:each="user,loop : ${principalUser}">
                 <input th:id="userName" type="hidden" th:value="${user.realName}" />
                 <input th:id="userPhone" type="hidden" th:value="${user.phone}" />
-                <input th:id="userAdress" type="hidden" th:value="${user.adress}" />
+                <input th:id="userPostcode" type="hidden" th:value="${user.postcode}" />
+                <input th:id="userAdress" type="hidden" th:value="${user.address}" />
+                <input th:id="userDetailAddress" type="hidden" th:value="${user.detailAddress}" />
+                <input th:id="userExtraAddress" type="hidden" th:value="${user.extraAddress}" />
             </div>
             <hr>
             <span>원가 </span><input id="sellPrice" readonly type="text"><span> - </span>
-            <span>할인금액</span><input id="discount" readonly type="text"><span> = </span>
-            <span>총 결제금액</span><input id="payPrice" readonly type="text">
+            <span>할인금액</span><input id="discount" readonly type="text"><span> - </span>
+            <span>포인트 사용</span><input id="point" type="number" min="0" th:max="${principalUser.point}" th:oninput="|validateMaxValue(this, ${principalUser.point})|"><span> = </span>
+            <span>총 결제금액</span><input id="payPrice" name="payPrice" readonly type="text">
             <hr>
-            <h4>결제 방법 선택</h4>
-            <select name="paymentOption">
-                <option value="bankTransfer" th:onclick="kg_request_pay()">무통장입금</option>
-                <option value="creditCard" th:onclick="kg_request_pay()">신용카드</option>
-                <option value="kakaoPay" th:onclick="ka_request_pay()">카카오페이</option>
-            </select>
             <br>
-            <input type="button" value="결제하기" onclick="submitForm()">
+            <input type="button" value="카카오로 결제하기" onclick="submitForm()">
         </form>
     </div>
 
 	<th:block layout:fragment="script">    
 		<script> 
-// 금액 총합 계산
-			var size = document.getElementById('size').value;
-			var sumSellPrice = 0;
-			var sumDiscount = 0;
-			for (var i = 0; i < size; i++) {
-				var quantity = document.getElementById('quantity_'+i).value;
-				for(var j = 0;j <quantity; j++){
-					sumSellPrice += parseFloat(document.getElementById('sellPrice_' + i).value) || 0;
-					sumDiscount += parseFloat(document.getElementById('discount_' + i).value) || 0;
-				}
-			}
-			document.getElementById('sellPrice').value = sumSellPrice;
-			document.getElementById('discount').value = sumDiscount;
-			document.getElementById('payPrice').value = sumSellPrice - sumDiscount;
-		
-// 배송지정보_주문자정보와 동일 체크
-			var sameDeliveryCheckbox = document.getElementById('sameDelivery');
-			sameDeliveryCheckbox.addEventListener('change', function() {
-				var realNameInput = document.getElementById('realName');
-				var phoneInput = document.getElementById('phone');
-				var adressInput = document.getElementById('adress');
-		
-				var userName = document.getElementById('userName').value;
-				var userPhone = document.getElementById('userPhone').value;
-				var userAdress = document.getElementById('userAdress').value;
-		
-				if (this.checked) {
-					realNameInput.value = userName;
-					phoneInput.value = userPhone;
-					adressInput.value = userAdress;
-				} else {
-					realNameInput.value = '';
-					phoneInput.value = '';
-					adressInput.value = '';
-				}
-			});
+		// 금액 총합 계산
+	     function validateMaxValue(input, maxValue) {
+	            if (parseFloat(input.value) > maxValue) {
+	                input.value = maxValue; // 최대값을 초과하면 최대값으로 설정
+	            }
+	            updateTotal(); // 입력 값이 변경될 때마다 총 결제 금액을 업데이트
+	        }
 
-			var IMP = window.IMP; // 생략가능
-		  	IMP.init('imp32764806'); // <-- 본인 가맹점 식별코드 삽입
-		  	
-//basketId 리스트로 만들고 orderForm제출
+	        function calculateTotals() {
+	            var size = document.getElementById('size').value;
+	            var sumSellPrice = 0;
+	            var sumDiscount = 0;
+	            for (var i = 0; i < size; i++) {
+	                var quantity = document.getElementById('quantity_' + i).value;
+	                var sellPrice = parseFloat(document.getElementById('sellPrice_' + i).value) || 0;
+	                var discount = parseFloat(document.getElementById('discount_' + i).value) || 0;
+
+	                sumSellPrice += sellPrice * quantity;
+	                sumDiscount += discount * quantity;
+	            }
+	            return { sumSellPrice, sumDiscount };
+	        }
+
+	        function updateTotal() {
+	            var { sumSellPrice, sumDiscount } = calculateTotals();
+	            var point = parseFloat(document.getElementById('point').value) || 0;
+
+	            document.getElementById('sellPrice').value = Math.floor(sumSellPrice);
+	            document.getElementById('discount').value = Math.floor(sumDiscount);
+	            document.getElementById('payPrice').value = Math.floor(sumSellPrice - sumDiscount - point);
+	        }
+
+	        window.onload = function() {
+	            updateTotal(); // 초기 로드 시 총 결제 금액을 계산
+	        };
+	// 배송지정보_주문자정보와 동일 체크
+	         var sameDeliveryCheckbox = document.getElementById('sameDelivery');
+	         sameDeliveryCheckbox.addEventListener('change', function() {
+	            var realNameInput = document.getElementById('realName');
+	            var phoneInput = document.getElementById('phone');
+	            var postcodeInput = document.getElementById('sample6_postcode');
+	            var adressInput = document.getElementById('sample6_address');
+	            var detailAddressInput = document.getElementById('sample6_detailAddress');
+	            var extraAddressInput = document.getElementById('sample6_extraAddress');
+				
+	            var userName = document.getElementById('userName').value;
+	            var userPhone = document.getElementById('userPhone').value;
+	            var userPostcode = document.getElementById('userPostcode').value;
+	            var userAdress = document.getElementById('userAdress').value;
+	            var userDetailAddress = document.getElementById('userDetailAddress').value;
+	            var userExtraAddress = document.getElementById('userExtraAddress').value;
+	      
+	            if (this.checked) {
+	               realNameInput.value = userName;
+	               phoneInput.value = userPhone;
+	               postcodeInput.value = userPostcode;
+	               adressInput.value = userAdress;
+	               detailAddressInput.value = userDetailAddress;
+	               extraAddressInput.value = userExtraAddress;
+	            } else {
+	               realNameInput.value = '';
+	               phoneInput.value = '';
+	               postcodeInput.value = '';
+	               adressInput.value = '';
+	               detailAddressInput.value = '';
+	               extraAddressInput.value = '';
+	            }
+	         });
+
+	         var IMP = window.IMP; // 생략가능
+	           IMP.init('imp32764806'); // <-- 본인 가맹점 식별코드 삽입
+	           
+	//basketId 리스트로 만들고 orderForm제출
 			function submitForm() {
-				IMP.init('imp32764806'); //iamport 대신 자신의 "가맹점 식별코드"를 사용
-				  IMP.request_pay({
-				    pg: "{inicis}.{INIpayTest}",
-				    pay_method: "card",
-				    merchant_uid : 'merchant_'+new Date().getTime(),
-				    name : '결제테스트',
-				    amount : 100,
-				    buyer_email : 'gaeun2323@naver.com',
-				    buyer_name : '구매자',
-				    buyer_tel : '010-4342-6938',
-				    buyer_addr : '서울특별시 강남구 삼성동',
-				    buyer_postcode : '123-456'
-				  }, function (rsp) { // callback
-				      if (rsp.success) {// 결제 성공 시 로직,
-				          alert('결제가 완료되었습니다.');
-				          const basketIds = [];
-							document.querySelectorAll('input[name="basketId"]').forEach(input => {
-								basketIds.push(input.value);
-							});
-					
-							const hiddenInput = document.createElement('input');
-							hiddenInput.type = 'hidden';
-							hiddenInput.name = 'basketIds';
-							hiddenInput.value = basketIds.join(',');
-						
-							const form = document.getElementById('orderForm');
-							form.appendChild(hiddenInput);
-						
-							form.submit();       				        
-				       
-				      } else {// 결제 실패 시 로직,
-				    	  var msg = '결제에 실패하였습니다.';
-				          msg += '에러내용 : ' + rsp.error_msg;
-				          alert(msg);				        
-				      }
-				  });
-				
-				
+				const basketIds = [];
+				document.querySelectorAll('input[name="basketId"]').forEach(input => {
+					basketIds.push(input.value);
+				});		
+				const hiddenInput = document.createElement('input');
+				hiddenInput.type = 'hidden';
+				hiddenInput.name = 'basketIds';
+				hiddenInput.value = basketIds.join(',');			
+				const form = document.getElementById('orderForm');
+				form.appendChild(hiddenInput);			
+				form.submit();
 			}
-		
 		</script>
-	<!-- JS 라이브러리를 추가 -->	
-	<script src="https://cdn.iamport.kr/v1/iamport.js"></script>	
-	<!-- jQuery -->
-	<script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js" ></script>
-	<!-- iamport.payment.js -->
-	<script type="text/javascript" src="https://cdn.iamport.kr/js/iamport.payment-{SDK-최신버전}.js"></script>
-	<!-- SDK Library 로드 -->
-	<script src="https://cdn.iamport.kr/v1/iamport.js"></script>	
+
+<!-- 다음주소 API -->
+		<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+		<script>
+		    function sample6_execDaumPostcode() {
+		        new daum.Postcode({
+		            oncomplete: function(data) {
+		                // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
+		
+		                // 각 주소의 노출 규칙에 따라 주소를 조합한다.
+		                // 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
+		                var addr = ''; // 주소 변수
+		                var extraAddr = ''; // 참고항목 변수
+		
+		                //사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
+		                if (data.userSelectedType === 'R') { // 사용자가 도로명 주소를 선택했을 경우
+		                    addr = data.roadAddress;
+		                } else { // 사용자가 지번 주소를 선택했을 경우(J)
+		                    addr = data.jibunAddress;
+		                }
+		
+		                // 사용자가 선택한 주소가 도로명 타입일때 참고항목을 조합한다.
+		                if(data.userSelectedType === 'R'){
+		                    // 법정동명이 있을 경우 추가한다. (법정리는 제외)
+		                    // 법정동의 경우 마지막 문자가 "동/로/가"로 끝난다.
+		                    if(data.bname !== '' && /[동|로|가]$/g.test(data.bname)){
+		                        extraAddr += data.bname;
+		                    }
+		                    // 건물명이 있고, 공동주택일 경우 추가한다.
+		                    if(data.buildingName !== '' && data.apartment === 'Y'){
+		                        extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+		                    }
+		                    // 표시할 참고항목이 있을 경우, 괄호까지 추가한 최종 문자열을 만든다.
+		                    if(extraAddr !== ''){
+		                        extraAddr = ' (' + extraAddr + ')';
+		                    }
+		                    // 조합된 참고항목을 해당 필드에 넣는다.
+		                    document.getElementById("sample6_extraAddress").value = extraAddr;
+		                
+		                } else {
+		                    document.getElementById("sample6_extraAddress").value = '';
+		                }
+		
+		                // 우편번호와 주소 정보를 해당 필드에 넣는다.
+		                document.getElementById('sample6_postcode').value = data.zonecode;
+		                document.getElementById("sample6_address").value = addr;
+		                // 커서를 상세주소 필드로 이동한다.
+		                document.getElementById("sample6_detailAddress").focus();
+		            }
+		        }).open();
+		    }
+		</script>
 	
 	</th:block>
 </html>

@@ -39,7 +39,7 @@ public class OrderlistEntity {
     
     private double discount;//할인률    
     
-    private String tid;
+    private String tid; // 카카오 결제 고유 번호
 
     
     

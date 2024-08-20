@@ -42,7 +42,10 @@ public class UserEntity {
 
     private String realName; //사용자이름
 
+    private String postcode; // 우편번호
     private String address; //기본주소
+    private String detailAddress; //상세주소
+    private String extraAddress; //참고항목
     
     private String phone;
     
@@ -63,5 +66,6 @@ public class UserEntity {
     
     @OneToMany(mappedBy = "writer", cascade = CascadeType.REMOVE)
     private List<ReviewEntity> review;
+    
     
 }

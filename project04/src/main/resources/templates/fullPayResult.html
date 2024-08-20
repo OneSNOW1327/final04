@@ -21,6 +21,7 @@
                 </tr>
             </thead>
             <tbody>
+            	<input id="point" type="hidden" th:value="${delivery.usePoint}"/>
                 <tr th:each="order,loop : ${delivery.order}">
                     <td><img th:src="|/file/display?folder=thumbnails&filename=${order.product.thumbnail[0].sysname}|" style="max-width: 100px;"></td>
                     <td th:text="${order.product.name}"></td>
@@ -35,16 +36,20 @@
          <h4>받는사람 정보</h4><hr>
         <table border="1">
 			<tr><td>받으시는분: </td> <td th:text="${delivery.receiveName}"></td></td></tr>
-			<tr><td> 주소: </td> <td th:text="${delivery.receiveAddress}"></td></td></tr>
+			<tr><td> 주소: </td> <td th:text="'('+${delivery.receivePostcode}+') '
+											+${delivery.receiveAddress}+' '
+											+${delivery.receiveDetailAddress}
+											+${delivery.receiveExtraAddress}"></td></td></tr>
 			<tr><td>전화번호: </td> <td th:text="${delivery.receivePhone}"></td></td></tr>
         	<tr><td>배송메세지: </td> <td th:text="${delivery.memo}"></td></td></tr>
         </table><br><br>
         
         <h4>결제 정보</h4><hr>
         <table border="1">
-		    <tr><td>결제수단: </td><td th:text="${delivery.order[0].payOption}"></td></tr>
+		    <tr><td>결제수단: </td><td th:text="|카카오 페이|"></td></tr>
 		    <tr><td>총 상품금액: </td><td><span id="sellPrice"></span></td></tr>
 		    <tr><td>총 할인금액: </td><td><span id="discount"></span></td></tr>
+		    <tr><td>사용 포인트: </td><td><span id="usePoint" th:text="${#numbers.formatDecimal(delivery.usePoint, 0, 'COMMA', 3, 'POINT').replace('.000', '')} + ' 원'"></span></td></tr>
 		    <tr><td>총 결제금액: </td><td><span id="payPrice"></span></td></tr>
 		</table>
     <input type="hidden" th:value="${#lists.size(delivery.order)}" id="size">
@@ -61,6 +66,7 @@
 	var size = document.getElementById('size').value;
 var sumSellPrice = 0;
 var sumDiscount = 0;
+var usePoint = document.getElementById('point').value;
 for (var i = 0; i < size; i++) {
     var quantity = document.getElementById('quantity_'+i).textContent || 0;
     var sellPrice = parseFloat(document.querySelector('#sellPrice_' + i).value) || 0;
@@ -71,7 +77,7 @@ for (var i = 0; i < size; i++) {
 }
 document.querySelector('#sellPrice').textContent = sumSellPrice.toLocaleString() + " 원";
 document.querySelector('#discount').textContent = sumDiscount.toLocaleString() + " 원";
-document.querySelector('#payPrice').textContent = (sumSellPrice - sumDiscount).toLocaleString() + " 원";
+document.querySelector('#payPrice').textContent = (sumSellPrice - sumDiscount - usePoint).toLocaleString() + " 원";
 	
    </script>
 </th:block>

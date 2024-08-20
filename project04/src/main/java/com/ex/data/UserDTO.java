@@ -27,9 +27,12 @@ public class UserDTO {
 
     private String email; // 이메일 주소
 
-    private String realName;
+    private String realName; //사용자 이름
 
-    private String address;
+    private String postcode; // 우편번호
+    private String address; //기본주소
+    private String detailAddress; //상세주소
+    private String extraAddress; //참고항목
     
     private String phone;
     
@@ -50,7 +53,10 @@ public class UserDTO {
 				.username(ue.getUsername())
 				.email(ue.getEmail())
 				.realName(ue.getRealName())
+				.postcode(ue.getPostcode())
 				.address(ue.getAddress())
+				.detailAddress(ue.getDetailAddress())
+				.extraAddress(ue.getExtraAddress())
 				.phone(ue.getPhone())
 				.reg(ue.getReg())
 				.point(ue.getPoint())

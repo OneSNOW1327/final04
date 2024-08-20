@@ -44,19 +44,30 @@
 		</div>
 	</div>
 	
-	<form th:action="@{|/product/basketAdd|}" method="post">
-		<input type="hidden" name="productId" th:value="${productDTO.id}">
-		<label th:text="수량"></label>
-		<input type="number" name="quantity" min="1" value="1">
-		<input type="submit" value="장바구니"> 
-	</form> 
-	<form th:attr="id='form-' + ${productDTO.id}" th:action="@{|/바로구매/|}" method="post">
-		<input type="hidden" name="productId" th:value="${productDTO.id}">
-		<input type="submit" value="바로구매">
+	<input type="number" name="quantity" id="quantity" min="1" value="1" oninput="updateQuantities()">
+<!-- 장바구니담기 -->	
+	<form th:action="@{|/product/basketAdd|}" method="post" onsubmit="return basketQuantity();">
+    <input type="hidden" name="productId" th:value="${productDTO.id}">
+    <label>수량</label>
+    <input type="hidden" name="quantity" id="basketQuantity"/>
+    <input type="submit" value="장바구니" onclick="submitForm(event)"> 
 	</form>
-	<form th:attr="id='form-' + ${productDTO.id}" th:action="@{|/찜♥/|}" method="post">
+<!-- 장바구니로 이동 하시겠습니까? -->
+	<div id="popup" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background-color:white; padding:20px; border:1px solid black;">
+	    <p>상품이 장바구니에 담겼습니다.</p>
+	    <button onclick="goToBasket()">장바구니 이동</button>
+	    <button onclick="closePopup()">닫기</button>
+	</div>
+<!-- 바로구매 -->			 
+	<form th:action="@{|/product/directPayPage|}" method="post" onsubmit="return directQuantity();">
+	    <input type="hidden" name="productId" th:value="${productDTO.id}">
+	    <input type="hidden" name="quantity" id="directQuantity"/>
+	    <input type="submit" value="바로구매">
+	</form>
+<!-- 찜 -->
+	<form th:action="@{|/product/wishadd|}" method="post">
 		<input type="hidden" name="productId" th:value="${productDTO.id}">
-		<input type="submit" value="찜♥"> 
+		<input type="submit" th:value="${isWished ? '찜취소' : '찜♥'}"> 
 	</form> 
 	
 	<div class="row mt-5">
@@ -133,12 +144,12 @@
 </div>
 <th:block layout:fragment="script">
 <script>
-    // 현재 선택된 이미지 인덱스
+// 현재 선택된 이미지 인덱스
     let currentIndex = 0;
-    // 썸네일 이미지 요소들
+// 썸네일 이미지 요소들
     let thumbnails = [];
 
-    // 페이지 로드 완료 시 썸네일 이미지 요소들을 배열에 저장하고 이벤트 리스너를 추가
+// 페이지 로드 완료 시 썸네일 이미지 요소들을 배열에 저장하고 이벤트 리스너를 추가
     document.addEventListener('DOMContentLoaded', function() {
         thumbnails = [...document.querySelectorAll('.thumbnail')];
         thumbnails.forEach((thumbnail, index) => {
@@ -149,7 +160,7 @@
         updateThumbnailSelection();
     });
 
-    // 방향에 따라 메인 이미지를 변경하는 함수
+// 방향에 따라 메인 이미지를 변경하는 함수
     function changeImage(direction) {
         currentIndex = (currentIndex + direction + thumbnails.length) % thumbnails.length;
         document.getElementById('mainImage').src = thumbnails[currentIndex].src;
@@ -157,7 +168,7 @@
         scrollToThumbnail();
     }
 
-    // 썸네일 이미지를 클릭하여 메인 이미지를 변경하는 함수
+// 썸네일 이미지를 클릭하여 메인 이미지를 변경하는 함수
     function selectImage(index) {
         currentIndex = index;
         document.getElementById('mainImage').src = thumbnails[currentIndex].src;
@@ -165,7 +176,7 @@
         scrollToThumbnail();
     }
 
-    // 현재 선택된 썸네일에 스타일을 적용하는 함수
+// 현재 선택된 썸네일에 스타일을 적용하는 함수
     function updateThumbnailSelection() {
         thumbnails.forEach((thumbnail, index) => {
             if (index === currentIndex) {
@@ -176,7 +187,7 @@
         });
     }
 
-    // 현재 선택된 썸네일로 스크롤하는 함수
+// 현재 선택된 썸네일로 스크롤하는 함수
     function scrollToThumbnail() {
         const container = document.getElementById('thumbnailContainer');
         const selectedThumbnail = thumbnails[currentIndex];
@@ -190,7 +201,7 @@
         }
     }
 
-    // 썸네일 이동 함수
+// 썸네일 이동 함수
     function moveThumbnail(direction) {
         currentIndex = (currentIndex + direction + thumbnails.length) % thumbnails.length;
         document.getElementById('mainImage').src = thumbnails[currentIndex].src;
@@ -222,6 +233,59 @@
 					}
 				});
 			});
+
+//변경 수량적용
+			
+			function updateQuantities() {
+			    var quantity = document.getElementById('quantity').value;
+			    document.getElementById('basketQuantity').value = quantity;
+			    document.getElementById('directQuantity').value = quantity;
+			}
+			
+			function basketQuantity() {
+			    updateQuantities();
+			    return true;
+			}
+			
+			function directQuantity() {
+			    updateQuantities();
+			    return true;
+			}
+			
+			
+//장바구니로 가시겠습니까?			
+			function submitForm(event) {
+			    event.preventDefault(); // 폼 제출을 막음
+			    var form = event.target.form; // 폼 요소를 가져옴
+			    var formData = new FormData(form); // 폼 데이터를 FormData 객체로 만듦
+			
+			    fetch(form.action, {
+			        method: form.method, // 폼의 메서드 (POST)
+			        body: formData // 폼 데이터
+			    }).then(response => {
+			        if (response.ok) {
+			            showPopup(); // 응답이 성공적이면 팝업을 표시
+			        } else {
+			            alert('상품을 장바구니에 담는 데 실패했습니다.'); // 실패 시 경고 메시지 표시
+			        }
+			    }).catch(error => {
+			        console.error('Error:', error); // 에러를 콘솔에 출력
+			        alert('상품을 장바구니에 담는 데 실패했습니다.'); // 에러 시 경고 메시지 표시
+			    });
+			}
+			
+			function showPopup() {
+			    document.getElementById('popup').style.display = 'block'; // 팝업을 표시
+			}
+			
+			function goToBasket() {
+			    window.location.href = '/product/basketList'; // 장바구니 페이지로 이동
+			}
+			
+			function closePopup() {
+			    document.getElementById('popup').style.display = 'none'; // 팝업을 닫음
+			}
+			
 </script>
 </th:block>
 </html>

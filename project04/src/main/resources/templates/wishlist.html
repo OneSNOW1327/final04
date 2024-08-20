@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout}">
+<div class="container my-3" layout:fragment="content">
+
+	<h1>찜리스트</h1>
+		<div th:if="${#lists.isEmpty(wishList)}">
+			<p>찜한 상품이 없습니다.</p>
+		</div>
+		<form id="deleteForm" action="/product/wishlist/removeSelected" method="post">
+            <table border="1">
+                <thead>
+                    <input id="selectAllWish" type="checkbox" /><span>전체선택  </span>
+                    <button type="button" id="deleteSelected">선택삭제</button>
+                    <tr>
+                        <th>선택</th>
+                        <th>상품사진</th>
+                        <th>상품명</th>
+                        <th>설명</th>
+                        <th>가격</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="product : ${wishList}">
+                        <td>
+                            <input class="wish-check" type="checkbox" name="selectedIds" th:value="${product.id}" />
+                        </td>
+                        <td>
+                            <img th:src="|/file/display?folder=thumbnails&filename=${product.thumbnail[0].sysname}|" style="max-width: 100px;">
+                        </td>
+                        <td th:text="${product.name}">상품명</td>
+                        <td th:text="${product.description}">상품 설명</td>
+                        <td th:text="${product.sellPrice*(1-product.discount/100)} + ' 원'">가격</td>
+                        <td>
+                            <button id="basketAdd" th:data-product-id="${product.id}">장바구니담기</button><br>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+<!-- 장바구니 팝업 -->
+			<div id="popup" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background-color:white; padding:20px; border:1px solid black;">
+			    <p>상품이 장바구니에 담겼습니다.</p>
+			    <button onclick="goToBasket()">장바구니 이동</button>
+			    <button onclick="closePopup()">닫기</button>
+			</div>
+        </form>
+        </div>
+
+</div>
+
+<th:block layout:fragment="script">
+	<script>
+	// "전체상품 선택" 체크박스
+	document.getElementById('selectAllWish').addEventListener('change', function() {
+	    const checkboxes = document.querySelectorAll('.wish-check');
+	    checkboxes.forEach(cb => cb.checked = this.checked);
+	});
+
+// 선택 삭제 버튼 클릭 시
+	document.getElementById('deleteSelected').addEventListener('click', function() {
+	    const selectedCheckboxes = document.querySelectorAll('.wish-check:checked');
+	    if (selectedCheckboxes.length > 0) {
+	        // 선택된 항목이 있으면 폼을 제출하여 서버에 전송
+	        document.getElementById('deleteForm').submit();
+	    } else {
+	        alert('선택된 상품이 없습니다.');
+	    }
+	});	
+	
+// "장바구니담기" 버튼
+	document.querySelectorAll('#basketAdd').forEach(button => {
+    button.addEventListener('click', function(event){
+        event.preventDefault(); // 기본 이벤트를 중지합니다.
+        
+        const productId = this.getAttribute('data-product-id');
+        const quantity = 1; // 기본 수량 설정
+
+        // 장바구니 추가 요청을 보냅니다.
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/product/wishToBasket';
+
+        const productIdInput = document.createElement('input');
+        productIdInput.type = 'hidden';
+        productIdInput.name = 'productId';
+        productIdInput.value = productId;
+        form.appendChild(productIdInput);
+
+        const quantityInput = document.createElement('input');
+        quantityInput.type = 'hidden';
+        quantityInput.name = 'quantity';
+        quantityInput.value = quantity;
+        form.appendChild(quantityInput);
+
+        document.body.appendChild(form);
+        
+        form.submit();
+        
+     // 팝업을 표시합니다.
+        showPopup();
+    });
+});
+
+//장바구니 이동 팝업
+		function submitForm(event) {
+    event.preventDefault(); // 폼 제출을 막음
+    var form = event.target.form; // 폼 요소를 가져옴
+    var formData = new FormData(form); // 폼 데이터를 FormData 객체로 만듦
+
+    fetch(form.action, {
+        method: form.method, // 폼의 메서드 (POST)
+        body: formData // 폼 데이터
+    }).then(response => {
+        if (response.ok) {
+            showPopup(); // 응답이 성공적이면 팝업을 표시
+        } else {
+            alert('상품을 장바구니에 담는 데 실패했습니다.'); // 실패 시 경고 메시지 표시
+        }
+    }).catch(error => {
+        console.error('Error:', error); // 에러를 콘솔에 출력
+        alert('상품을 장바구니에 담는 데 실패했습니다.'); // 에러 시 경고 메시지 표시
+    });
+}
+
+function showPopup() {
+    document.getElementById('popup').style.display = 'block'; // 팝업을 표시
+}
+
+function goToBasket() {
+    window.location.href = '/product/basketList'; // 장바구니 페이지로 이동
+}
+
+function closePopup() {
+    document.getElementById('popup').style.display = 'none'; // 팝업을 닫음
+    window.location.href = '/product/wishlist'; // 찜리스트 페이지로 이동
+}
+
+
+	</script>
+</th:block>
+</html>

@@ -78,11 +78,20 @@ public class ProductController {
 
 	// 디테일
 	@GetMapping("/detail/{id}")
-	public String detail(@PathVariable("id") Integer id, Model model) {
+	public String detail(@PathVariable("id") Integer id, Model model, Principal principal) {
 		ProductDTO productDTO = productService.findById(id);
 		productDTO.setThumbnailPaths(photoService.getThumbnailPaths(id));
 		productDTO.setDescriptionImagePaths(photoService.getDescriptionImagePaths(id));
 		model.addAttribute("productDTO", productDTO);
+		
+		if (principal.getName() != null) {
+	        UserEntity user = userService.findByUserName(principal.getName());
+	        boolean isWished = user.getWishList().stream()
+	                              .anyMatch(product -> product.getId().equals(id));
+	        model.addAttribute("isWished", isWished);
+	        }
+	    
+		
 		return "productDetail";
 	}
 
@@ -121,10 +130,11 @@ public class ProductController {
 		return "productSearch";
 	}
 
-//(가은)장바구니담기 버튼 눌렀을때 
+//(가은)디테일 장바구니담기 버튼 눌렀을때 
 	@PostMapping("/basketAdd")
 	@PreAuthorize("isAuthenticated()")
-	public String addToBasket(Principal principal, @RequestParam("quantity") int quantity,
+	public String addToBasket(Principal principal, 
+			@RequestParam(value = "quantity", defaultValue = "1") int quantity,
 			@RequestParam("productId") Integer productId) {
 		productService.addToBasket(productId, principal.getName(), quantity);
 		return "redirect:/product/detail/" + productId;
@@ -172,19 +182,43 @@ public class ProductController {
 		productService.addToWish(productId, principal.getName());
 		return "redirect:/product/detail/" + productId;
 	}
+	
 //(가은) 찜리스트
 	@GetMapping("/wishlist")
-    public String wishlist(Model model, Principal principal) {		
-        List<ProductEntity> wishList = 
+	@PreAuthorize("isAuthenticated()")
+    public String wishlist(Model model, Principal principal) {	
+		List<ProductEntity> wishList =         
         productService.getUserWishList(userService.findByUserName(principal.getName()).getId());
         model.addAttribute("wishList", wishList);
         return "wishlist";
     }
 	
-//(가은) 결제페이지
+//(가은) 찜 선택상품 삭제
+	@PostMapping("/wishlist/removeSelected")
+	@PreAuthorize("isAuthenticated()")
+    public String removeSelectedProducts(Principal principal, Model model, 
+    									@RequestParam("selectedIds") List<Integer> selectedIds) {
+		Integer userId = userService.findByUserName(principal.getName()).getId();
+		productService.removeSelectedWishlist(userId , selectedIds);
+        // 위시리스트를 다시 조회하여 모델에 추가
+        List<ProductEntity> updateWishlist = productService.getUserWishList(userId);
+        model.addAttribute("wishList", updateWishlist);
+        return "wishlist";
+    }
+	//(가은) 찜 장바구니담기 버튼 눌렀을때 
+		@PostMapping("/wishToBasket")
+		@PreAuthorize("isAuthenticated()")
+		public String wishToBasket(Principal principal, 
+				@RequestParam(value = "quantity", defaultValue = "1") int quantity,
+				@RequestParam("productId") Integer productId) {
+			productService.addToBasket(productId, principal.getName(), quantity);
+			return "redirect:/product/wishlist";
+		}    
+	
+//(가은) 결제페이지 from BASKET
 	@PostMapping("/paymentPage") // 선택된 장바구니 항목이 넘어옴
 	@PreAuthorize("isAuthenticated()")
-	public String paymentPage(@RequestParam("selectProduct") String selectProduct, Model model, Principal principal) {
+	public String basketPay(@RequestParam("selectProduct") String selectProduct, Model model, Principal principal) {
 		List<Integer> basketIds = Arrays.stream(selectProduct.split(",")).map(Integer::parseInt)// 스트림의 요소를 정수로 변환
 				.collect(Collectors.toList());// 스트림의 모든 요소를 새로운 리스트로
 		// 선택된 상품들 결제페이지로 보내기
@@ -192,28 +226,25 @@ public class ProductController {
 		model.addAttribute("principalUser", userService.findByUserName(principal.getName()));
 		return "paymentPage";
 	}
-
-//(가은) (구매상품 장바구니,결제수단)주문테이블저장, 배송정보저장 0807
-	@PostMapping("/requestPay")
+//(가은) 결제페이지 from DIRECT
+	@PostMapping("/directPayPage")
 	@PreAuthorize("isAuthenticated()")
-	public String requestPay(@RequestParam("basketId") String basketId, 
-							@ModelAttribute DeliveryDTO deliveryDTO,
-							@RequestParam("paymentOption") String payOption, 
-							Model model, Principal principal) {
-		// basket의ID를 "ID,ID,.."형식으로 가지고있음
-		List<Integer> basketIds = Arrays.stream(basketId.split(","))// 콤마를 기준으로 분리
-				.map(Integer::parseInt)// 스트림의 요소를 정수로 변환
-				.collect(Collectors.toList());// 스트림의 모든 요소를 새로운 리스트로 만들어 반환		
-		// 배송정보 저장
-		DeliveryEntity delivery = productService.saveDelivery(deliveryDTO,principal.getName());		
-		// 주문테이블저장
-		productService.saveOrderInfo(basketIds, payOption,delivery);
-		// 주문상세페이지로 정보 보내기		
-		int deliveryId = delivery.getId();
-		productService.findDeliveryById(deliveryId);
-        model.addAttribute("delivery", delivery);
-		return "redirect:/product/fullPayResult?deliveryId="+deliveryId;
+	public String directPay(Model model, Principal principal,
+	                        @RequestParam(value = "quantity", defaultValue = "1") int quantity,
+	                        @RequestParam("productId") Integer productId) {
+	    // 임시 장바구니 항목 생성
+	    BasketEntity tempBasketItem = productService.createTemporaryBasketItem(productId, principal.getName(), quantity);
+	    // 임시 장바구니 항목 결제페이지로 보내기
+	    List<BasketEntity> lastInBasket = new ArrayList<>();
+	    if (tempBasketItem != null) {
+	        lastInBasket.add(tempBasketItem);
+	    }
+	    model.addAttribute("expectPay", lastInBasket);
+	    model.addAttribute("principalUser", userService.findByUserName(principal.getName()));
+	    return "paymentPage";
 	}
+	
+
 	
 //(가은) 상세 주문내역 fullPayResult
 	@GetMapping("/fullPayResult")

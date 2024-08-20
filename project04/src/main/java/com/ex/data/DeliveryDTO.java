@@ -27,7 +27,10 @@ public class DeliveryDTO {
 	
 	private String receivePhone; // 받는사람 전화
 	
-	private String receiveAddress; // 받는사람 주소
+	private String receivePostcode; // 받는사람 우편번호
+    private String receiveAddress; //받는사람 기본주소
+    private String receiveDetailAddress; //받는사람 상세주소
+    private String receiveExtraAddress; //받는사람 참고항목
 	
 	private String memo; // 배송메모
 	
@@ -35,14 +38,21 @@ public class DeliveryDTO {
 	
 	private String waybill; // 운송장번호
 	
+	private long usePoint;
+	
 	public static DeliveryDTO entityToDTO(DeliveryEntity de) {
 		return DeliveryDTO.builder().id(de.getId())
+				.user(de.getUser())
 				.order(de.getOrder())
 				.receiveName(de.getReceiveName())
 				.receivePhone(de.getReceivePhone())
+				.receivePostcode(de.getReceivePostcode())
 				.receiveAddress(de.getReceiveAddress())
+				.receiveDetailAddress(de.getReceiveDetailAddress())
+				.receiveExtraAddress(de.getReceiveExtraAddress())
 				.memo(de.getMemo())
 				.situation(de.getSituation())
+				.usePoint(de.getUsePoint())
 				.waybill(de.getWaybill()).build();
 	}
 

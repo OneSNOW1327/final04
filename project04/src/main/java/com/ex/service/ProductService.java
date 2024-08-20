@@ -215,29 +215,45 @@ public class ProductService {
 	}
 	
 //(가은) 장바구니 추가
-  	public void addToBasket(Integer productId, String userName, int quantity) {
-  		
-		Optional<ProductEntity> pop = this.productRepository.findById(productId);
-		Optional<UserEntity> uop = this.userRepository.findByUsername(userName);
-		if(pop.isPresent()&&uop.isPresent()) {
-			ProductEntity pe = pop.get();
-			UserEntity ue = uop.get();
-			Optional<BasketEntity> bop = basketRepository.findByUserIdAndProductId(ue.getId(), productId);
-			if(!bop.isPresent()) {  		
-				BasketEntity be = BasketEntity.builder()
-					.product(pop.get())
-	  				.user(ue)
-	  				.quantity(quantity)
-	  				.build();
-	  		basketRepository.save(be);
-			}else {
-				BasketEntity be = basketRepository.findByUserIdAndProductId(ue.getId(), productId).get();
-				be.setQuantity(be.getQuantity()+quantity);
-				basketRepository.save(be);
-			}
-		}
-  	}
-  	
+	public void addToBasket(Integer productId, String userName, int quantity) {
+	    Optional<ProductEntity> pop = this.productRepository.findById(productId);
+	    Optional<UserEntity> uop = this.userRepository.findByUsername(userName);
+	    if (pop.isPresent() && uop.isPresent()) {
+	        ProductEntity pe = pop.get();
+	        UserEntity ue = uop.get();
+	        Optional<BasketEntity> bop = basketRepository.findByUserIdAndProductId(ue.getId(), productId);
+	        if (!bop.isPresent()) {
+	            BasketEntity be = BasketEntity.builder()
+	                .product(pe)
+	                .user(ue)
+	                .quantity(quantity)
+	                .build();
+	            basketRepository.save(be);
+	        } else {
+	            BasketEntity be = bop.get();
+	            be.setQuantity(be.getQuantity() + quantity);
+	            basketRepository.save(be);
+	        }
+	    }
+	}
+//(가은) DIRECT결제시 임시 장바구니 생성
+	public BasketEntity createTemporaryBasketItem(Integer productId, String userName, int quantity) {
+	    Optional<ProductEntity> pop = this.productRepository.findById(productId);
+	    Optional<UserEntity> uop = this.userRepository.findByUsername(userName);
+	    if (pop.isPresent() && uop.isPresent()) {
+	        ProductEntity pe = pop.get();
+	        UserEntity ue = uop.get();
+	        // 새로운 임시 장바구니 항목 생성
+	        BasketEntity be = BasketEntity.builder()
+	            .product(pe)
+	            .user(ue)
+	            .quantity(quantity)
+	            .build();
+	        return be; //save 하지 않고 넘김
+	    }
+	    return null;
+	}
+	
 //(가은) 장바구니 수량 변경 
   	public void updateQuantity(int basketIds,int quantity) {
   		Optional<BasketEntity> bop = basketRepository.findById(basketIds);
@@ -253,29 +269,36 @@ public class ProductService {
   	}
 
 //(가은) 결제정보(상품정보,결제수단) 주문테이블저장 
-  	@Transactional
-    public void saveOrderInfo(List<Integer> basketIds, String payOption,DeliveryEntity delivery) {
+    public void saveOrderInfo(List<Integer> basketIds, DeliveryEntity delivery,String tid) {
         for (Integer basketId : basketIds) {
         	BasketEntity be = basketRepository.findById(basketId).get();
         	OrderlistEntity ole = OrderlistEntity.builder().quantity(be.getQuantity())
         													.product(be.getProduct())
         													.delivery(delivery)
-        													.orderTime(LocalDateTime.now())
-        													.payOption(payOption)
+        													.orderTime(LocalDateTime.now())        											
         													.discount(be.getProduct().getDiscount())
+        													.tid(tid)
         													.build();
         	orderlistRepository.save(ole);
+        	sales(be.getProduct().getId(),be.getQuantity(),salesVolumeDesc(be.getProduct().getId()));
             // 장바구니에서 주문한 상품 제거
         	basketRepository.deleteById(basketId);
         }
     }
+//(가은)바로구매 장바구니 최근 담은 리스트 꺼내오기
+    public List<BasketEntity> lastInBasket(Integer userId) {
+    	return basketRepository.findAllByUserIdOrderByIdDesc(userId);
+	}
   	
 //(가은) 배송정보 저장 
   	public DeliveryEntity saveDelivery(DeliveryDTO delivery,
-  								String username) {
+  								String username,long point) {
   		
   		String completePay = "결제완료";
   		UserEntity ue = userService.findByUserName(username);
+  		if(delivery.getMemo() == null) {
+  			delivery.setMemo("");
+  		}
   		//운송장번호12자리
   		StringBuilder sb = new StringBuilder();
         for (int i = 0; i < 12; i++) {
@@ -283,14 +306,19 @@ public class ProductService {
             sb.append(digit);
         }
         String waybillNum = sb.toString();
-        DeliveryEntity de = DeliveryEntity.builder().memo(delivery.getMemo())
-        												.receiveAddress(delivery.getReceiveAddress())
-        												.receiveName(delivery.getReceiveName())
-        												.receivePhone(delivery.getReceivePhone())
-        												.waybill(waybillNum)
-        												.situation(completePay)
-        												.user(ue)
-        												.build();
+        DeliveryEntity de = DeliveryEntity.builder()
+        		.memo(delivery.getMemo())
+                .receivePostcode(delivery.getReceivePostcode())
+                .receiveAddress(delivery.getReceiveAddress())
+                .receiveDetailAddress(delivery.getReceiveDetailAddress())
+                .receiveExtraAddress(delivery.getReceiveExtraAddress())
+                .receiveName(delivery.getReceiveName())
+                .receivePhone(delivery.getReceivePhone())
+                .waybill(waybillNum)
+                .situation(completePay)
+                .user(ue)
+                .usePoint(point)
+                .build();
   		deliveryRepository.save(de);
         return de;
   	}
@@ -328,10 +356,17 @@ public class ProductService {
 		}  		
 	}
 //(가은) 찜리스트 조회
-	public List<ProductEntity> getUserWishList(int userId) {
+	public List<ProductEntity> getUserWishList(Integer userId) {
         return userRepository.findById(userId)
                              .map(UserEntity::getWishList)
                              .orElse(new ArrayList<>());
+    }
+//(가은) 찜 선택삭제
+	public void removeSelectedWishlist(Integer userId, List<Integer> productIds) {
+        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        List<ProductEntity> productsToRemove = productRepository.findAllById(productIds);
+        user.getWishList().removeAll(productsToRemove);
+        userRepository.save(user);
     }
 	
 //0808 성진 테스트
@@ -349,40 +384,42 @@ public class ProductService {
 	}
 	
 	//0808 성진 수정
-	public void sales(Integer id, int rate, List<SalesVolumeEntity> svel) {
-		SalesVolumeEntity sve = null;
-		ProductEntity pe = this.productRepository.findById(id).get();
-		long sellprice = (long)(rate*pe.getSellPrice() * (1-pe.getDiscount()/100));
-		// 원래 갯수가 0일경우 새로 db에 등록
-		if(svel.get(0).getSalesRate() == 0) {
-			sve = SalesVolumeEntity.builder()
-					.product(pe)
-					.recordDate(LocalDate.now())
-					.salesRate(rate)
-					.salesPrice(sellprice)
-					.build();
-		}else{
-			//0이 아닐경우 날짜를 함께 검색하여 검색값이 있을경우 업데이트
-			Optional<SalesVolumeEntity> sop = salesVolumeRepository.findByProductIdAndRecordDate(id, LocalDate.now());
-			if(sop.isPresent()) {
-				sve= sop.get();
-				sve.setSalesRate(rate+sve.getSalesRate());
-				sve.setSalesPrice(svel.get(0).getSalesPrice() + sellprice);
-			}else {
-				sve = SalesVolumeEntity.builder()
-						.product(this.productRepository.findById(id).get())
-						.recordDate(LocalDate.now())
-						.salesRate(svel.get(0).getSalesRate() +rate)
-						.salesPrice(svel.get(0).getSalesPrice() + sellprice)
-						.build();
-			}
-		}
-		AmountDTO amountDTO = adminService.total().get(0);
-		amountDTO.setAmount(sellprice);
-		amountDTO.setReason("sell");
-		adminService.amount(amountDTO, LocalDate.now());
-		salesVolumeRepository.save(sve);
-	}
+	   public void sales(Integer id, int rate, List<SalesVolumeEntity> svel) {
+		      SalesVolumeEntity sve = null;
+		      ProductEntity pe = this.productRepository.findById(id).get();
+		      long sellprice = (long)(rate*pe.getSellPrice() * (1-pe.getDiscount()/100));
+		      // 원래 갯수가 0일경우 새로 db에 등록
+		      if(svel.get(0).getSalesRate() == 0) {
+		         sve = SalesVolumeEntity.builder()
+		               .product(pe)
+		               .recordDate(LocalDate.now())
+		               .salesRate(rate)
+		               .salesPrice(sellprice)
+		               .build();
+		      }else{
+		         //0이 아닐경우 날짜를 함께 검색하여 검색값이 있을경우 업데이트
+		         Optional<SalesVolumeEntity> sop = salesVolumeRepository.findByProductIdAndRecordDate(id, LocalDate.now());
+		         if(sop.isPresent()) {
+		            sve= sop.get();
+		            sve.setSalesRate(rate+sve.getSalesRate());
+		            sve.setSalesPrice(svel.get(0).getSalesPrice() + sellprice);
+		         }else {
+		            sve = SalesVolumeEntity.builder()
+		                  .product(this.productRepository.findById(id).get())
+		                  .recordDate(LocalDate.now())
+		                  .salesRate(svel.get(0).getSalesRate() +rate)
+		                  .salesPrice(svel.get(0).getSalesPrice() + sellprice)
+		                  .build();
+		         }
+		      }
+		      pe.setStock(pe.getStock()-rate);
+		      productRepository.save(pe);
+		      AmountDTO amountDTO = adminService.total().get(0);
+		      amountDTO.setAmount(sellprice);
+		      amountDTO.setReason("sell");
+		      adminService.amount(amountDTO, LocalDate.now());
+		      salesVolumeRepository.save(sve);
+		   }
 		
 	//08 12 성진 테스트
 	public List<ProducttypeEntity> getSortedProductTypes() {
@@ -408,4 +445,17 @@ public class ProductService {
 		}
 			return productTypes;  // 정렬된 상태의 productTypes 반환
 	}
+	
+	public DeliveryDTO DTOFindByTid(String tid) {
+		List<OrderlistEntity> oll = orderlistRepository.findByTid(tid);
+		if(!oll.isEmpty()) {
+			return DeliveryDTO.entityToDTO(oll.get(0).getDelivery());
+		}else {
+			throw new RuntimeException("Order not found");
+		}
+		
+	}
+	
+	
+	
 }

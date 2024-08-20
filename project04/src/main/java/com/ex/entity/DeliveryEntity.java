@@ -36,13 +36,18 @@ public class DeliveryEntity {
 	
 	private String receivePhone; // 받는사람 전화
 	
-	private String receiveAddress; // 받는사람 주소
+	private String receivePostcode; // 받는사람 우편번호
+    private String receiveAddress; //받는사람 기본주소
+    private String receiveDetailAddress; //받는사람 상세주소
+    private String receiveExtraAddress; //받는사람 참고항목
 	
 	private String memo; // 배송메모
 	
 	private String situation; //현재상태
 	
 	private String waybill; // 운송장번호
+	
+	private long usePoint;
 	
 	
 }
