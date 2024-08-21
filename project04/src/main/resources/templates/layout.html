@@ -10,162 +10,206 @@
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
-	   <style>
+	<style>
+		body, html {
+			margin: 0;
+			padding: 0;
+			overflow: hidden;
+			height: 100%;
+		}
+		
 		.product-main-image-container {
 			position: relative;
 			max-width: 400px;
-            margin: 0 auto;
-        }
-        .product-main-image {
-            width: 100%;
-            height: auto;
-        }  
-        .thumbnail {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            cursor: pointer;
-        } 
-        .thumbnail.selected {
-            border: 2px solid red;
-        }
-        .description-image {
-            display: block;
-            margin: 0 auto;
-            max-width: 400px;
-        }
-        .nav-arrow {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 24px;
-            color: #fff;
-            background: rgba(0, 0, 0, 0.5);
-            border: none;
-            cursor: pointer;
-            z-index: 1;
-        }
-        .nav-arrow-prev {
-            left: 0;
-        }
-        .nav-arrow-next {
-            right: 0;
-        }
-        .card {
-            margin-bottom: 20px;
-            border: none;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        .card-header {
-            color: #fff;
-            border-radius: 10px 10px 0 0;
-        }
-        .user-info-card {
-            background-color: #007bff;
-        }
-        .order-history-card {
-            background-color: #28a745;
-        }
-        .review-card {
-            background-color: #ffc107;
-        }
-        .wishlist-card {
-            background-color: #17a2b8;
-        }
-        .card-body {
-            background-color: #f8f9fa;
-        }
-        .table-bordered {
-            background-color: #fff;
-        }
-        .table thead th {
-            background-color: #f1f1f1;
-        }
+			margin: 0 auto;
+		}
+		
+		.product-main-image {
+			width: 100%;
+			height: auto;
+		}
+		
+		.thumbnail {
+			width: 100px;
+			height: 100px;
+			object-fit: cover;
+			cursor: pointer;
+		}
+		
+		.thumbnail.selected {
+			border: 2px solid red;
+		}
+		
+		.description-image {
+			display: block;
+			margin: 0 auto;
+			max-width: 400px;
+		}
+		
+		.nav-arrow {
+			position: absolute;
+			top: 50%;
+			transform: translateY(-50%);
+			font-size: 24px;
+			color: #fff;
+			background: rgba(0, 0, 0, 0.5);
+			border: none;
+			cursor: pointer;
+			z-index: 1;
+		}
+		
+		.nav-arrow-prev {
+			left: 0;
+		}
+		
+		.nav-arrow-next {
+			right: 0;
+		}
+		
+		.card {
+			margin-bottom: 20px;
+			border: none;
+			border-radius: 10px;
+			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+		}
+		
+		.card-header {
+			color: #fff;
+			border-radius: 10px 10px 0 0;
+		}
+		
+		.user-info-card {
+			background-color: #007bff;
+		}
+		
+		.order-history-card {
+			background-color: #28a745;
+		}
+		
+		.review-card {
+			background-color: #ffc107;
+		}
+		
+		.wishlist-card {
+			background-color: #17a2b8;
+		}
+		
+		.card-body {
+			background-color: #f8f9fa;
+		}
+		
+		.table-bordered {
+			background-color: #fff;
+		}
+		
+		.table thead th {
+			background-color: #f1f1f1;
+		}
+		
 		.img-thumbnail {
-            max-width: 100px;
-            margin: 5px;
-            position: relative;
-        }
-        .btn-delete {
-            position: absolute;
-            top: 0;
-            right: 0;
-            background-color: red;
-            color: white;
-            border: none;
-            padding: 2px 5px;
-            cursor: pointer;
-        }  
-     #overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            z-index: 999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        #popup-content {
-            position: relative;
-            max-width: 90%;
-            max-height: 90vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        #popup-image {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
-
-        #close-button {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 24px;
-            color: white;
-            background: rgba(0, 0, 0, 0.5);
-            border: none;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-        }
-
-        #dont-show {
-            position: absolute;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.5);
-            padding: 5px 10px;
-            border-radius: 20px;
-            color: white;
-            font-size: 14px;
-            white-space: nowrap;
-        }
-
-        #dont-show input {
-            margin-right: 5px;
-            vertical-align: middle;
-        }
-
-        #dont-show label {
-            margin: 0;
-            vertical-align: middle;
-        }
-    </style>
+			max-width: 100px;
+			margin: 5px;
+			position: relative;
+		}
+		
+		.btn-delete {
+			position: absolute;
+			top: 0;
+			right: 0;
+			background-color: red;
+			color: white;
+			border: none;
+			padding: 2px 5px;
+			cursor: pointer;
+		}
+		
+		#overlay {
+			display: none;
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background-color: rgba(0, 0, 0, 0.8);
+			z-index: 999;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			text-align: center;
+		}
+		
+		#popup-content {
+			position: relative;
+			background-color: white;
+			padding: 20px;
+			border-radius: 8px;
+			max-width: 90%;
+			max-height: 90vh;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			text-align: center;
+		}
+		
+		#popup-image {
+			max-width: 100%;
+			max-height: 100%;
+			object-fit: contain;
+		}
+		
+		#overlay img {
+			max-width: 100%;
+			max-height: 70vh; /* 화면 높이의 70%로 제한 */
+			object-fit: contain;
+			margin-bottom: 20px;
+		}
+		
+		#close-button {
+			position: absolute;
+			top: 10px;
+			right: 10px;
+			font-size: 16px;
+			color: white;
+			background: rgba(0, 0, 0, 0.5);
+			background-color: red;
+			border: none;
+			border-radius: 50%;
+			width: 30px;
+			height: 30px;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			cursor: pointer;
+		}
+		
+		#dont-show {
+			display: flex;
+			position: absolute;
+			margin-top: 10px;
+			bottom: 10px;
+			left: 50%;
+			transform: translateX(-50%);
+			background: rgba(0, 0, 0, 0.5);
+			padding: 5px 10px;
+			border-radius: 20px;
+			align-items: center;
+			justify-content: center;
+			color: white;
+			font-size: 14px;
+			white-space: nowrap;
+		}
+		
+		#dont-show input {
+			margin-right: 5px;
+			vertical-align: middle;
+		}
+		
+		#dont-show label {
+			margin: 0;
+			vertical-align: middle;
+		}
+	</style>
+	<th:block layout:fragment="script-popup"></th:block>
 </head>
 
 <body>
