@@ -8,6 +8,7 @@
 						<img th:if="${product.thumbnail.size() > 0}" th:id="|images_${product.id}|" src="" alt="Product Image" class="pt-1 img-fluid" style="max-width: 150px; max-height: 150px;">
 					</div>
 					<div class="text-center">
+						<span th:if="${product.stock == 0}" class="text-danger" th:text="|[매진]|"></span>
 						<span th:text="${product.name}" class="text-dark link-offset-2 link-underline link-underline-opacity-0"></span>
 						<div>
 							<span th:if="${product.discount == 0}" th:text="${#numbers.formatDecimal(product.sellPrice, 0, 'COMMA', 3, 'POINT').replace('.000', '')} + '원'"></span>

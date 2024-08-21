@@ -33,6 +33,4 @@ public class AmountEntity {
 	//사유 (예시: 입금, 물건판매 등등)
 	private String reason;
     
-    
-    
 }

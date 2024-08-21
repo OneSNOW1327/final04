@@ -25,4 +25,6 @@ public class ProducttypeEntity {
 	@OneToMany(mappedBy = "type", cascade = CascadeType.REMOVE)
 	@ToString.Exclude
 	private List<ProductEntity> product;
+	
+	private String content;
 }

@@ -13,11 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.view.RedirectView;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import com.ex.data.AmountDTO;
 import com.ex.data.NoticeDTO;
 import com.ex.data.ProductDTO;
@@ -28,9 +23,6 @@ import com.ex.service.ProductService;
 import com.ex.service.ReviewService;
 
 import lombok.RequiredArgsConstructor;
-
-import org.springframework.data.domain.Page;
-import com.ex.entity.NoticeEntity;
 
 @Controller
 @RequiredArgsConstructor
@@ -93,25 +85,31 @@ public class AdminController {
 		return String.format("redirect:/product/detail/%s", reviewService.findByReviewId(id).getId());
 	}
 	
+	@PostMapping("buy/{id}")
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	public String buy(@PathVariable("id")Integer id,@RequestParam("rate")int rate) {
+		productService.buyStock(id, rate);
+		return "redirect:/admin/product/"+id;
+	}
+	
 	@GetMapping("/NoticeWriteForm")
 	public String noticeWriteForm(@RequestParam(value = "id", required = false) Integer id, Model model) {
-	    if (id != null) {
-	        NoticeDTO noticeDTO = noticeService.findById(id);
-	        noticeDTO.setNoticePhotoPath(photoService.getNotice(id));  // 이미지 경로 설정
-	        model.addAttribute("noticeDTO", noticeDTO);
-	    } else {
-	        model.addAttribute("noticeDTO", new NoticeDTO());
-	    }
-	    return "NoticeWriteForm";
-	}
-
-		// 등록/수정 처리 메서드
-		@PostMapping("/NoticewritePro")
-		public String saveOrUpdateProduct(@ModelAttribute NoticeDTO noticeDTO,
-				@RequestParam("notice") MultipartFile[] notice)
-				throws IOException {
-			Integer id = noticeService.NoticecreateOrUpdate(noticeDTO, notice);
-			return String.format("redirect:/main/NoticeDetail/%d", id);
+		if (id != null) {
+			NoticeDTO noticeDTO = noticeService.findById(id);
+			noticeDTO.setNoticePhotoPath(photoService.getNotice(id));  // 이미지 경로 설정
+			model.addAttribute("noticeDTO", noticeDTO);
+		} else {
+			model.addAttribute("noticeDTO", new NoticeDTO());
 		}
-
+		return "NoticeWriteForm";
+	}
+	
+	// 등록/수정 처리 메서드
+	@PostMapping("/NoticewritePro")
+	public String saveOrUpdateProduct(@RequestParam("notice") MultipartFile[] notice,
+																	@ModelAttribute NoticeDTO noticeDTO)throws IOException {
+		Integer id = noticeService.NoticecreateOrUpdate(noticeDTO, notice);
+		return String.format("redirect:/main/NoticeDetail/%d", id);
+	}
+		
 }

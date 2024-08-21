@@ -23,21 +23,24 @@
                     <th>수량</th>
                 </tr>
                 <tr th:each=" basket,loop : ${userBasket}">
-                    <td><input th:id="|id_${loop.index}|" type="checkbox" class="basket-check" name="check" th:value="${basket.id}"/></td>
+                    <td>
+                    	<input th:id="|id_${loop.index}|" type="checkbox" class="basket-check" name="check" th:value="${basket.id}" th:unless="${basket.product.stock} <${basket.quantity}"/>
+                    	<input th:id="|id_${loop.index}|" type="checkbox" class="basket-check" name="stock" th:value="${basket.id}" th:if="${basket.product.stock} <${basket.quantity}"/>
+                    </td>
                     <td><img th:src="|/file/display?folder=thumbnails&filename=${basket.product.thumbnail[0].sysname}|" style="max-width: 100px;"></td>
-                    <td  th:text="${basket.product.name}">상품명</td>
+                    <td ><span th:if="${basket.product.stock} <${basket.quantity}" th:text="|[재고 부족]|" class="text-danger"></span><span th:text="${basket.product.name}"></span></td>
                     <td class="price" th:text="${basket.product.sellPrice*(1-basket.product.discount/100)}">할인가</td>
                     <td><!-- 수량 -->
                         <input th:data-basketId="${basket.id}" class="quantity" type="number" th:value="${basket.quantity}" min="1" />
-                        
                     </td>
                 </tr>
             </table>
 
-            <h5>
+			<h5>
                 <p id="totalQuantity">선택한 상품 0개</p>
                 <p id="totalPrice">결제예정금액: 0원</p>
-            </h5><br>
+            </h5>
+            <br/>
             
             <!-- 상품수량변경시 --> 
             <form id="quantityForm" action="/product/updateQuantity" method="post" style="display:none;">
@@ -73,7 +76,9 @@ document.getElementById('basketForm').addEventListener('submit', function(event)
     if (checkboxes.length > 0) {
         const selectedValues = Array.from(checkboxes).map(cb => cb.value);
         document.getElementById('selectProduct').value = selectedValues.join(',');
-        this.submit();
+        if (validateForm()) {
+            this.submit(); // 재고 검증이 통과하면 폼을 제출
+        }
     } else {
         alert('선택된 상품이 없습니다.');
     }
@@ -86,7 +91,9 @@ document.getElementById('allOrderButton').addEventListener('click', function() {
     const basketForm = document.getElementById('basketForm');
     const allValues = Array.from(checkboxes).map(cb => cb.value);
     document.getElementById('selectProduct').value = allValues.join(',');
-    basketForm.submit();
+    if (validateForm()) {
+        basketForm.submit(); // 재고 검증이 통과하면 폼을 제출
+    }
 });
 
 // "선택 삭제"
@@ -101,6 +108,16 @@ document.getElementById('removeBasket').addEventListener('submit', function(even
         alert('선택된 상품이 없습니다.');
     }
 });
+
+// 재고보다 주문수량이 많을 때
+function validateForm() {
+    const stockCheckboxes = document.querySelectorAll('input[name="stock"]:checked');
+    if (stockCheckboxes.length > 0) {
+        alert("현재 재고가 부족합니다.");
+        return false; // 폼 제출을 중단
+    }
+    return true; // 재고 상태가 양호한 경우 폼을 제출
+}
 
 // 총합 업데이트 함수
 function updateTotals() {

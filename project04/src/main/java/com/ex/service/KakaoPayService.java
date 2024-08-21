@@ -1,4 +1,5 @@
 package com.ex.service;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 
@@ -9,17 +10,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import com.ex.data.BasketDTO;
 import com.ex.data.KakaoPayDTO;
-import com.ex.data.ProductDTO;
 import com.ex.entity.DeliveryEntity;
-import com.ex.entity.OrderlistEntity;
-import com.ex.repository.OrderlistRepository;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.security.Principal;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;

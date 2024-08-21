@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.ex.data.KakaoDTO;
-import com.ex.repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import lombok.RequiredArgsConstructor;
@@ -28,7 +27,6 @@ public class KakaoService {
     private static final String REDIRECT_URI = "http://localhost:8080/user/kakao";
     private static final String CLIENT_ID = "2973e8a76b1a6fd676870daca0d61cc1";
     private static final String CLIENT_SECRET = "3OHnlturZOhcXWnCKEryAfOBSzcdQKbh";
-    private final UserRepository userRepository;
 
     public String getAccessToken(String code) {
         RestTemplate restTemplate = new RestTemplate();

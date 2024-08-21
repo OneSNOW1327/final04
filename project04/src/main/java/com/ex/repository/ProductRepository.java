@@ -13,5 +13,8 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Integer>
 	Page<ProductEntity> findAll(Specification<ProductEntity>spec, Pageable pageable);
 	
 	Page<ProductEntity> findByTypeId(Integer tpyeId, Pageable pageable);
-	List<ProductEntity> findByTypeId(Integer typeId);
+	
+	List<ProductEntity> findAllByStock(int stock);
+	
+	List<ProductEntity> findAllByStockLessThanEqual(int stock);
 }

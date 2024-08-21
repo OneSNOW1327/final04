@@ -3,9 +3,6 @@ package com.ex.data;
 import java.util.List;
 
 import com.ex.entity.NoticeEntity;
-import com.ex.entity.NoticePhotoEntity;
-import com.ex.entity.ProductEntity;
-import com.ex.entity.ProductThumbnailEntity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

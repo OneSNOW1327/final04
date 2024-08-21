@@ -1,15 +1,11 @@
 package com.ex.controller;
 
-import com.ex.data.BasketDTO;
-import com.ex.data.DeliveryDTO;
 import com.ex.data.ProductDTO;
 import com.ex.entity.BasketEntity;
 import com.ex.entity.DeliveryEntity;
-import com.ex.entity.OrderlistEntity;
 import com.ex.entity.ProductEntity;
 import com.ex.entity.ProducttypeEntity;
 import com.ex.entity.UserEntity;
-import com.ex.repository.OrderlistRepository;
 import com.ex.service.ProductService;
 import com.ex.service.UserService;
 import com.ex.service.PhotoService;
@@ -28,12 +24,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.springframework.web.bind.annotation.RequestBody;
 
 @Controller
 @RequiredArgsConstructor
@@ -205,15 +199,15 @@ public class ProductController {
         model.addAttribute("wishList", updateWishlist);
         return "wishlist";
     }
-	//(가은) 찜 장바구니담기 버튼 눌렀을때 
-		@PostMapping("/wishToBasket")
-		@PreAuthorize("isAuthenticated()")
-		public String wishToBasket(Principal principal, 
-				@RequestParam(value = "quantity", defaultValue = "1") int quantity,
-				@RequestParam("productId") Integer productId) {
-			productService.addToBasket(productId, principal.getName(), quantity);
-			return "redirect:/product/wishlist";
-		}    
+	
+	//(가은) 찜 장바구니담기 버튼 눌렀을때
+	@PostMapping("/wishToBasket")
+	@PreAuthorize("isAuthenticated()")
+	public String wishToBasket(@RequestParam(value = "quantity", defaultValue = "1") int quantity,
+													@RequestParam("productId") Integer productId,Principal principal) {
+		productService.addToBasket(productId, principal.getName(), quantity);
+		return "redirect:/product/wishlist";
+	}    
 	
 //(가은) 결제페이지 from BASKET
 	@PostMapping("/paymentPage") // 선택된 장바구니 항목이 넘어옴
@@ -226,6 +220,7 @@ public class ProductController {
 		model.addAttribute("principalUser", userService.findByUserName(principal.getName()));
 		return "paymentPage";
 	}
+	
 //(가은) 결제페이지 from DIRECT
 	@PostMapping("/directPayPage")
 	@PreAuthorize("isAuthenticated()")
@@ -267,9 +262,10 @@ public class ProductController {
 	}
 
 	//0802성진 테스트
-		@PostMapping("/sales/{id}")
-		public String slaes(@PathVariable("id")Integer id,@RequestParam("rate")int rate) {
-			productService.sales(id,rate,productService.salesVolumeDesc(id));
-			return "redirect:/admin/product/"+id;
-		}
+	@PostMapping("/sales/{id}")
+	public String slaes(@PathVariable("id")Integer id,@RequestParam("rate")int rate) {
+		productService.sales(id,rate,productService.salesVolumeDesc(id));
+		return "redirect:/admin/product/"+id;
 	}
+	
+}
