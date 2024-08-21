@@ -43,8 +43,8 @@ public class MainController {
 		model.addAttribute("typeList", productService.getAllProductTypes());
 		List<ProducttypeEntity> productTypes = productService.getSortedProductTypes();
 		model.addAttribute("productTypes", productTypes);
-	     NoticeDTO notice = noticeService.getLatestNotice();
-	     model.addAttribute("notice", notice);
+		NoticeDTO notice = noticeService.getLatestNotice();
+		model.addAttribute("notice", notice);
 		return "main";
 	}
 
@@ -91,25 +91,27 @@ public class MainController {
 				.collect(Collectors.toList());
 		return new ResponseEntity<>(imageList, HttpStatus.OK);
 	}
+	
 	// 공지사항 상세 보기
-	 @GetMapping("/main/NoticeDetail/{id}")
-	 public String noticeDetail(@PathVariable("id") Integer id, Model model) {
-	     NoticeDTO noticeDTO = noticeService.findById(id); // 공지사항 정보 불러오기
-	     noticeDTO.setNoticePhotoPath(photoService.getNotice(id)); // 이미지 경로 설정
-	     model.addAttribute("NoticeDTO", noticeDTO); // 모델에 NoticeDTO 추가
-	     return "NoticeDetail"; // 템플릿 반환
-	 }
-	 
-	 @GetMapping("/main/noticeList")
-	    public String list(@RequestParam(value = "page", defaultValue = "1") int page, Model model) {
-	        if (page <= 0) {
-	            return "redirect:/main/noticeList?page=1";
-	        }
-
-	        Page<NoticeEntity> noticePage = noticeService.noticeAll(page - 1);
-	        model.addAttribute("noticeList", noticePage.getContent());
-	        model.addAttribute("currentPage", page);
-	        model.addAttribute("totalPages", noticePage.getTotalPages());
-	        return "NoticeList";
-	    }
+	@GetMapping("/main/NoticeDetail/{id}")
+	public String noticeDetail(@PathVariable("id") Integer id, Model model) {
+		NoticeDTO noticeDTO = noticeService.findById(id); // 공지사항 정보 불러오기
+		noticeDTO.setNoticePhotoPath(photoService.getNotice(id)); // 이미지 경로 설정
+		model.addAttribute("NoticeDTO", noticeDTO); // 모델에 NoticeDTO 추가
+		return "NoticeDetail"; // 템플릿 반환
+	}
+	
+	@GetMapping("/main/noticeList")
+	public String list(@RequestParam(value = "page", defaultValue = "1") int page, Model model) {
+		if (page <= 0) {
+			return "redirect:/main/noticeList?page=1";
+		}
+		
+		Page<NoticeEntity> noticePage = noticeService.noticeAll(page - 1);
+		model.addAttribute("noticeList", noticePage.getContent());
+		model.addAttribute("currentPage", page);
+		model.addAttribute("totalPages", noticePage.getTotalPages());
+		return "NoticeList";
+	}
+	
 }

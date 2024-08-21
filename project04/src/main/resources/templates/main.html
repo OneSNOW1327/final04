@@ -83,12 +83,13 @@
                                 <a th:href="@{/product/detail/{id}(id=${product.id})}">
                                     <img th:src="|/file/display?folder=thumbnails&filename=${product.thumbnail[0].sysname}|" alt="Product Image" class="card-img-top">
                                     <div class="card-body">
-                                        <h5 class="card-title text-dark" th:text="${product.name}"></h5>
+										<span th:if="${product.stock == 0}" class="text-danger" th:text="|[매진]|"></span>
+                                        <h5 class="card-title text-dark" th:text="${product.name}" style="display: inline-block;"></h5>
                                         <p class="card-text">
                                             <span th:if="${product.discount > 0}">
                                                 <del class="text-muted" th:text="${#numbers.formatDecimal(product.sellPrice, 0, 'COMMA', 3, 'POINT').replace('.000', '')} + '원'"></del>
                                                 <br>
-                                                <strong class="text-danger" th:text="'쿠폰 최대할인: ' + ${product.discount} + '%'"></strong>
+                                                <strong class="text-danger" th:text="'할인: ' + ${product.discount} + '%'"></strong>
                                                 <br>
                                                 <strong class="text-primary" th:text="${#numbers.formatDecimal(product.sellPrice * (100-product.discount)/100, 0, 'COMMA', 3, 'POINT').replace('.000', '')} + '원'"></strong>
                                             </span>
