@@ -14,7 +14,7 @@
                             <p><strong>이메일:</strong> <span th:text="${user.email}"></span></p>
                             <p><strong>가입 날짜:</strong> <span th:text="${#temporals.format(user.reg, 'yyyy-MM-dd HH:mm')}"></span></p>
                             <p><strong>이름:</strong> <span th:text="${user.realName}"></span></p>
-                            <p><strong>주소:</strong> <span th:text="${user.adress}"></span></p>
+                            <p><strong>주소:</strong> <span th:text="${user.address}"></span></p>
                             <p><strong>전화번호:</strong> <span th:text="${user.phone}"></span></p>
                             <p><strong>등급:</strong> <span th:text="${user.grade}"></span></p>
                             <p><strong>포인트:</strong> <span th:text="${user.point}"></span></p>
@@ -56,9 +56,6 @@
 					                    </tr>
 					                </tbody>
 					            </table>
-					        </div>
-					        <div th:if="${user.delivery == null or #lists.isEmpty(user.delivery)}">
-					            <p>주문 내역이 없습니다.</p>
 					        </div>
 					    </div>
 					</div>

@@ -10,6 +10,7 @@
         <h2 class="mb-4">문의 목록</h2>
         <div class="mb-3">
             <a class="btn btn-primary" th:href="@{/question/create}" th:if="${#authentication.principal != null}">문의 작성하기</a>
+            <a class="btn btn-secondary" href="/"> 메인으로 </a>
         </div>
         <table class="table table-striped">
             <thead>
