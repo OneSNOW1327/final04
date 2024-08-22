@@ -166,6 +166,14 @@ public class UserService{
 		
 		    return sortedDeliveries; // 정렬된 DeliveryEntity 반환
 		}
-	    
+		// 사용자 삭제하기
+	    public void deleteUser(String username) {
+	        Optional<UserEntity> op = userRepository.findByUsername(username);
+	        if (op.isPresent()) {
+	            userRepository.delete(op.get());
+	        } else {
+	            throw new RuntimeException("존재하지 않는 사용자입니다.");
+	        }
+	    }
 	    
 }

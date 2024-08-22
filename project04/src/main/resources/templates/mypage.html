@@ -19,6 +19,10 @@
                             <p><strong>등급:</strong> <span th:text="${user.grade}"></span></p>
                             <p><strong>포인트:</strong> <span th:text="${user.point}"></span></p>
                             <a th:href="@{/user/userUpdateForm}" class="btn btn-primary mt-3">회원정보 변경</a>
+                             <!-- 회원탈퇴 버튼 추가 -->
+		                    <form th:action="@{/user/deleteAccount}" method="post" onsubmit="return confirm('정말로 탈퇴하시겠습니까?');">
+		                        <button type="submit" class="btn btn-danger mt-3">회원탈퇴</button>
+		                    </form>
                         </div>
                     </div>
                 </div>
