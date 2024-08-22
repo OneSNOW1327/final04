@@ -20,15 +20,14 @@ public class QuestionEntity {
     private Long id; // 문의 ID
 
     private String title; // 문의 제목
+    
     private String content; // 문의 내용
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
     private UserEntity user; // 작성자
 
     private LocalDateTime createdDate; // 작성 날짜
 
-    @Column(columnDefinition = "TEXT")
     private String answer; // 답변 내용
 
     private LocalDateTime answeredDate; // 답변 작성 날짜

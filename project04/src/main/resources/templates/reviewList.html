@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout}">
+<div class="container my-3" layout:fragment="content">
+
+                    <div class="card review-card">
+                        <div class="card-header bg-primary text-white">
+                            작성한 리뷰
+                        </div>
+                        <div class="card-body bg-white text-dark">
+                            <div th:if="${user.review != null and !#lists.isEmpty(user.review)}">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>리뷰 ID</th>
+                                            <th>상품명</th>
+                                            <th>리뷰 내용</th>
+                                            <th>작성 날짜</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="review : ${user.review}">
+                                            <td th:text="${review.id}"></td>
+                                            <td >
+                                            	<a th:text="${review.product.name}" th:href="@{|/product/detail/${review.product.id}|}"></a>
+                                            </td>
+                                            <td th:text="${review.content}"></td>
+                                            <td th:text="${#temporals.format(review.writeDate, 'yyyy-MM-dd HH:mm')}"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div th:if="${user.review == null or #lists.isEmpty(user.review)}">
+                                <p>작성한 리뷰가 없습니다.</p>
+                            </div>
+                        </div>
+                    </div>
+
+</div>
+
+<th:block layout:fragment="script">
+
+	<script>
+	
+		<!-- 스크 립트 -->
+	
+   </script>
+
+
+</th:block>
+</html>

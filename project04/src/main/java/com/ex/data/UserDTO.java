@@ -4,8 +4,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.ex.entity.BasketEntity;
+import com.ex.entity.DeliveryEntity;
 import com.ex.entity.OrderlistEntity;
 import com.ex.entity.ProductEntity;
+import com.ex.entity.QuestionEntity;
+import com.ex.entity.ReviewEntity;
 import com.ex.entity.UserEntity;
 
 import lombok.AllArgsConstructor;
@@ -41,12 +44,16 @@ public class UserDTO {
     private int grade;
     
     private long point;
+
+    private List<QuestionEntity>questionList; //해당회원의 질문 리스트
     
     private List<BasketEntity> basketList; //해당회원의 장바구니
     
     private List<ProductEntity> wishList; //찜목록
     
-    private List<OrderlistEntity> orderlist; //주문내역, 결제
+    private List<ReviewEntity> review;
+
+    private List<DeliveryEntity> delivery; //주문내역, 결제
     
     public static UserDTO entityToDTO(UserEntity ue) {
 		return UserDTO.builder().id(ue.getId())
@@ -59,10 +66,13 @@ public class UserDTO {
 				.extraAddress(ue.getExtraAddress())
 				.phone(ue.getPhone())
 				.reg(ue.getReg())
+				.grade(ue.getGrade())
 				.point(ue.getPoint())
 				.basketList(ue.getBasketList())
+				.review(ue.getReview())
+				.delivery(ue.getDelivery())
+				.questionList(ue.getQuestionList())
 				.wishList(ue.getWishList())
-				.grade(ue.getGrade())
 				.build();
 	}
 

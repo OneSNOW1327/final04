@@ -11,6 +11,8 @@ public interface NoticeRepository  extends JpaRepository<NoticeEntity, Integer> 
 	
     Page<NoticeEntity> findAll(Specification<NoticeEntity> spec, Pageable pageable);
 
-    NoticeEntity findTopByOrderByIdDesc(); // ID를 기준으로 최신 공지사항을 가져옴
+    Page<NoticeEntity> findAll(Pageable pageable);
+    
+    NoticeEntity findByMain(int main); // 메인이 체크된 공지사항 가져옴
     
 }

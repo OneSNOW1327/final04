@@ -63,7 +63,7 @@
                     <!-- 작성한 리뷰 카드 -->
                     <div class="card review-card">
                         <div class="card-header bg-primary text-white">
-                            작성한 리뷰
+                            <a href="/user/allReview" class="text-white">작성한 리뷰</a>
                         </div>
                         <div class="card-body bg-white text-dark">
                             <div th:if="${user.review != null and !#lists.isEmpty(user.review)}">
@@ -77,9 +77,11 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr th:each="review : ${user.review}">
+                                        <tr th:each="review : ${myReview}">
                                             <td th:text="${review.id}"></td>
-                                            <td th:text="${review.product.name}"></td>
+                                            <td>
+                                            	<a th:text="${review.product.name}" th:href="@{|/product/detail/${review.product.id}|}"></a>
+                                            </td>
                                             <td th:text="${review.content}"></td>
                                             <td th:text="${#temporals.format(review.writeDate, 'yyyy-MM-dd HH:mm')}"></td>
                                         </tr>

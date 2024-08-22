@@ -2,6 +2,7 @@ package com.ex.entity;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -56,7 +57,7 @@ public class ProductEntity {
 
     @ManyToMany
 	@JsonIgnore // 직렬화에서 제외
-    private List<UserEntity> wishUser; //유저의 위시리스트
+    private Set<UserEntity> wishUser; //유저의 위시리스트
     
     @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
 	@JsonIgnore // 직렬화에서 제외

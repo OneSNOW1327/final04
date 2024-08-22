@@ -13,4 +13,7 @@ public interface ReviewRepository extends JpaRepository<ReviewEntity, Integer> {
     List<ReviewEntity> findByProduct_Id(Integer productId); // 상품 ID로 리뷰 검색
 
     Optional<ReviewEntity> findByProduct_IdAndAdopted(Integer productId,int adopted);
+    
+    List<Optional<ReviewEntity>> findAllByWriterIdOrderByWriteDateDesc(Integer writerId);
+    
 }

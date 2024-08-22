@@ -3,7 +3,6 @@ package com.ex.controller;
 import com.ex.data.ProductDTO;
 import com.ex.entity.BasketEntity;
 import com.ex.entity.DeliveryEntity;
-import com.ex.entity.ProductEntity;
 import com.ex.entity.ProducttypeEntity;
 import com.ex.entity.UserEntity;
 import com.ex.service.ProductService;
@@ -77,15 +76,6 @@ public class ProductController {
 		productDTO.setThumbnailPaths(photoService.getThumbnailPaths(id));
 		productDTO.setDescriptionImagePaths(photoService.getDescriptionImagePaths(id));
 		model.addAttribute("productDTO", productDTO);
-		
-		if (principal.getName() != null) {
-	        UserEntity user = userService.findByUserName(principal.getName());
-	        boolean isWished = user.getWishList().stream()
-	                              .anyMatch(product -> product.getId().equals(id));
-	        model.addAttribute("isWished", isWished);
-	        }
-	    
-		
 		return "productDetail";
 	}
 
@@ -170,9 +160,9 @@ public class ProductController {
 	}
 
 //(가은) 찜 버튼 눌렀을때
-	@PostMapping("/wishadd")
+	@GetMapping("/wishadd/{id}")
 	@PreAuthorize("isAuthenticated()")
-	public String addToWish(Principal principal, @RequestParam("productId") Integer productId) {
+	public String addToWish(Principal principal, @PathVariable("id") Integer productId) {
 		productService.addToWish(productId, principal.getName());
 		return "redirect:/product/detail/" + productId;
 	}
@@ -181,12 +171,11 @@ public class ProductController {
 	@GetMapping("/wishlist")
 	@PreAuthorize("isAuthenticated()")
     public String wishlist(Model model, Principal principal) {	
-		List<ProductEntity> wishList =         
-        productService.getUserWishList(userService.findByUserName(principal.getName()).getId());
-        model.addAttribute("wishList", wishList);
+		UserEntity user = userService.findByUserName(principal.getName());
+        model.addAttribute("user", user);
         return "wishlist";
     }
-	
+	/*
 //(가은) 찜 선택상품 삭제
 	@PostMapping("/wishlist/removeSelected")
 	@PreAuthorize("isAuthenticated()")
@@ -199,7 +188,7 @@ public class ProductController {
         model.addAttribute("wishList", updateWishlist);
         return "wishlist";
     }
-	
+	*/
 	//(가은) 찜 장바구니담기 버튼 눌렀을때
 	@PostMapping("/wishToBasket")
 	@PreAuthorize("isAuthenticated()")

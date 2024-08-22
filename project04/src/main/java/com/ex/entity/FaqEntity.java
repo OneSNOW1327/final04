@@ -27,9 +27,4 @@ public class FaqEntity {
     @Column(nullable = false)
     private String answer;  // FAQ 답변 텍스트
 
-    @Column(nullable = false)
-    private String writer;  // 작성자 (FAQ 등록자의 이름)
-
-    @Column(nullable = false)
-    private int grade;  // 작성자의 등급 (1: 일반 사용자, 3: 관리자)
 }

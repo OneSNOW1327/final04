@@ -338,22 +338,19 @@ public class ProductService {
 		if(pop.isPresent()&&uop.isPresent()) {
 			ProductEntity pe = pop.get();
 			UserEntity ue = uop.get();
-			if(!ue.getWishList().contains(pe)) {
-				ue.getWishList().add(pe);
-				userRepository.save(ue);
-			}else {
+			if(pe.getWishUser().contains(ue)) {
+				pe.getWishUser().remove(ue);
 				ue.getWishList().remove(pe);
 				userRepository.save(ue);
+				productRepository.save(pe);
+			}else {
+				ue.getWishList().add(pe);
+				pe.getWishUser().add(ue);
+				userRepository.save(ue);
+				productRepository.save(pe);
 			}
 		}
 	}
-
-//(가은) 찜리스트 조회
-	public List<ProductEntity> getUserWishList(int userId) {
-		return userRepository.findById(userId)
-							.map(UserEntity::getWishList)
-							.orElse(new ArrayList<>());
-    }
 	
 //(가은) 찜 선택삭제
 	public void removeSelectedWishlist(Integer userId, List<Integer> productIds) {
@@ -520,5 +517,6 @@ public class ProductService {
 			}
 		}
 	}
+	
 	
 }

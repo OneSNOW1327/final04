@@ -11,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -58,6 +59,9 @@ public class UserEntity {
     @OneToMany(mappedBy = "user", cascade=CascadeType.REMOVE)
     private List<BasketEntity> basketList; //해당회원의 장바구니
     
+    @OneToMany(mappedBy = "user", cascade=CascadeType.REMOVE)
+    private List<QuestionEntity>questionList; //해당회원의 질문 리스트
+    
     @ManyToMany
     private List<ProductEntity> wishList; //찜목록
     
@@ -65,6 +69,7 @@ public class UserEntity {
     private List<DeliveryEntity> delivery; //주문내역, 결제
     
     @OneToMany(mappedBy = "writer", cascade = CascadeType.REMOVE)
+	@OrderBy("writeDate DESC")
     private List<ReviewEntity> review;
     
     

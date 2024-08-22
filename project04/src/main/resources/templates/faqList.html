@@ -112,7 +112,7 @@
         <p th:text="${faq.answer}"></p>
 
         <!-- 버튼 그룹 (grade가 3일 때만 표시) -->
-        <div class="btn-group" th:if="${userGrade == 3}">
+        <div class="btn-group" sec:authorize="hasRole('ROLE_ADMIN')">
             <!-- 수정하기 버튼 -->
             <a th:href="@{'/faq/edit/' + ${faq.id}}" class="btn-edit">수정하기</a>
             <!-- FAQ 삭제 버튼 -->

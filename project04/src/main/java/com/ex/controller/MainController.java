@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,10 +20,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.ex.data.FaqDTO;
 import com.ex.data.NoticeDTO;
 import com.ex.entity.NoticeEntity;
 import com.ex.entity.ProductThumbnailEntity;
 import com.ex.entity.ProducttypeEntity;
+import com.ex.service.FaqService;
 import com.ex.service.NoticeService;
 import com.ex.service.PhotoService;
 import com.ex.service.ProductService;
@@ -36,16 +39,22 @@ public class MainController {
 	private final NoticeService noticeService;
 	private final ProductService productService;
 	private final PhotoService photoService;
+    private final FaqService faqService;
  
 	@GetMapping("/main")
-	public String mainPage(Model model) {    	
-		
-		model.addAttribute("typeList", productService.getAllProductTypes());
-		List<ProducttypeEntity> productTypes = productService.getSortedProductTypes();
-		model.addAttribute("productTypes", productTypes);
-		NoticeDTO notice = noticeService.getLatestNotice();
-		model.addAttribute("notice", notice);
-		return "main";
+	public String mainPage(Model model) {
+	    model.addAttribute("typeList", productService.getAllProductTypes());
+	    List<ProducttypeEntity> productTypes = productService.getSortedProductTypes();
+	    model.addAttribute("productTypes", productTypes);
+
+	    NoticeDTO notice = noticeService.getMainNotice();
+	    model.addAttribute("notice", notice);
+
+	    // 공지사항 이미지 존재 여부 확인
+	    boolean hasNoticePhoto = notice != null && notice.getNoticePhotoPath() != null && !notice.getNoticePhotoPath().isEmpty();
+	    model.addAttribute("hasNoticePhoto", hasNoticePhoto);
+
+	    return "main";
 	}
 
 	@GetMapping("/")
@@ -93,7 +102,7 @@ public class MainController {
 	}
 	
 	// 공지사항 상세 보기
-	@GetMapping("/main/NoticeDetail/{id}")
+	@GetMapping("/NoticeDetail/{id}")
 	public String noticeDetail(@PathVariable("id") Integer id, Model model) {
 		NoticeDTO noticeDTO = noticeService.findById(id); // 공지사항 정보 불러오기
 		noticeDTO.setNoticePhotoPath(photoService.getNotice(id)); // 이미지 경로 설정
@@ -101,7 +110,7 @@ public class MainController {
 		return "NoticeDetail"; // 템플릿 반환
 	}
 	
-	@GetMapping("/main/noticeList")
+	@GetMapping("/noticeList")
 	public String list(@RequestParam(value = "page", defaultValue = "1") int page, Model model) {
 		if (page <= 0) {
 			return "redirect:/main/noticeList?page=1";
@@ -113,5 +122,15 @@ public class MainController {
 		model.addAttribute("totalPages", noticePage.getTotalPages());
 		return "NoticeList";
 	}
+	
+    // FAQ 리스트를 표시하는 메서드
+    @GetMapping("/faqList")
+    public String showFaqList(Model model, Principal principal) {
+        List<FaqDTO> faqs = faqService.getAllFaqs();  // 모든 FAQ를 조회
+        model.addAttribute("faqs", faqs);  // 조회된 FAQ 리스트를 모델에 추가
+
+        return "faqList";  // FAQ 리스트를 표시하는 뷰로 이동
+    }
+	
 	
 }

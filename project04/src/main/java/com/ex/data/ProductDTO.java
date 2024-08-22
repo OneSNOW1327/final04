@@ -2,6 +2,7 @@ package com.ex.data;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 import com.ex.entity.BasketEntity;
 import com.ex.entity.DeliveryEntity;
@@ -37,7 +38,7 @@ public class ProductDTO {
     
     private List<BasketEntity> basketlist; // 장바구니
     
-    private List<UserEntity> wishUser; // 유저의 위시리스트
+    private Set<UserEntity> wishUser; // 유저의 위시리스트
 
     private List<SalesVolumeEntity> salesVolume; // 판매량 ID
 
@@ -79,6 +80,7 @@ public class ProductDTO {
 				.registrationDate(pe.getRegistrationDate())
 				.orderEmail(pe.getOrderEmail())
 				.salesVolume(pe.getSalesVolume())
+				.wishUser(pe.getWishUser())
 				.build();
     }
 

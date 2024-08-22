@@ -5,6 +5,7 @@ import com.ex.data.QuestionDTO;
 import com.ex.entity.UserEntity;
 import com.ex.service.UserService;
 import com.ex.service.QuestionService;
+import com.ex.service.ReviewService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,6 +26,7 @@ public class UserController {
 
 	private final UserService userService;
 	private final QuestionService questionService; // QuestionService 추가
+	private final ReviewService reviewService;
 	
 	@GetMapping("login")
 	public String loginPage() {
@@ -76,7 +78,7 @@ public class UserController {
 	public String findpw() {
 		return "findpw";
 	}
-	@PostMapping("/findpwpro")
+	@PostMapping("findpwpro")
     public String findPassword(@RequestParam("username") String username, @RequestParam("realName") String realName, @RequestParam("email") String email, Model model) {
         try {
             userService.verifyUser(username, realName, email);
@@ -86,7 +88,7 @@ public class UserController {
             return "redirect:/user/findpw?error=true";
         }
     }
-	@PostMapping("/setnewpassword")
+	@PostMapping("setnewpassword")
     public String setNewPassword(@RequestParam("username") String username, @RequestParam("newPassword") String newPassword) {
         userService.updatePassword(username, newPassword);
         return "redirect:/user/login";
@@ -99,19 +101,17 @@ public class UserController {
 	      return "userinfo";
 	   }
 	   
-	   @GetMapping("/mypage")
-	    public String myPage(@AuthenticationPrincipal UserDetails userDetails, Model model) {
-	        UserEntity user = userService.findByUserName(userDetails.getUsername());
+	   @GetMapping("mypage")
+	    @PreAuthorize("isAuthenticated()") // 인증된 사용자만 접근 가능
+	    public String myPage(Principal principal, Model model) {
+	        UserEntity user = userService.findByUserName(principal.getName());
 	        model.addAttribute("user", user);
-
-	        // 사용자가 작성한 문의 목록을 가져와서 모델에 추가
-	        List<QuestionDTO> questionList = questionService.findByUsername(userDetails.getUsername());
-	        model.addAttribute("questionList", questionList);
-
+	        model.addAttribute("myReview",reviewService.myPageReview(principal.getName()));
 	        return "mypage";
 	    }
+	   
 	   // <-- 제성 회원정보 변경 -->
-	   @GetMapping("/userUpdateForm") // 회원정보 변경 폼 요청
+	   @GetMapping("userUpdateForm") // 회원정보 변경 폼 요청
 	    @PreAuthorize("isAuthenticated()") // 인증된 사용자만 접근 가능
 	    public String showUserUpdateForm(Principal principal, Model model) {
 	        UserEntity user = userService.findByUserName(principal.getName()); // 사용자 정보 가져오기
@@ -119,10 +119,18 @@ public class UserController {
 	        return "userUpdateForm"; // userUpdateForm.html 뷰 반환
 	    }
 
-	    @PostMapping("/update") // 회원정보 변경 처리
+	    @PostMapping("update") // 회원정보 변경 처리
 	    @PreAuthorize("isAuthenticated()") // 인증된 사용자만 접근 가능
 	    public String updateUser(UserDTO userDTO, Principal principal) {
 	        userService.updateUser(principal.getName(), userDTO); // 회원정보 변경 로직 실행
 	        return "redirect:/user/mypage"; // 변경 후 마이페이지로 리다이렉트
 	    }
+	    
+	    @GetMapping("allReview")
+	    @PreAuthorize("isAuthenticated()") // 인증된 사용자만 접근 가능
+	    public String myAllReview(Principal pricipal,Model model) {
+	    	model.addAttribute("user",UserDTO.entityToDTO(userService.findByUserName(pricipal.getName())));
+	    	return "reviewList";
+	    }
+	    
 }

@@ -98,6 +98,7 @@ public class NoticeService {
 	
 	public Page<NoticeEntity> noticeAll(int page) {
 		List<Sort.Order> sorts = new ArrayList<>();
+		sorts.add(Sort.Order.desc("id"));
 		return noticeRepository.findAll(PageRequest.of(page, 10, Sort.by(sorts)));
 	}
 	
@@ -115,11 +116,11 @@ public class NoticeService {
 		return photoDTOList;
 	}
 	
-	public NoticeDTO getLatestNotice() {
-		NoticeEntity latestNotice = noticeRepository.findTopByOrderByIdDesc();
-		if (latestNotice != null) {
-			NoticeDTO noticeDTO = NoticeDTO.entityToDTO(latestNotice);
-			noticeDTO.setNoticePhotoPath(getNoticePhotoPaths(latestNotice.getId()));
+	public NoticeDTO getMainNotice() {
+		NoticeEntity mainNotice = noticeRepository.findByMain(1);
+		if (mainNotice != null) {
+			NoticeDTO noticeDTO = NoticeDTO.entityToDTO(mainNotice);
+			noticeDTO.setNoticePhotoPath(getNoticePhotoPaths(mainNotice.getId()));
 			return noticeDTO;
 		}
 		return null; // 공지사항이 없는 경우 null 반환
@@ -137,6 +138,15 @@ public class NoticeService {
 			);
 		}
 		return photoDTOList;
+	}
+	
+	public void changeMainNotice(Integer id) {
+		NoticeEntity oldMainNotice = noticeRepository.findByMain(1);
+		oldMainNotice.setMain(0);
+		noticeRepository.save(oldMainNotice);
+		NoticeEntity newMainNotice = noticeRepository.findById(id).get();
+		newMainNotice.setMain(1);
+		noticeRepository.save(newMainNotice);
 	}
 	
 }

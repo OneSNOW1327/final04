@@ -1,51 +1,51 @@
 <!DOCTYPE html>
 <html lang="ko" layout:decorate="~{layout}">
-	<th:block layout:fragment="script-popup">
-		<script type="text/javascript">
-			function setCookie(name, value, days) {
-				var date = new Date();
-				date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-				var expires = "expires=" + date.toUTCString();
-				document.cookie = name + "=" + value + ";" + expires + ";path=/";
-			}
-			
-			function getCookie(name) {
-				var nameEQ = name + "=";
-				var ca = document.cookie.split(';');
-				for (var i = 0; i < ca.length; i++) {
-					var c = ca[i];
-					while (c.charAt(0) == ' ') c = c.substring(1, c.length);
-					if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
-				}
-				return null;
-			}
-			
-			function openLayerPopup() {
-				if (getCookie("popupClosed") !== "true") {
-					$("#overlay").fadeIn();
-					$("html, body").css("overflow", "hidden");
-				}
-			}
-			
-			function closeLayerPopup() {
-				if ($("#dont-show-checkbox").is(":checked")) {
-					setCookie("popupClosed", "true", 1);  // 하루 동안 팝업 안 보이게 설정
-				}
-				$("#overlay").fadeOut();
-				$("html, body").css("overflow", "auto");
-			}
-			
-			$(document).ready(function() {
-				openLayerPopup();
-				$("#close-button").on('click', closeLayerPopup);
-				
-				// 오버레이 클릭 시 팝업 닫기
-				$("#overlay").on('click', function(e) {
-					if ($(e.target).is("#overlay")) {
-						closeLayerPopup();
-					}
-				});
-			});
+<th:block layout:fragment="script-popup">
+<script type="text/javascript">
+function setCookie(name, value, days) {
+    var date = new Date();
+    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+    var expires = "expires=" + date.toUTCString();
+    document.cookie = name + "=" + value + ";" + expires + ";path=/";
+}
+
+function getCookie(name) {
+    var nameEQ = name + "=";
+    var ca = document.cookie.split(';');
+    for (var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+    }
+    return null;
+}
+
+function openLayerPopup() {
+    if (getCookie("popupClosed") !== "true") {
+        $("#overlay").fadeIn();
+        $("html, body").css("overflow", "hidden");
+    }
+}
+
+function closeLayerPopup() {
+    if ($("#dont-show-checkbox").is(":checked")) {
+        setCookie("popupClosed", "true", 1);  // 하루 동안 팝업 안 보이게 설정
+    }
+    $("#overlay").fadeOut();
+    $("html, body").css("overflow", "auto");
+}
+
+$(document).ready(function() {
+    openLayerPopup();
+    $("#close-button").on('click', closeLayerPopup);
+    
+    // 오버레이 클릭 시 팝업 닫기
+    $("#overlay").on('click', function(e) {
+        if ($(e.target).is("#overlay")) {
+            closeLayerPopup();
+        }
+    });
+});
     	</script>
     </th:block>
 <body>
@@ -62,7 +62,9 @@
                 <a class="btn btn-info mx-1" th:href="@{/product/basketList}" sec:authorize="isAuthenticated()">장바구니</a>
                 <a class="btn btn-success mx-1" th:href="@{/product/writeForm}">상품등록</a>
                 <a class="btn btn-warning mx-1" th:href="@{/product/simplePayResult}">주문내역</a>
-                <a class="btn btn-light mx-1" th:href="@{/admin/noticeList}">공지사항</a>
+                <a class="btn btn-light mx-1" th:href="@{/noticeList}">공지사항</a>
+                <a class="btn btn-light mx-1" th:href="@{/question/questionList}">문의하기</a>
+                <a class="btn btn-light mx-1" th:href="@{/faq/faqList}">FAQ</a>
             </div>
         </div>
 
@@ -110,20 +112,24 @@
         </div>
 
         <!-- 레이어 팝업 오버레이 -->
-        <div id="overlay" th:if="${notice.noticePhotoPath != null and !#lists.isEmpty(notice.noticePhotoPath)}">
-            <div id="popup-content">
-                <button id="close-button">&times;</button>
-                <div id="popup-images">
-                    <img th:each="photo : ${notice.noticePhotoPath}"
-                         th:src="@{|/file/display?folder=notice&filename=${photo.sysname}|}" 
-                         alt="공지사항 이미지">
-                </div>
-                <div id="dont-show">
-                    <input type="checkbox" id="dont-show-checkbox">
-                    <label for="dont-show-checkbox">하루 동안 보지 않기</label>
-                </div>
-            </div>
+<!-- 기존 코드 유지 -->
+
+<!-- 팝업 오버레이 -->
+<div id="overlay" style="display: none;" th:if="${hasNoticePhoto}">
+    <div id="popup-content">
+        <button id="close-button">&times;</button>
+        <div id="popup-images">
+            <img th:each="photo : ${notice.noticePhotoPath}"
+                 th:src="@{|/file/display?folder=notice&filename=${photo.sysname}|}" 
+                 alt="공지사항 이미지">
+        </div>
+        <div id="dont-show">
+            <input type="checkbox" id="dont-show-checkbox">
+            <label for="dont-show-checkbox">하루 동안 보지 않기</label>
         </div>
     </div>
-</body>
+</div>
+    </div>
+</body>	
+
 </html>

@@ -4,8 +4,6 @@ import org.springframework.stereotype.Service;
 import com.ex.repository.FaqRepository;
 import com.ex.entity.FaqEntity;
 import com.ex.data.FaqDTO;
-import com.ex.entity.UserEntity;
-import com.ex.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,7 +16,6 @@ import java.util.stream.Collectors;
 public class FaqService {
 
     private final FaqRepository faqRepository;
-    private final UserRepository userRepository;
 
     // 모든 FAQ를 조회하여 DTO 리스트로 반환하는 메서드
     public List<FaqDTO> getAllFaqs() {
@@ -35,15 +32,10 @@ public class FaqService {
     }
 
     // 새로운 FAQ를 등록하는 메서드
-    public void createFaq(FaqDTO faqDTO, String username) {
-        // 사용자 정보를 가져와서 작성자 및 등급을 설정
-        UserEntity user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    public void createFaq(FaqDTO faqDTO) {
         FaqEntity faqEntity = FaqEntity.builder()
                 .question(faqDTO.getQuestion())
                 .answer(faqDTO.getAnswer())
-                .writer(user.getUsername())  // 작성자 설정
-                .grade(user.getGrade())  // 작성자 등급 설정
                 .build();
         faqRepository.save(faqEntity);
     }
@@ -69,8 +61,6 @@ public class FaqService {
                 .id(faqEntity.getId())
                 .question(faqEntity.getQuestion())
                 .answer(faqEntity.getAnswer())
-                .writer(faqEntity.getWriter())
-                .grade(faqEntity.getGrade())
                 .build();
     }
 }

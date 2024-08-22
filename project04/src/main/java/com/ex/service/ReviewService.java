@@ -1,5 +1,7 @@
 package com.ex.service;
 
+import com.ex.data.ProductDTO;
+import com.ex.data.ReviewDTO;
 import com.ex.entity.ProductEntity;
 import com.ex.entity.ReviewEntity;
 import com.ex.entity.ReviewImgEntity;
@@ -126,6 +128,18 @@ public class ReviewService {
 			ue.setPoint(ue.getPoint()+1000);
 			userRepository.save(ue);
 		}
+	}
+
+	public List<ReviewDTO> myPageReview(String username){
+		UserEntity ue = userRepository.findByUsername(username).get();
+		List<ReviewDTO> reviewList = new ArrayList<>();
+		List<Optional<ReviewEntity>> orll = reviewRepository.findAllByWriterIdOrderByWriteDateDesc(ue.getId());
+		for(int i=0; i<5; i++) {
+			if(orll.get(i).isPresent()) {
+				reviewList.add(ReviewDTO.entityToDTO(orll.get(i).get()));
+			}
+		}
+		return reviewList;
 	}
 	
 }

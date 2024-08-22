@@ -27,8 +27,10 @@ public class NoticeEntity {
 	 private String name; // 상품명
 	 private String description; // 상품 설명
 	 
-	    @OneToMany(mappedBy = "notice", cascade = CascadeType.REMOVE)
-		@JsonIgnore // 직렬화에서 제외
-	    private List<NoticePhotoEntity> noticePhoto; //썸네일
+	 @OneToMany(mappedBy = "notice", cascade = CascadeType.REMOVE)
+	 @JsonIgnore // 직렬화에서 제외
+	 private List<NoticePhotoEntity> noticePhoto; //썸네일
+	 
+	 private int main;
 	    
 }
