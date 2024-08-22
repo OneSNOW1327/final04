@@ -17,7 +17,7 @@
                 <tr th:each="notice : ${noticeList}">
                     <td th:text="${notice.id}">1</td>
                     <td>
-                    	<a th:href="@{/main/NoticeDetail/{id}(id=${notice.id})}" th:text="${notice.name}">공지사항 제목</a>
+                    	<a th:href="@{/NoticeDetail/{id}(id=${notice.id})}" th:text="${notice.name}">공지사항 제목</a>
                     	<a th:href="@{|/admin/mainNotice/${notice.id}|}"sec:authorize="hasRole('ROLE_ADMIN')" th:if="${notice.main == 0}" th:text="|[메인]|"></a>
                     </td>
                 </tr>
@@ -25,13 +25,13 @@
         </table>
         <div>
             <span th:if="${currentPage > 1}">
-                <a th:href="@{/main/NoticeList(page=${currentPage-1})}">Previous</a>
+                <a th:href="@{/NoticeList(page=${currentPage-1})}">Previous</a>
             </span>
             <span th:each="i : ${#numbers.sequence(1, totalPages)}">
-                <a th:href="@{main//NoticeList(page=${i})}" th:text="${i}">1</a>
+                <a th:href="@{/NoticeList(page=${i})}" th:text="${i}">1</a>
             </span>
             <span th:if="${currentPage < totalPages}">
-                <a th:href="@{/main/NoticeList(page=${currentPage+1})}">Next</a>
+                <a th:href="@{/NoticeList(page=${currentPage+1})}">Next</a>
             </span>
         </div>
         <a href="/admin/NoticeWriteForm" class="btn btn-primary" sec:authorize="hasRole('ROLE_ADMIN')" >새 공지사항 작성</a>

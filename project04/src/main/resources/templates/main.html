@@ -59,11 +59,10 @@ $(document).ready(function() {
             <div class="d-flex justify-content-end mb-4">
                 <a class="btn btn-primary mx-1" th:href="@{/user/login}" sec:authorize="isAnonymous()">로그인</a>
                 <a class="btn btn-secondary mx-1" th:href="@{/user/logout}" sec:authorize="isAuthenticated()">로그아웃</a>
-                <a class="btn btn-info mx-1" th:href="@{/product/wishlist}" sec:authorize="isAuthenticated()">관심상품</a>                
                 <a class="btn btn-info mx-1" th:href="@{/product/basketList}" sec:authorize="isAuthenticated()">장바구니</a>
-                <a class="btn btn-success mx-1" th:href="@{/product/writeForm}" sec:authorize="hasRole('ROLE_ADMIN')">상품등록</a>
+                <a class="btn btn-success mx-1" th:href="@{/product/writeForm}">상품등록</a>
                 <a class="btn btn-warning mx-1" th:href="@{/product/simplePayResult}">주문내역</a>
-                <a class="btn btn-light mx-1" th:href="@{/noticeList}">공지사항</a>
+                <a class="btn btn-light mx-1" th:href="@{/NoticeList}">공지사항</a>
                 <a class="btn btn-light mx-1" th:href="@{/question/questionList}">문의하기</a>
                 <a class="btn btn-light mx-1" th:href="@{/faq/faqList}">FAQ</a>
             </div>
@@ -120,8 +119,7 @@ $(document).ready(function() {
     <div id="popup-content">
         <button id="close-button">&times;</button>
         <div id="popup-images">
-            <img th:each="photo : ${notice.noticePhotoPath}"
-                 th:src="@{|/file/display?folder=notice&filename=${photo.sysname}|}" 
+            <img th:src="@{|/file/display?folder=notice&filename=${notice.noticePhotoPath[0].sysname}|}" 
                  alt="공지사항 이미지">
         </div>
         <div id="dont-show">
@@ -130,6 +128,7 @@ $(document).ready(function() {
         </div>
     </div>
 </div>
+
     </div>
 </body>	
 

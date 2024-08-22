@@ -110,10 +110,10 @@ public class MainController {
 		return "NoticeDetail"; // 템플릿 반환
 	}
 	
-	@GetMapping("/noticeList")
+	@GetMapping("/NoticeList")
 	public String list(@RequestParam(value = "page", defaultValue = "1") int page, Model model) {
 		if (page <= 0) {
-			return "redirect:/main/noticeList?page=1";
+			return "redirect:/NoticeList?page=1";
 		}
 		
 		Page<NoticeEntity> noticePage = noticeService.noticeAll(page - 1);

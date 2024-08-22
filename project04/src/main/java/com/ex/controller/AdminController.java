@@ -113,7 +113,7 @@ public class AdminController {
 	public String saveOrUpdateProduct(@RequestParam("notice") MultipartFile[] notice,
 																	@ModelAttribute NoticeDTO noticeDTO)throws IOException {
 		Integer id = noticeService.NoticecreateOrUpdate(noticeDTO, notice);
-		return String.format("redirect:/main/NoticeDetail/%d", id);
+		return String.format("redirect:/NoticeDetail/%d", id);
 	}
 		
     // FAQ 등록 폼을 표시하는 메서드
