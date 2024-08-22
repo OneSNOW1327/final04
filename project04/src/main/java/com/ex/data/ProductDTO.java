@@ -81,6 +81,8 @@ public class ProductDTO {
 				.orderEmail(pe.getOrderEmail())
 				.salesVolume(pe.getSalesVolume())
 				.wishUser(pe.getWishUser())
+				.thumbnail(pe.getThumbnail())
+				.detail(pe.getDetail())
 				.build();
     }
 

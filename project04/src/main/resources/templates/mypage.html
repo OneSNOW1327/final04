@@ -97,10 +97,10 @@
                     <!-- 찜 목록 카드 -->
                     <div class="card wishlist-card">
                         <div class="card-header bg-primary text-white">
-                            찜 목록
+                        	<a th:href="@{/product/wishlist}" class="text-white">관심 상품</a>
                         </div>
                         <div class="card-body bg-white text-dark">
-                            <div th:if="${user.wishList != null and !#lists.isEmpty(user.wishList)}">
+                            <div th:if="${myWishList != null and !#lists.isEmpty(myWishList)}">
                                 <table class="table table-bordered">
                                     <thead>
                                         <tr>
@@ -110,7 +110,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr th:each="wish : ${user.wishList}">
+                                        <tr th:each="wish : ${myWishList}">
                                             <td><img th:src="|/file/display?folder=thumbnails&filename=${wish.thumbnail[0].sysname}|" style="max-width: 100px;"></td>
                                             <td th:text="${wish.name}"></td>
                                             <td th:text="${wish.sellPrice}"></td>

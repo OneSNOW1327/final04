@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -175,27 +176,26 @@ public class ProductController {
         model.addAttribute("user", user);
         return "wishlist";
     }
-	/*
-//(가은) 찜 선택상품 삭제
-	@PostMapping("/wishlist/removeSelected")
-	@PreAuthorize("isAuthenticated()")
-    public String removeSelectedProducts(Principal principal, Model model, 
-    									@RequestParam("selectedIds") List<Integer> selectedIds) {
-		Integer userId = userService.findByUserName(principal.getName()).getId();
-		productService.removeSelectedWishlist(userId , selectedIds);
-        // 위시리스트를 다시 조회하여 모델에 추가
-        List<ProductEntity> updateWishlist = productService.getUserWishList(userId);
-        model.addAttribute("wishList", updateWishlist);
-        return "wishlist";
-    }
-	*/
+	
+	//(가은) 찜 선택상품 삭제
+		@PostMapping("/wishlist/removeSelected")
+		@PreAuthorize("isAuthenticated()")
+	    public String removeSelectedProducts(Principal principal, Model model, 
+	    									@RequestParam("selectedIds") List<Integer> selectedIds) {
+			Integer userId = userService.findByUserName(principal.getName()).getId();
+			productService.removeSelectedWishlist(userId , selectedIds);
+	        return "redirect:/product/wishlist";
+	    }
+		
 	//(가은) 찜 장바구니담기 버튼 눌렀을때
 	@PostMapping("/wishToBasket")
 	@PreAuthorize("isAuthenticated()")
+	@ResponseBody
 	public String wishToBasket(@RequestParam(value = "quantity", defaultValue = "1") int quantity,
 													@RequestParam("productId") Integer productId,Principal principal) {
 		productService.addToBasket(productId, principal.getName(), quantity);
-		return "redirect:/product/wishlist";
+		productService.addToWish(productId, principal.getName());
+        return "success";
 	}    
 	
 //(가은) 결제페이지 from BASKET

@@ -2,6 +2,7 @@ package com.ex.service;
 
 import com.ex.data.AmountDTO;
 import com.ex.data.DeliveryDTO;
+import com.ex.data.OrderlistDTO;
 import com.ex.data.ProductDTO;
 import com.ex.entity.BasketEntity;
 import com.ex.entity.DeliveryEntity;
@@ -273,6 +274,7 @@ public class ProductService {
 																			.orderTime(LocalDateTime.now())
 																			.discount(be.getProduct().getDiscount())
 																			.tid(tid)
+																			.situation("결제 완료")
 																			.build();
 			orderlistRepository.save(ole);
 			sales(be.getProduct().getId(),be.getQuantity(),salesVolumeDesc(be.getProduct().getId()));
@@ -288,7 +290,6 @@ public class ProductService {
   	
   //(가은) 배송정보 저장
 	public DeliveryEntity saveDelivery(DeliveryDTO delivery, String username, long point) {
-		String completePay = "결제완료";
 		UserEntity ue = userService.findByUserName(username);
 		if(delivery.getMemo() == null) {
 			delivery.setMemo("");
@@ -308,7 +309,6 @@ public class ProductService {
 																					.receiveName(delivery.getReceiveName())
 																					.receivePhone(delivery.getReceivePhone())
 																					.waybill(waybillNum)
-																					.situation(completePay)
 																					.user(ue)
 																					.usePoint(point)
 																					.build();
@@ -324,8 +324,8 @@ public class ProductService {
 	}
  	
  	
-//(가은) 유저 주문내역 꺼내기
-	public OrderlistEntity orders(int orderId){
+//(가은) 주문내역 꺼내기
+	public OrderlistEntity orders(long orderId){
 		Optional<OrderlistEntity> oop = orderlistRepository.findById(orderId);
 		return oop.get();
 	}  	
@@ -355,9 +355,23 @@ public class ProductService {
 //(가은) 찜 선택삭제
 	public void removeSelectedWishlist(Integer userId, List<Integer> productIds) {
 		UserEntity user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-		List<ProductEntity> productsToRemove = productRepository.findAllById(productIds);
-		user.getWishList().removeAll(productsToRemove);
+		for(Integer productId : productIds) {
+			user.getWishList().remove(productRepository.findById(productId).get());
+		}
 		userRepository.save(user);
+	}
+	
+	public List<ProductDTO> myWishList(String username){
+		List<ProductDTO> myWishList = new ArrayList<>();
+		UserEntity user = userService.findByUserName(username);
+		List<ProductEntity> pel = user.getWishList();
+		if(!pel.isEmpty()) {
+		int maxIterations = Math.min(pel.size(), 5);
+			for(int i = 0; i<maxIterations;i++) {
+				myWishList.add(ProductDTO.entityToDTO(pel.get(i)));
+			}
+		}
+		return myWishList;
 	}
 	
 //0808 성진 테스트
@@ -453,7 +467,7 @@ public class ProductService {
 		// 원래 갯수가 0일경우 새로 db에 등록
 		pe.setStock(pe.getStock()+rate);
 		productRepository.save(pe);
-//		emailService.sendMailReject(ProductDTO.entityToDTO(pe), rate);
+		emailService.sendMailReject(ProductDTO.entityToDTO(pe), rate);
 		AmountDTO amountDTO = adminService.total().get(0);
 		amountDTO.setAmount(-buyprice);
 		amountDTO.setReason("buy");
@@ -463,13 +477,12 @@ public class ProductService {
 	@Scheduled(cron= "0 0 0 * * *")
 	@Transactional
 	public void deliveryReady() {
-		List<DeliveryEntity> del = deliveryRepository.findAllBySituation("결제완료");
-		if(!del.isEmpty()) {
-			for(DeliveryEntity de : del) {
-				if(LocalDateTime.now().isAfter(de.getOrder().get(0).getOrderTime().plusDays(1))){
-					DeliveryEntity deli = deliveryRepository.findById(de.getId()).get();
-					deli.setSituation("배송준비");
-					deliveryRepository.save(deli);
+		List<OrderlistEntity> oll = orderlistRepository.findAllBySituation("결제 완료");
+		if(!oll.isEmpty()) {
+			for(OrderlistEntity oe : oll) {
+				if(LocalDateTime.now().isAfter(oe.getOrderTime().plusDays(1))){
+					oe.setSituation("배송 준비");
+					orderlistRepository.save(oe);
 				}
 			}
 		}
@@ -478,13 +491,12 @@ public class ProductService {
 	@Scheduled(cron= "0 0 0 * * *")
 	@Transactional
 	public void inDelivery() {
-		List<DeliveryEntity> del = deliveryRepository.findAllBySituation("배송준비");
-		if(!del.isEmpty()) {
-			for(DeliveryEntity de : del) {
-				if(LocalDateTime.now().isAfter(de.getOrder().get(0).getOrderTime().plusDays(2))){
-					DeliveryEntity deli = deliveryRepository.findById(de.getId()).get();
-					deli.setSituation("배송중");
-					deliveryRepository.save(deli);
+		List<OrderlistEntity> oll = orderlistRepository.findAllBySituation("배송 준비");
+		if(!oll.isEmpty()) {
+			for(OrderlistEntity oe : oll) {
+				if(LocalDateTime.now().isAfter(oe.getOrderTime().plusDays(2))){
+					oe.setSituation("배송중");
+					orderlistRepository.save(oe);
 				}
 			}
 		}
@@ -493,13 +505,12 @@ public class ProductService {
 	@Scheduled(cron= "0 0 0 * * *")
 	@Transactional
 	public void deliveryComplete() {
-		List<DeliveryEntity> del = deliveryRepository.findAllBySituation("배송중");
-		if(!del.isEmpty()) {
-			for(DeliveryEntity de : del) {
-				if(LocalDateTime.now().isAfter(de.getOrder().get(0).getOrderTime().plusDays(4))){
-					DeliveryEntity deli = deliveryRepository.findById(de.getId()).get();
-					deli.setSituation("배송완료");
-					deliveryRepository.save(deli);
+		List<OrderlistEntity> oll = orderlistRepository.findAllBySituation("배송중");
+		if(!oll.isEmpty()) {
+			for(OrderlistEntity oe : oll) {
+				if(LocalDateTime.now().isAfter(oe.getOrderTime().plusDays(4))){
+					oe.setSituation("배송 완료");
+					orderlistRepository.save(oe);
 				}
 			}
 		}
@@ -518,5 +529,17 @@ public class ProductService {
 		}
 	}
 	
+	public OrderlistDTO orderCancel(long id) {
+		Optional<OrderlistEntity> op = orderlistRepository.findById(id);
+		if(op.isPresent()) {
+			OrderlistEntity oe = op.get();
+			oe.setSituation("결제 취소");
+			orderlistRepository.save(oe);
+			return OrderlistDTO.entityToDTO(oe);
+		}else {
+			throw new RuntimeException("Order not found");			
+		}
+	}
+
 	
 }

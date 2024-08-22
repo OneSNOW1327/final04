@@ -43,7 +43,6 @@ public class DeliveryEntity {
 	
 	private String memo; // 배송메모
 	
-	private String situation; //현재상태
 	
 	private String waybill; // 운송장번호
 	

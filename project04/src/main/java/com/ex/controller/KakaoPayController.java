@@ -3,6 +3,7 @@ package com.ex.controller;
 import lombok.RequiredArgsConstructor;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -14,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import com.ex.data.DeliveryDTO;
+import com.ex.data.OrderlistDTO;
 import com.ex.entity.DeliveryEntity;
 import com.ex.repository.BasketRepository;
 import com.ex.service.KakaoPayService;
@@ -59,10 +61,28 @@ public class KakaoPayController {
 		return "fullPayResult";
 	}
 	
-	@GetMapping("/cancel")
-	public String  cancel() {
-		return "kakaoPayCancel";
+	@GetMapping("/cancel/{id}")
+	public String  cancel(@PathVariable("id")long id,Model model) {
+        String result = kakaoPayService.cancelPayment(OrderlistDTO.entityToDTO(productService.orders(id)));
+        try {
+        	long orderid= Integer.parseInt(result);
+        	model.addAttribute("cancelOrder", productService.orderCancel(orderid));
+        	model.addAttribute("nowTime", LocalDateTime.now());
+    		return "cancelOrder";
+        }catch(Exception e) {
+        	e.printStackTrace();
+        }
+        return "redirect:/product/simplePayResult";
 	}
-   
+	
+    // 결제 취소 요청 처리
+    @PostMapping("/cancelPayment")
+    @PreAuthorize("isAuthenticated()")
+    public String cancelPayment(@RequestParam("id") long id,
+                                Model model) {
+        String result = kakaoPayService.cancelPayment(OrderlistDTO.entityToDTO(productService.orders(id)));
+        model.addAttribute("cancelResult", result);
+        return "kakaoPayCancelResult"; // 결제 취소 결과 페이지
+    }
 }
 

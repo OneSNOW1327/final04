@@ -5,12 +5,13 @@ import lombok.extern.java.Log;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import com.ex.data.KakaoPayDTO;
+import com.ex.data.OrderlistDTO;
 import com.ex.entity.DeliveryEntity;
 
 import java.net.URI;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Log
 public class KakaoPayService {
+	
     private static final String Host = "https://open-api.kakaopay.com";
     private KakaoPayDTO kakaoPayDTO;
     private DeliveryEntity deliveryEntity;
@@ -33,10 +35,9 @@ public class KakaoPayService {
     private long point;
     private final ProductService productService;
     private final UserService userService;
-
+    
     public String kakaoPayReady(String payPrice, DeliveryEntity delivery, String productNames,String basketIds, String userName,long point) {
         RestTemplate restTemplate = new RestTemplate();
-        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory()); // 정확한 에러 파악을 위해 생성
         
         HttpHeaders headers = new HttpHeaders();
         							  
@@ -83,34 +84,67 @@ public class KakaoPayService {
       
         return "/pay";
     }
-    
+
     // 카카오페이 결제 승인
     // 사용자가 결제 수단을 선택하고 비밀번호를 입력해 결제 인증을 완료한 뒤, 최종적으로 결제 완료 처리를 하는 단계
     public String payApprove(String pgToken) {
-    	
+
     	List<Integer> basketIds = Arrays.stream(basketId.split(","))// 콤마를 기준으로 분리
-				.map(Integer::parseInt)// 스트림의 요소를 정수로 변환
-				.collect(Collectors.toList());// 스트림의 모든 요소를 새로운 리스트로 만들어 반환		
+    			.map(Integer::parseInt)// 스트림의 요소를 정수로 변환
+    			.collect(Collectors.toList());// 스트림의 모든 요소를 새로운 리스트로 만들어 반환		
     	productService.saveOrderInfo(basketIds, deliveryEntity,kakaoPayDTO.getTid());
-    	
-        Map<String, String> parameters = new HashMap<>();
-        HttpHeaders headers = new HttpHeaders();     						
-        headers.set("Authorization", "SECRET_KEY" + " " + "DEV5E3FCF1585B617B742FDE8166830ADC9B0D73");
-        headers.set("Content-type", "application/json");        
-        parameters.put("cid", "TC0ONETIME");              // 가맹점 코드(테스트용) 건들지말것
-        parameters.put("tid", kakaoPayDTO.getTid());      // 결제 고유번호 카카오만 아는거 우리쪽 디비에 저장해야함
-        parameters.put("partner_order_id", Integer.toString(deliveryEntity.getId())); // 주문번호 위와 동일
-        parameters.put("partner_user_id", deliveryEntity.getUser().getUsername());// 회원 아이디
-        parameters.put("pg_token", pgToken);              // 결제승인 요청을 인증하는 토큰
-        
 
-        HttpEntity<Map<String, String>> requestEntity = new HttpEntity<Map<String, String>>(parameters, headers);
+    	Map<String, String> parameters = new HashMap<>();
+    	HttpHeaders headers = new HttpHeaders();     						
+    	headers.set("Authorization", "SECRET_KEY" + " " + "DEV5E3FCF1585B617B742FDE8166830ADC9B0D73");
+    	headers.set("Content-type", "application/json");        
+    	parameters.put("cid", "TC0ONETIME");              // 가맹점 코드(테스트용) 건들지말것
+    	parameters.put("tid", kakaoPayDTO.getTid());      // 결제 고유번호 카카오만 아는거 우리쪽 디비에 저장해야함
+    	parameters.put("partner_order_id", Integer.toString(deliveryEntity.getId())); // 주문번호 위와 동일
+    	parameters.put("partner_user_id", deliveryEntity.getUser().getUsername());// 회원 아이디
+    	parameters.put("pg_token", pgToken);              // 결제승인 요청을 인증하는 토큰
 
-        RestTemplate template = new RestTemplate();
-        String url = "https://open-api.kakaopay.com/online/v1/payment/approve";
-        KakaoPayDTO approveResponse = template.postForObject(url, requestEntity, KakaoPayDTO.class);
-        log.info("결제승인 응답객체: " + approveResponse);
-        
-        return kakaoPayDTO.getTid();
+
+    	HttpEntity<Map<String, String>> requestEntity = new HttpEntity<Map<String, String>>(parameters, headers);
+
+    	RestTemplate template = new RestTemplate();
+    	String url = "https://open-api.kakaopay.com/online/v1/payment/approve";
+    	KakaoPayDTO approveResponse = template.postForObject(url, requestEntity, KakaoPayDTO.class);
+    	log.info("결제승인 응답객체: " + approveResponse);
+
+    	return kakaoPayDTO.getTid();
     }
+
+    public String cancelPayment(OrderlistDTO oDTO) {
+    	
+    	long cancelAmount = (long)(oDTO.getProduct().getSellPrice()*((100-oDTO.getDiscount())/100)*oDTO.getQuantity());
+    	
+    	RestTemplate restTemplate = new RestTemplate();
+
+    	HttpHeaders headers = new HttpHeaders();
+    	headers.set("Authorization", "SECRET_KEY " + "DEV5E3FCF1585B617B742FDE8166830ADC9B0D73");
+    	headers.set("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
+
+    	Map<String, String> params = new HashMap<>();
+    	params.put("cid", "TC0ONETIME"); // 가맹점 코드
+    	params.put("tid", oDTO.getTid()); // 결제 고유번호
+    	params.put("cancel_amount", String.valueOf(cancelAmount)); // 취소 금액
+    	params.put("cancel_tax_free_amount", "0"); // 취소 비과세 금액
+    	
+    	HttpEntity<Map<String,String>> body = new HttpEntity<>(params, headers);
+
+    	try {
+    		URI uri = new URI(Host + "/online/v1/payment/cancel");
+    		KakaoPayDTO cancelResponse = restTemplate.postForObject(uri, body, KakaoPayDTO.class);
+    		log.info("결제 취소 응답객체: " + cancelResponse);
+
+    		return String.valueOf(oDTO.getId());
+    	} catch (RestClientException | URISyntaxException e) {
+    		e.printStackTrace();
+    		return "결제 취소 중 오류가 발생했습니다.";
+    	}
+    }
+
+    
+    
 }

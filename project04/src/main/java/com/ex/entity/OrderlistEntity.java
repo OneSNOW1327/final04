@@ -35,12 +35,10 @@ public class OrderlistEntity {
     
     private LocalDateTime orderTime; //주문일시
     
-    private String payOption; //결제방식
-    
     private double discount;//할인률    
     
     private String tid; // 카카오 결제 고유 번호
-
     
+	private String situation; //현재상태
     
 }

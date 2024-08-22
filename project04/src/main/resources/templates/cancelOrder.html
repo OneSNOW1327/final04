@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout}">
+<div class="container my-3" layout:fragment="content">
+
+<!--   -->
+	<h2>결제 취소</h2>
+    <div th:if="${cancelOrder != null}">
+        <div>
+			<p><span th:text="${#temporals.format(nowTime, 'yyyy-MM-dd HH:mm')}"></span> 
+			주문 번호: <span th:text="${cancelOrder.id}"></span></p>
+        </div><br>
+            
+        <h4>주문 상품 목록</h4><hr>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>상품사진</th>
+                    <th>상품명</th>
+                    <th>수량</th>
+                    <th>판매가</th>
+                    <th>상태</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                	<td>
+                		<img th:src="|/file/display?folder=thumbnails&filename=${cancelOrder.product.thumbnail[0].sysname}|" style="max-width: 100px;">
+                	</td>
+                    <td th:text="${cancelOrder.product.name}"></td>
+                    <td th:text="${cancelOrder.quantity}"></td>
+                    <td th:text="${cancelOrder.product.sellPrice*(1-order.product.discount/100)}"></td>
+                    <td th:text="${cancelOrder.situation}"></td>
+           		</tr>
+            </tbody>
+        </table><br><br>
+        <h4>결제 정보</h4><hr>
+        <table border="1">
+		    <tr><td>결제수단: </td><td th:text="|카카오 페이|"></td></tr>
+		    <tr><td>환불 금액: </td><td><span th:text="${cancelOrder.quantity * (cancelOrder.product.sellPrice*(1-order.product.discount/100))}"></span></td></tr>
+		</table>
+    </div>
+
+    <div th:if="${cancelOrder == null}">
+        <p>주문 상세 정보를 찾을 수 없습니다.</p>
+    </div>
+    <br/>
+    <a href="/">메인으로</a>
+</div>
+
+<th:block layout:fragment="script">
+	<script>
+
+   </script>
+</th:block>
+</html>

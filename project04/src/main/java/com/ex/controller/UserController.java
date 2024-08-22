@@ -1,23 +1,19 @@
 package com.ex.controller;
 
 import com.ex.data.UserDTO;
-import com.ex.data.QuestionDTO;
 import com.ex.entity.UserEntity;
 import com.ex.service.UserService;
-import com.ex.service.QuestionService;
+import com.ex.service.ProductService;
 import com.ex.service.ReviewService;
 
 import lombok.RequiredArgsConstructor;
 
 import java.security.Principal;
-import java.util.List;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 
 @Controller
 @RequestMapping("/user/*")
@@ -25,8 +21,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 public class UserController {
 
 	private final UserService userService;
-	private final QuestionService questionService; // QuestionService 추가
 	private final ReviewService reviewService;
+	private final ProductService productService;
 	
 	@GetMapping("login")
 	public String loginPage() {
@@ -107,6 +103,7 @@ public class UserController {
 	        UserEntity user = userService.findByUserName(principal.getName());
 	        model.addAttribute("user", user);
 	        model.addAttribute("myReview",reviewService.myPageReview(principal.getName()));
+	        model.addAttribute("myWishList",productService.myWishList((principal.getName())));
 	        return "mypage";
 	    }
 	   

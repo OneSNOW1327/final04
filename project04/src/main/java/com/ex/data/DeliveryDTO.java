@@ -34,7 +34,6 @@ public class DeliveryDTO {
 	
 	private String memo; // 배송메모
 	
-	private String situation; //현재상태
 	
 	private String waybill; // 운송장번호
 	
@@ -51,7 +50,6 @@ public class DeliveryDTO {
 				.receiveDetailAddress(de.getReceiveDetailAddress())
 				.receiveExtraAddress(de.getReceiveExtraAddress())
 				.memo(de.getMemo())
-				.situation(de.getSituation())
 				.usePoint(de.getUsePoint())
 				.waybill(de.getWaybill()).build();
 	}

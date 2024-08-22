@@ -2,7 +2,7 @@
 <html layout:decorate="~{layout}">
 <div class="container my-3" layout:fragment="content">
 
-	<h1>찜리스트</h1>
+	<h1>관심 상품 목록</h1>
 		<div th:if="${#lists.isEmpty(wishList)}">
 			<p>찜한 상품이 없습니다.</p>
 		</div>
@@ -21,7 +21,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr th:each="product : ${wishList}">
+                    <tr th:each="product : ${user.wishList}">
                         <td>
                             <input class="wish-check" type="checkbox" name="selectedIds" th:value="${product.id}" />
                         </td>
@@ -38,15 +38,14 @@
                 </tbody>
             </table>
 
+
+        </form>
 <!-- 장바구니 팝업 -->
 			<div id="popup" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background-color:white; padding:20px; border:1px solid black;">
 			    <p>상품이 장바구니에 담겼습니다.</p>
 			    <button onclick="goToBasket()">장바구니 이동</button>
 			    <button onclick="closePopup()">닫기</button>
 			</div>
-        </form>
-        </div>
-
 </div>
 
 <th:block layout:fragment="script">
@@ -69,36 +68,32 @@
 	});	
 	
 // "장바구니담기" 버튼
-	document.querySelectorAll('#basketAdd').forEach(button => {
+document.querySelectorAll('#basketAdd').forEach(button => {
     button.addEventListener('click', function(event){
         event.preventDefault(); // 기본 이벤트를 중지합니다.
         
         const productId = this.getAttribute('data-product-id');
         const quantity = 1; // 기본 수량 설정
 
-        // 장바구니 추가 요청을 보냅니다.
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = '/product/wishToBasket';
-
-        const productIdInput = document.createElement('input');
-        productIdInput.type = 'hidden';
-        productIdInput.name = 'productId';
-        productIdInput.value = productId;
-        form.appendChild(productIdInput);
-
-        const quantityInput = document.createElement('input');
-        quantityInput.type = 'hidden';
-        quantityInput.name = 'quantity';
-        quantityInput.value = quantity;
-        form.appendChild(quantityInput);
-
-        document.body.appendChild(form);
-        
-        form.submit();
-        
-     // 팝업을 표시합니다.
-        showPopup();
+        // 비동기 요청을 보냅니다.
+        fetch('/product/wishToBasket', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `productId=${productId}&quantity=${quantity}`
+        }).then(response => response.text())
+          .then(data => {
+              if (data === 'success') {
+                  showPopup(); // 성공 시 팝업을 표시합니다.
+              } else {
+                  alert('상품을 장바구니에 담는 데 실패했습니다.');
+              }
+          })
+          .catch(error => {
+              console.error('Error:', error);
+              alert('상품을 장바구니에 담는 데 실패했습니다.');
+          });
     });
 });
 

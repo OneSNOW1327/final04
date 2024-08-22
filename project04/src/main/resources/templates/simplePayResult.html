@@ -5,40 +5,36 @@
      	<h2 th:text="${#lists.size(user.delivery)}"></h2>
      	
 			<table class="table table-bordered" th:each="delivery : ${user.delivery}" th:if="${user.delivery != null}">
+				<p th:text="${#temporals.format(delivery.order[0].orderTime,'yyyy-MM-dd HH:mm')}"></p>
 				<thead>
 					<tr>
 						<th>상품사진</th>
 						<th>상품명</th>
 						<th>주문 날짜</th>
 						<th>상태</th>
-						
 					</tr>
 				</thead>
 				<tbody>
-					<tr >
-					
-					<p th:text="${#temporals.format(delivery.order[0].orderTime, 'yyyy-MM-dd HH:mm')}"></p>
 					<a th:href="@{|/product/fullPayResult?deliveryId=${delivery.id}|}">주문 상세</a>
-						<td colspan="4">
-							<table class="table table-bordered">
-								<tbody>
-									<tr th:each="order : ${delivery.order}">
-										<td><img th:src="|/file/display?folder=thumbnails&filename=${order.product.thumbnail[0].sysname}|" style="max-width: 100px;"></td>
-										<td th:text="${order.product.name}"></td>
-										<td th:text="${#temporals.format(order.orderTime, 'yyyy-MM-dd HH:mm')}"></td>
-										<td th:text="${delivery.situation}"></td>										
-									</tr>
-								</tbody>
-							</table>
+					<tr th:each="order : ${delivery.order}">
+						<td><img th:src="|/file/display?folder=thumbnails&filename=${order.product.thumbnail[0].sysname}|" style="max-width: 100px;"></td>
+						<td>
+							<a th:href="@{|/product/detail/${order.product.id}|}" th:text="${order.product.name}" class="text-dark"></a>
 						</td>
+						<td th:text="${#temporals.format(order.orderTime, 'yyyy-MM-dd HH:mm')}"></td>
+						<td th:text="${order.situation}"></td>
 					</tr>
 				</tbody>
-			</table><br><hr><br>
+			</table>
+			
+			<br><hr><br>
 
 		<div th:if="${user.delivery == null or #lists.isEmpty(user.delivery)}">
 			<p>주문 내역이 없습니다.</p>
 		</div>
 	</div>
+    <br/>
+    <a href="/">메인으로</a>
 </div>
 <th:block layout:fragment="script">
 

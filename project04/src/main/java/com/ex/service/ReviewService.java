@@ -1,6 +1,5 @@
 package com.ex.service;
 
-import com.ex.data.ProductDTO;
 import com.ex.data.ReviewDTO;
 import com.ex.entity.ProductEntity;
 import com.ex.entity.ReviewEntity;

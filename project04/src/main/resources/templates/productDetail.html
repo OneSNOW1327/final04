@@ -53,10 +53,10 @@
     <input type="submit" value="장바구니" onclick="submitForm(event)"> 
 	</form>
 <!-- 장바구니로 이동 하시겠습니까? -->
-	<div id="popup" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background-color:white; padding:20px; border:1px solid black;">
+	<div id="popup" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background-color:white; padding:20px; border:1px solid black; z-index: 999;">
 	    <p>상품이 장바구니에 담겼습니다.</p>
-	    <button onclick="goToBasket()">장바구니 이동</button>
-	    <button onclick="closePopup()">닫기</button>
+	    <button onclick="goToBasket();">장바구니 이동</button>
+	    <button onclick="closePopup();">닫기</button>
 	</div>
 <!-- 바로구매 -->			 
 	<form th:action="@{|/product/directPayPage|}" method="post" onsubmit="return directQuantity();">
