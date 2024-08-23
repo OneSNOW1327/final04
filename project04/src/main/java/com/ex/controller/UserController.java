@@ -1,9 +1,11 @@
 package com.ex.controller;
 
+import com.ex.data.QuestionDTO;
 import com.ex.data.UserDTO;
 import com.ex.entity.UserEntity;
 import com.ex.service.UserService;
 import com.ex.service.ProductService;
+import com.ex.service.QuestionService;
 import com.ex.service.ReviewService;
 
 import jakarta.servlet.http.Cookie;
@@ -13,6 +15,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 import java.security.Principal;
+import java.util.List;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,6 +30,7 @@ public class UserController {
 	private final UserService userService;
 	private final ReviewService reviewService;
 	private final ProductService productService;
+	private final QuestionService questionService;
 	
 	@GetMapping("login")
 	public String loginPage() {
@@ -102,21 +106,26 @@ public class UserController {
 	   }
 	   
 	   @GetMapping("mypage")
-	    @PreAuthorize("isAuthenticated()") // 인증된 사용자만 접근 가능
-	    public String myPage(Principal principal, Model model) {
-	        UserEntity user = userService.findByUserName(principal.getName());
-	        model.addAttribute("user", user);
-	        if(!user.getReview().isEmpty()) {
-		        model.addAttribute("myReview",reviewService.myPageReview(principal.getName()));	        	
-	        }
-	        if(!user.getWishList().isEmpty()) {
-		        model.addAttribute("myWishList",productService.myWishList((principal.getName())));
-	        }
-	        if(!user.getDelivery().isEmpty()) {
-		        model.addAttribute("myOrder",productService.myOrder((principal.getName())));
-	        }
-	        return "mypage";
-	    }
+	   @PreAuthorize("isAuthenticated()")
+	   public String myPage(Principal principal, Model model) {
+	       UserEntity user = userService.findByUserName(principal.getName());
+	       model.addAttribute("user", user);
+	       if(!user.getReview().isEmpty()) {
+	           model.addAttribute("myReview", reviewService.myPageReview(principal.getName()));        
+	       }
+	       if(!user.getWishList().isEmpty()) {
+	           model.addAttribute("myWishList", productService.myWishList((principal.getName())));
+	       }
+	       if(!user.getDelivery().isEmpty()) {
+	           model.addAttribute("myOrder", productService.myOrder((principal.getName())));
+	       }
+	       
+	       // 문의 목록 추가
+	       List<QuestionDTO> questionList = questionService.findAllByUsername(principal.getName());
+	       model.addAttribute("questionList", questionList);
+
+	       return "mypage";
+	   }
 	   
 	   // <-- 제성 회원정보 변경 -->
 	   @GetMapping("userUpdateForm") // 회원정보 변경 폼 요청
