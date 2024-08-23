@@ -1,135 +1,131 @@
 <!DOCTYPE html>
 <html lang="ko" layout:decorate="~{layout}">
-<th:block layout:fragment="script-popup">
-<script type="text/javascript">
-function setCookie(name, value, days) {
-    var date = new Date();
-    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-    var expires = "expires=" + date.toUTCString();
-    document.cookie = name + "=" + value + ";" + expires + ";path=/";
-}
+<head>
+    <th:block layout:fragment="script-popup">
+        <script type="text/javascript">
+            function setCookie(name, value, days) {
+                var date = new Date();
+                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                var expires = "expires=" + date.toUTCString();
+                document.cookie = name + "=" + value + ";" + expires + ";path=/";
+            }
 
-function getCookie(name) {
-    var nameEQ = name + "=";
-    var ca = document.cookie.split(';');
-    for (var i = 0; i < ca.length; i++) {
-        var c = ca[i];
-        while (c.charAt(0) == ' ') c = c.substring(1, c.length);
-        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
-    }
-    return null;
-}
+            function getCookie(name) {
+                var nameEQ = name + "=";
+                var ca = document.cookie.split(';');
+                for (var i = 0; i < ca.length; i++) {
+                    var c = ca[i];
+                    while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+                    if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+                }
+                return null;
+            }
 
-function openLayerPopup() {
-    if (getCookie("popupClosed") !== "true") {
-        $("#overlay").fadeIn();
-        $("html, body").css("overflow", "hidden");
-    }
-}
+            function openLayerPopup() {
+                if (getCookie("popupClosed") !== "true") {
+                    $("#overlay").fadeIn();
+                    $("html, body").css("overflow", "hidden");
+                }
+            }
 
-function closeLayerPopup() {
-    if ($("#dont-show-checkbox").is(":checked")) {
-        setCookie("popupClosed", "true", 1);  // 하루 동안 팝업 안 보이게 설정
-    }
-    $("#overlay").fadeOut();
-    $("html, body").css("overflow", "auto");
-}
+            function closeLayerPopup() {
+                if ($("#dont-show-checkbox").is(":checked")) {
+                    setCookie("popupClosed", "true", 1);  // 하루 동안 팝업 안 보이게 설정
+                }
+                $("#overlay").fadeOut();
+                $("html, body").css("overflow", "auto");
+            }
 
-$(document).ready(function() {
-    openLayerPopup();
-    $("#close-button").on('click', closeLayerPopup);
-    
-    // 오버레이 클릭 시 팝업 닫기
-    $("#overlay").on('click', function(e) {
-        if ($(e.target).is("#overlay")) {
-            closeLayerPopup();
-        }
-    });
-});
-    	</script>
+            $(document).ready(function() {
+                openLayerPopup();
+                $("#close-button").on('click', closeLayerPopup);
+                
+                // 오버레이 클릭 시 팝업 닫기
+                $("#overlay").on('click', function(e) {
+                    if ($(e.target).is("#overlay")) {
+                        closeLayerPopup();
+                    }
+                });
+            });
+        </script>
     </th:block>
+</head>
+
 <body>
     <div class="container my-3" layout:fragment="content" style="max-width:1600px;">
         <div class="container mt-5">
             <div class="d-flex justify-content-center">
-                <div>
-                    <h1 class="text-center">메인 페이지</h1>
-                </div>
-            </div>
-            <div class="d-flex justify-content-end mb-4">
-                <a class="btn btn-primary mx-1" th:href="@{/user/login}" sec:authorize="isAnonymous()">로그인</a>
-                <a class="btn btn-secondary mx-1" th:href="@{/user/logout}" sec:authorize="isAuthenticated()">로그아웃</a>
-                <a class="btn btn-info mx-1" th:href="@{/product/basketList}" sec:authorize="isAuthenticated()">장바구니</a>
-                <a class="btn btn-success mx-1" th:href="@{/product/writeForm}">상품등록</a>
-                <a class="btn btn-warning mx-1" th:href="@{/product/simplePayResult}">주문내역</a>
-                <a class="btn btn-light mx-1" th:href="@{/NoticeList}">공지사항</a>
-                <a class="btn btn-light mx-1" th:href="@{/question/questionList}">문의하기</a>
-                <a class="btn btn-light mx-1" th:href="@{/faq/faqList}">FAQ</a>
+                <!-- 콘텐츠를 여기에 추가 -->
             </div>
         </div>
 
         <div class="row">
-            <div class="col-md-2">
-                <h4>상품 카테고리</h4>
-                <div class="list-group">
-                    <a th:each="type : ${typeList}" th:text="${type.typename}" th:href="@{|/product/list/${type.id}|}" class="list-group-item list-group-item-action"></a>
-                </div>
-            </div>
-
             <div class="col-md-10">
-                <div th:each="productType : ${productTypes}">
-                    <h2 th:text="${productType.typename}" class="mb-4"></h2>
-                    <div class="row">
-                        <div class="col-md-4" th:each="product : ${productType.product}">
-                            <div class="card mb-4">
-                                <a th:href="@{/product/detail/{id}(id=${product.id})}">
-                                    <img th:src="|/file/display?folder=thumbnails&filename=${product.thumbnail[0].sysname}|" alt="Product Image" class="card-img-top">
-                                    <div class="card-body">
-										<span th:if="${product.stock == 0}" class="text-danger" th:text="|[매진]|"></span>
-                                        <h5 class="card-title text-dark" th:text="${product.name}" style="display: inline-block;"></h5>
-                                        <p class="card-text">
-                                            <span th:if="${product.discount > 0}">
-                                                <del class="text-muted" th:text="${#numbers.formatDecimal(product.sellPrice, 0, 'COMMA', 3, 'POINT').replace('.000', '')} + '원'"></del>
-                                                <br>
-                                                <strong class="text-danger" th:text="'할인: ' + ${product.discount} + '%'"></strong>
-                                                <br>
-                                                <strong class="text-primary" th:text="${#numbers.formatDecimal(product.sellPrice * (100-product.discount)/100, 0, 'COMMA', 3, 'POINT').replace('.000', '')} + '원'"></strong>
-                                            </span>
-                                            <span th:if="${product.discount == 0}">
-                                                <strong class="text-primary" th:text="${#numbers.formatDecimal(product.sellPrice, 0, 'COMMA', 3, 'POINT').replace('.000', '')} + '원'"></strong>
-                                            </span>
-                                        </p>
+                <div th:each="productType : ${productTypes}" class="product-section">
+                    <section class="py-5">
+                        <div class="container px-4 px-lg-5 mt-5">
+                            <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+                                <!-- 제품 리스트 시작 -->
+                                <div class="col mb-5" th:each="product : ${productType.product}">
+                                    <div class="card h-100">
+                                        <!-- Product image -->
+                                        <a th:href="@{/product/detail/{id}(id=${product.id})}">
+                                            <img th:src="|/file/display?folder=thumbnails&filename=${product.thumbnail[0].sysname}|" alt="Product Image" class="card-img-top">
+                                        </a>
+                                        <!-- Product details -->
+                                        <div class="card-body p-4">
+                                            <div class="text-center">
+                                                <!-- Product name -->
+                                                <h5 class="fw-bolder text-dark" th:text="${product.name}"></h5>
+                                                <!-- Product price -->
+                                                <p class="card-text">
+                                                    <span th:if="${product.discount > 0}">
+                                                        <del class="text-muted" th:text="${#numbers.formatDecimal(product.sellPrice, 0, 'COMMA', 3, 'POINT').replace('.000', '')} + '원'"></del>
+                                                        <br>
+                                                        <strong class="text-danger" th:text="'할인: ' + ${product.discount} + '%'"></strong>
+                                                        <br>
+                                                        <strong class="text-primary" th:text="${#numbers.formatDecimal(product.sellPrice * (100 - product.discount) / 100, 0, 'COMMA', 3, 'POINT').replace('.000', '')} + '원'"></strong>
+                                                    </span>
+                                                    <span th:if="${product.discount == 0}">
+                                                        <strong class="text-primary" th:text="${#numbers.formatDecimal(product.sellPrice, 0, 'COMMA', 3, 'POINT').replace('.000', '')} + '원'"></strong>
+                                                    </span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <!-- Product actions -->
+                                        <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+                                            <div class="text-center">
+                                                <small th:text="'리뷰 ' + ${product.review.size()}"></small>
+                                            </div>
+                                        </div>
                                     </div>
-                                </a>
-                                <div class="card-footer text-muted">
-                                    <small th:text="'리뷰 ' + ${product.review.size()}"></small>
                                 </div>
+                                <!-- 제품 리스트 끝 -->
                             </div>
                         </div>
+                    </section>
+                    <!-- "더보기" 링크 및 구분선 추가 -->
+                    <div class="text-center mt-4" th:if="${#lists.size(productType.product) > 0}">
+                        <a th:href="@{|/product/list/${productType.id}|}" class="text-muted small">더보기 &gt;</a>
                     </div>
+                    <div class="section-divider"></div>
                 </div>
             </div>
         </div>
 
-        <!-- 레이어 팝업 오버레이 -->
-<!-- 기존 코드 유지 -->
-
-<!-- 팝업 오버레이 -->
-<div id="overlay" style="display: none;" th:if="${hasNoticePhoto}">
-    <div id="popup-content">
-        <button id="close-button">&times;</button>
-        <div id="popup-images">
-            <img th:src="@{|/file/display?folder=notice&filename=${notice.noticePhotoPath[0].sysname}|}" 
-                 alt="공지사항 이미지">
-        </div>
-        <div id="dont-show">
-            <input type="checkbox" id="dont-show-checkbox">
-            <label for="dont-show-checkbox">하루 동안 보지 않기</label>
+        <!-- 팝업 오버레이 -->
+        <div id="overlay" style="display: none;" th:if="${hasNoticePhoto}">
+            <div id="popup-content">
+                <button id="close-button">&times;</button>
+                <div id="popup-images">
+                    <img th:src="@{|/file/display?folder=notice&filename=${notice.noticePhotoPath[0].sysname}|}" alt="공지사항 이미지">
+                </div>
+                <div id="dont-show">
+                    <input type="checkbox" id="dont-show-checkbox">
+                    <label for="dont-show-checkbox">하루 동안 보지 않기</label>
+                </div>
+            </div>
         </div>
     </div>
-</div>
-
-    </div>
-</body>	
-
+</body>
 </html>

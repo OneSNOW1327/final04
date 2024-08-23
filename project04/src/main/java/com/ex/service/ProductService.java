@@ -591,6 +591,9 @@ public class ProductService {
 			throw new RuntimeException("Order not found");			
 		}
 	}
-
+    public int getBasketItemCount(Integer userId) {
+        Integer count = basketRepository.countBasketItemsByUserId(userId);
+        return (count != null) ? count : 0; // null이 반환될 경우 0을 반환하도록 처리
+    }
 	
 }
