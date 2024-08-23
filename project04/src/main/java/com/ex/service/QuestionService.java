@@ -83,4 +83,10 @@ public class QuestionService {
                 .answeredDate(questionEntity.getAnsweredDate())
                 .build();
     }
+    
+    public List<QuestionDTO> findAllByUsername(String username) {
+        return questionRepository.findAllByUserUsername(username).stream()
+            .map(this::entityToDTO)
+            .collect(Collectors.toList());
+    }
 }

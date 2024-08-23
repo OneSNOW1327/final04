@@ -122,36 +122,37 @@
                     </div>
 
                     <!-- 내 문의 목록 카드 -->
-                    <div class="card inquiry-card">
-                        <div class="card-header bg-primary text-white">
-                            내 문의 목록
-                        </div>
-                        <div class="card-body bg-white text-dark">
-                            <div th:if="${questionList != null and !#lists.isEmpty(questionList)}">
-                                <table class="table table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <th>제목</th>
-                                            <th>작성일</th>
-                                            <th>상태</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr th:each="question : ${questionList}">
-                                            <td>
-                                                <a th:href="@{/question/detail/{id}(id=${question.id})}" class="text-dark" th:text="${question.title}"></a>
-                                            </td>
-                                            <td th:text="${#temporals.format(question.createdDate, 'yyyy-MM-dd HH:mm')}"></td>
-                                            <td th:text="${question.answer != null ? '답변 완료' : '답변 대기'}"></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div th:if="${questionList == null or #lists.isEmpty(questionList)}">
-                                <p>작성한 문의가 없습니다.</p>
-                            </div>
-                        </div>
-                    </div>
+				 <div class="card inquiry-card">
+				    <div class="card-header bg-primary text-white">
+				        내 문의 목록
+				    </div>
+				    <div class="card-body bg-white text-dark">
+				        <div th:if="${questionList != null and !#lists.isEmpty(questionList)}">
+				            <table class="table table-bordered">
+				                <thead>
+				                    <tr>
+				                        <th>제목</th>
+				                        <th>작성일</th>
+				                        <th>상태</th>
+				                    </tr>
+				                </thead>
+				                <tbody>
+				                    <tr th:each="question : ${questionList}">
+				                        <td>
+				                            <a th:href="@{/question/detail/{id}(id=${question.id})}" class="text-dark" th:text="${question.title}"></a>
+				                        </td>
+				                        <td th:text="${#temporals.format(question.createdDate, 'yyyy-MM-dd HH:mm')}"></td>
+				                        <td th:text="${question.answer != null ? '답변 완료' : '답변 대기'}"></td>
+				                    </tr>
+				                </tbody>
+				            </table>
+				        </div>
+				        <div th:if="${questionList == null or #lists.isEmpty(questionList)}">
+				            <p>작성한 문의가 없습니다.</p>
+				        </div>
+				    </div>
+				</div>
+
 
                 </div>
             </div>

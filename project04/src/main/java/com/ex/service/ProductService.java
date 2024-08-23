@@ -385,17 +385,17 @@ public class ProductService {
 		userRepository.save(user);
 	}
 	
-	public List<ProductDTO> myWishList(String username){
-		List<ProductDTO> myWishList = new ArrayList<>();
-		UserEntity user = userService.findByUserName(username);
-		List<ProductEntity> pel = user.getWishList();
-		if(!pel.isEmpty()) {
-		int maxIterations = Math.min(pel.size(), 5);
-			for(int i = 0; i<maxIterations;i++) {
-				myWishList.add(ProductDTO.entityToDTO(pel.get(i)));
-			}
-		}
-		return myWishList;
+	public List<ProductDTO> myWishList(String username) {
+	    List<ProductDTO> myWishList = new ArrayList<>();
+	    UserEntity user = userService.findByUserName(username);
+	    List<ProductEntity> pel = user.getWishList();
+	    if (!pel.isEmpty()) {
+	        int maxIterations = Math.min(pel.size(), 5);
+	        for (int i = 0; i < maxIterations; i++) {
+	            myWishList.add(ProductDTO.entityToDTO(pel.get(i)));
+	        }
+	    }
+	    return myWishList;
 	}
 	
 	public List<OrderlistDTO> myOrder(String username){

@@ -129,16 +129,17 @@ public class ReviewService {
 		}
 	}
 
-	public List<ReviewDTO> myPageReview(String username){
-		UserEntity ue = userRepository.findByUsername(username).get();
-		List<ReviewDTO> reviewList = new ArrayList<>();
-		List<Optional<ReviewEntity>> orll = reviewRepository.findAllByWriterIdOrderByWriteDateDesc(ue.getId());
-		for(int i=0; i<5; i++) {
-			if(orll.get(i).isPresent()) {
-				reviewList.add(ReviewDTO.entityToDTO(orll.get(i).get()));
-			}
-		}
-		return reviewList;
-	}
+	public List<ReviewDTO> myPageReview(String username) {
+	       UserEntity ue = userRepository.findByUsername(username).get();
+	       List<ReviewDTO> reviewList = new ArrayList<>();
+	       List<Optional<ReviewEntity>> orll = reviewRepository.findAllByWriterIdOrderByWriteDateDesc(ue.getId());
+	       int maxIterations = Math.min(orll.size(), 5);
+	       for (int i = 0; i < maxIterations; i++) {
+	           if (orll.get(i).isPresent()) {
+	               reviewList.add(ReviewDTO.entityToDTO(orll.get(i).get()));
+	           }
+	       }
+	       return reviewList;
+	   }
 	
 }
