@@ -3,7 +3,9 @@ package com.ex.controller;
 import com.ex.data.ProductDTO;
 import com.ex.entity.BasketEntity;
 import com.ex.entity.DeliveryEntity;
+import com.ex.entity.OrderlistEntity;
 import com.ex.entity.ProducttypeEntity;
+import com.ex.entity.SalesVolumeEntity;
 import com.ex.entity.UserEntity;
 import com.ex.service.ProductService;
 import com.ex.service.UserService;
@@ -206,7 +208,7 @@ public class ProductController {
 				.collect(Collectors.toList());// 스트림의 모든 요소를 새로운 리스트로
 		// 선택된 상품들 결제페이지로 보내기
 		model.addAttribute("expectPay", productService.expectPay(basketIds));
-		model.addAttribute("principalUser", userService.findByUserName(principal.getName()));
+		model.addAttribute("user", userService.findByUserName(principal.getName()));
 		return "paymentPage";
 	}
 	
@@ -214,22 +216,22 @@ public class ProductController {
 	@PostMapping("/directPayPage")
 	@PreAuthorize("isAuthenticated()")
 	public String directPay(Model model, Principal principal,
-	                        @RequestParam(value = "quantity", defaultValue = "1") int quantity,
-	                        @RequestParam("productId") Integer productId) {
-	    // 임시 장바구니 항목 생성
-	    BasketEntity tempBasketItem = productService.createTemporaryBasketItem(productId, principal.getName(), quantity);
-	    // 임시 장바구니 항목 결제페이지로 보내기
-	    List<BasketEntity> lastInBasket = new ArrayList<>();
-	    if (tempBasketItem != null) {
-	        lastInBasket.add(tempBasketItem);
-	    }
-	    model.addAttribute("expectPay", lastInBasket);
-	    model.addAttribute("principalUser", userService.findByUserName(principal.getName()));
-	    return "paymentPage";
-	}
-	
+			@RequestParam(value = "quantity", defaultValue = "1") int quantity,
+			@RequestParam("productId") Integer productId) {
+		// 임시 장바구니 항목 생성
+		BasketEntity tempBasketItem = productService.createTemporaryBasketItem(productId, principal.getName(), quantity);
 
-	
+		// 임시 장바구니 항목 결제페이지로 보내기
+		List<BasketEntity> lastInBasket = new ArrayList<>();
+		if (tempBasketItem != null) {
+			lastInBasket.add(tempBasketItem);
+		}
+
+		model.addAttribute("expectPay", lastInBasket);
+		model.addAttribute("user", userService.findByUserName(principal.getName()));
+		return "directPay";
+	}
+
 //(가은) 상세 주문내역 fullPayResult
 	@GetMapping("/fullPayResult")
 	@PreAuthorize("isAuthenticated()") 
@@ -257,4 +259,14 @@ public class ProductController {
 		return "redirect:/admin/product/"+id;
 	}
 	
+	@GetMapping("/payCancel/{id}")
+	@PreAuthorize("isAuthenticated()")
+	public String payCancel(@PathVariable("id")long id,Model model) {
+		OrderlistEntity order = productService.orderFindById(id);
+		List<SalesVolumeEntity> svl = productService.salesVolumeDesc(order.getProduct().getId());
+		productService.sales(order.getProduct().getId(), -order.getQuantity(), svl);
+		model.addAttribute("payCancel",productService.orderCancel(id));
+		return "payCancel";
+	}
+
 }

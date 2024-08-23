@@ -1,6 +1,7 @@
 package com.ex.service;
 
 import com.ex.data.AmountDTO;
+import com.ex.data.BasketDTO;
 import com.ex.data.DeliveryDTO;
 import com.ex.data.OrderlistDTO;
 import com.ex.data.ProductDTO;
@@ -157,6 +158,12 @@ public class ProductService {
 		}
 		photoService.deleteThumbnails(thumbnailIds);
 
+		List<UserEntity> usersWithProductInWishList = userRepository.findByWishListId(id);
+		for (UserEntity user : usersWithProductInWishList) {
+			user.getWishList().removeIf(product -> product.getId().equals(id));
+			userRepository.save(user); // 업데이트된 사용자 정보를 저장
+		}
+		
 		// 제품 삭제
 		productRepository.deleteById(id);
 	}
@@ -283,6 +290,20 @@ public class ProductService {
 		}
 	}
 	
+	public void saveOrderInfo(Integer productId, DeliveryEntity delivery,String tid,int quantity) {
+		ProductEntity pe =productRepository.findById(productId).get();
+		OrderlistEntity ole = OrderlistEntity.builder().quantity(quantity)
+																			.product(pe)
+																			.delivery(delivery)
+																			.orderTime(LocalDateTime.now())
+																			.discount(pe.getDiscount())
+																			.tid(tid)
+																			.situation("결제 완료")
+																			.build();
+			orderlistRepository.save(ole);
+			sales(pe.getId(),quantity,salesVolumeDesc(productId));
+	}
+	
 //(가은)바로구매 장바구니 최근 담은 리스트 꺼내오기
 	public List<BasketEntity> lastInBasket(Integer userId) {
 		return basketRepository.findAllByUserIdOrderByIdDesc(userId);
@@ -323,6 +344,9 @@ public class ProductService {
 				// DeliveryEntity를 찾지 못하면, 커스텀 메시지와 함께 RuntimeException을 던짐
 	}
  	
+	public OrderlistEntity orderFindById(long id) {
+		return orderlistRepository.findById(id).get();
+	}
  	
 //(가은) 주문내역 꺼내기
 	public OrderlistEntity orders(long orderId){
@@ -374,19 +398,33 @@ public class ProductService {
 		return myWishList;
 	}
 	
+	public List<OrderlistDTO> myOrder(String username){
+		List<OrderlistDTO> myOrder = new ArrayList<>();
+		List<OrderlistEntity> allOrder = new ArrayList<>();
+		List<DeliveryEntity> del = deliveryRepository.findAllByUserIdOrderByIdDesc(userService.findByUserName(username).getId());
+		int sum = 0;
+		if(!del.isEmpty()) {
+			for(int i = 0; i<del.size();i++) {
+				if(!del.get(i).getOrder().isEmpty()) {
+					for(int j=0; j<del.get(i).getOrder().size();j++) {
+						allOrder.add(del.get(i).getOrder().get(j));
+						sum +=1;
+					}
+				}
+			}
+			int maxIterations = Math.min(sum, 5);
+			for(int i = 0; i<maxIterations;i++) {
+				myOrder.add(OrderlistDTO.entityToDTO(allOrder.get(i)));
+			}
+		}
+		return myOrder;
+	}
+	
 //0808 성진 테스트
 	public List<SalesVolumeEntity> salesVolumeDesc(Integer id) {
 		//상품의 판매기록 검색
-		List<SalesVolumeEntity> sopl = salesVolumeRepository.findByProductIdOrderByRecordDateDesc(id);
-		if(sopl.isEmpty()) {
-			sopl.add(SalesVolumeEntity.builder()
-					.salesPrice(0).salesRate(0)
-					.product(productRepository.findById(id).get())
-					.build());
+		return 	salesVolumeRepository.findByProductIdOrderByRecordDateDesc(id);
 		}
-		//없을경우 0을 리턴
-		return sopl;
-	}
 	
 	//0808 성진 수정
 	public void sales(Integer id, int rate, List<SalesVolumeEntity> svel) {
@@ -394,7 +432,7 @@ public class ProductService {
 		ProductEntity pe = this.productRepository.findById(id).get();
 		long sellprice = (long)(rate*pe.getSellPrice() * (1-pe.getDiscount()/100));
 		// 원래 갯수가 0일경우 새로 db에 등록
-		if(svel.get(0).getSalesRate() == 0) {
+		if(svel.isEmpty()) {
 			sve = SalesVolumeEntity.builder()
 					.product(pe)
 					.recordDate(LocalDate.now())
@@ -421,7 +459,11 @@ public class ProductService {
 		productRepository.save(pe);
 		AmountDTO amountDTO = adminService.total().get(0);
 		amountDTO.setAmount(sellprice);
-		amountDTO.setReason("sell");
+		if(rate>0) {
+			amountDTO.setReason("sell");
+		}else {
+			amountDTO.setReason("refund");
+		}
 		adminService.amount(amountDTO, LocalDate.now());
 		salesVolumeRepository.save(sve);
 	}
@@ -451,10 +493,17 @@ public class ProductService {
 		return productTypes;  // 정렬된 상태의 productTypes 반환
 	}
 
-	public DeliveryDTO DTOFindByTid(String tid) {
-		List<OrderlistEntity> oll = orderlistRepository.findByTid(tid);
-		if(!oll.isEmpty()) {
-			return DeliveryDTO.entityToDTO(oll.get(0).getDelivery());
+	
+	public DeliveryDTO findByTid(String tid){
+		DeliveryDTO dDTO = DeliveryDTO.entityToDTO(orderlistRepository.findByTid(tid).get(0).getDelivery());
+		return dDTO;
+				
+	}
+	
+	public DeliveryDTO deliveryFindById(Integer id) {
+		Optional<DeliveryEntity> op = deliveryRepository.findById(id);
+		if(op.isPresent()) {
+			return DeliveryDTO.entityToDTO(op.get());
 		}else {
 			throw new RuntimeException("Order not found");
 		}	
@@ -533,8 +582,10 @@ public class ProductService {
 		Optional<OrderlistEntity> op = orderlistRepository.findById(id);
 		if(op.isPresent()) {
 			OrderlistEntity oe = op.get();
+			if(!oe.getSituation().equals("결제 취소")) {
 			oe.setSituation("결제 취소");
 			orderlistRepository.save(oe);
+			}
 			return OrderlistDTO.entityToDTO(oe);
 		}else {
 			throw new RuntimeException("Order not found");			

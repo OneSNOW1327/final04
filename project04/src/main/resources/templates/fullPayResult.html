@@ -30,7 +30,7 @@
                     <td th:id="|payPrice_${loop.index}|" th:text="${order.product.sellPrice*(1-order.product.discount/100)}"></td>
                     <td>
                     	<span th:text="${order.situation}"></span>
-                    	<a th:href="@{|/kakao/cancel/${order.id}|}" class="text-danger">[환불]</a>
+                    	<a th:href="@{|/product/payCancel/${order.id}|}" class="text-danger" th:if="${order.situation != '결제 취소'}">[취소]</a>
                     </td>
                 	<input th:id="|sellPrice_${loop.index}|" type="hidden" th:value="${order.product.sellPrice}" readonly/>
                     <input th:id="|discount_${loop.index}|" type="hidden" th:value="${order.product.sellPrice * (order.product.discount / 100)}" readonly/>

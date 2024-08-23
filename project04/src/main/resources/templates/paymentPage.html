@@ -53,18 +53,16 @@
                 </tr>
 
             </table>
-            <div th:each="user,loop : ${principalUser}">
                 <input th:id="userName" type="hidden" th:value="${user.realName}" />
                 <input th:id="userPhone" type="hidden" th:value="${user.phone}" />
                 <input th:id="userPostcode" type="hidden" th:value="${user.postcode}" />
                 <input th:id="userAdress" type="hidden" th:value="${user.address}" />
                 <input th:id="userDetailAddress" type="hidden" th:value="${user.detailAddress}" />
                 <input th:id="userExtraAddress" type="hidden" th:value="${user.extraAddress}" />
-            </div>
             <hr>
             <span>원가 </span><input id="sellPrice" readonly type="text"><span> - </span>
             <span>할인금액</span><input id="discount" readonly type="text"><span> - </span>
-            <span>포인트 사용</span><input id="point" type="number" min="0" th:max="${principalUser.point}" th:oninput="|validateMaxValue(this, ${principalUser.point})|"><span> = </span>
+            <span>포인트 사용</span><input id="point" type="number" min="0" th:max="${user.point}" value="" th:oninput="|validateMaxValue(this, ${user.point})|"><span> = </span>
             <span>총 결제금액</span><input id="payPrice" name="payPrice" readonly type="text">
             <hr>
             <br>
@@ -82,29 +80,29 @@
             updateTotal(); // 입력 값이 변경될 때마다 총 결제 금액을 업데이트
         }
 
-        function calculateTotals() {
-            var size = document.getElementById('size').value;
-            var sumSellPrice = 0;
-            var sumDiscount = 0;
-            for (var i = 0; i < size; i++) {
-                var quantity = document.getElementById('quantity_' + i).value;
-                var sellPrice = parseFloat(document.getElementById('sellPrice_' + i).value) || 0;
-                var discount = parseFloat(document.getElementById('discount_' + i).value) || 0;
+     function calculateTotals() {
+    	    var size = parseInt(document.getElementById('size').value) || 0;
+    	    var sumSellPrice = 0;
+    	    var sumDiscount = 0;
+    	    for (var i = 0; i < size; i++) {
+    	        var quantity = parseFloat(document.getElementById('quantity_' + i).value) || 0;
+    	        var sellPrice = parseFloat(document.getElementById('sellPrice_' + i).value) || 0;
+    	        var discount = parseFloat(document.getElementById('discount_' + i).value) || 0;
 
-                sumSellPrice += sellPrice * quantity;
-                sumDiscount += discount * quantity;
-            }
-            return { sumSellPrice, sumDiscount };
-        }
+    	        sumSellPrice += sellPrice * quantity;
+    	        sumDiscount += discount * quantity;
+    	    }
+    	    return { sumSellPrice, sumDiscount };
+    	}
 
-        function updateTotal() {
-            var { sumSellPrice, sumDiscount } = calculateTotals();
-            var point = parseFloat(document.getElementById('point').value) || 0;
+    	function updateTotal() {
+    	    var { sumSellPrice, sumDiscount } = calculateTotals();
+    	    var point = parseFloat(document.getElementById('point').value) || 0;
 
-            document.getElementById('sellPrice').value = Math.floor(sumSellPrice);
-            document.getElementById('discount').value = Math.floor(sumDiscount);
-            document.getElementById('payPrice').value = Math.floor(sumSellPrice - sumDiscount - point);
-        }
+    	    document.getElementById('sellPrice').value = Math.floor(sumSellPrice);
+    	    document.getElementById('discount').value = Math.floor(sumDiscount);
+    	    document.getElementById('payPrice').value = Math.floor(sumSellPrice - sumDiscount - point);
+    	}
 
         window.onload = function() {
             updateTotal(); // 초기 로드 시 총 결제 금액을 계산

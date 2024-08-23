@@ -42,7 +42,10 @@ public class UserService{
 				.password(passwordEncoder.encode(userDTO.getPassword()))
 				.realName(userDTO.getRealName())
 				.email(userDTO.getEmail())
+				.postcode(userDTO.getPostcode())
 				.address(userDTO.getAddress())
+				.detailAddress(userDTO.getDetailAddress())
+				.extraAddress(userDTO.getExtraAddress())
 				.phone(userDTO.getPhone())
 				.reg(LocalDateTime.now())
 				.point(1000)
@@ -166,6 +169,7 @@ public class UserService{
 		
 		    return sortedDeliveries; // 정렬된 DeliveryEntity 반환
 		}
+	    
 		// 사용자 삭제하기
 	    public void deleteUser(String username) {
 	        Optional<UserEntity> op = userRepository.findByUsername(username);

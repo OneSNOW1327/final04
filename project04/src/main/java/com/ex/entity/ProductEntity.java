@@ -47,14 +47,14 @@ public class ProductEntity {
 	@JsonIgnore // 직렬화에서 제외
     private List<ProductThumbnailEntity> thumbnail; //썸네일
     
-    @ManyToMany
-	@JsonIgnore // 직렬화에서 제외
-    private List<DeliveryEntity> delivery;
-
-    @ManyToMany
+    @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
 	@JsonIgnore // 직렬화에서 제외
     private List<BasketEntity> basketlist; // 장바구니
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
+	@JsonIgnore // 직렬화에서 제외
+    private List<OrderlistEntity> orderlist; // 주문내역
+    
     @ManyToMany
 	@JsonIgnore // 직렬화에서 제외
     private Set<UserEntity> wishUser; //유저의 위시리스트

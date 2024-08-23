@@ -15,14 +15,15 @@
                             <p><strong>가입 날짜:</strong> <span th:text="${#temporals.format(user.reg, 'yyyy-MM-dd HH:mm')}"></span></p>
                             <p><strong>이름:</strong> <span th:text="${user.realName}"></span></p>
                             <p><strong>주소:</strong> <span th:text="${user.address}"></span></p>
+                            <p><strong>상세 주소:</strong> <span th:text="${user.detailAddress}"></span></p>
                             <p><strong>전화번호:</strong> <span th:text="${user.phone}"></span></p>
                             <p><strong>등급:</strong> <span th:text="${user.grade}"></span></p>
                             <p><strong>포인트:</strong> <span th:text="${user.point}"></span></p>
                             <a th:href="@{/user/userUpdateForm}" class="btn btn-primary mt-3">회원정보 변경</a>
-                             <!-- 회원탈퇴 버튼 추가 -->
+                               <!-- 회원탈퇴 버튼 추가 -->
 		                    <form th:action="@{/user/deleteAccount}" method="post" onsubmit="return confirm('정말로 탈퇴하시겠습니까?');">
 		                        <button type="submit" class="btn btn-danger mt-3">회원탈퇴</button>
-		                    </form>
+		                    </form>                      
                         </div>
                     </div>
                 </div>
@@ -44,19 +45,11 @@
 					                    </tr>
 					                </thead>
 					                <tbody>
-					                    <tr th:each="delivery : ${user.delivery}">
-					                        <td colspan="4">
-					                            <table class="table table-bordered">
-					                                <tbody>
-					                                    <tr th:each="order : ${delivery.order}">
-					                                        <td th:text="${order.id}"></td>
-					                                        <td th:text="${order.product.name}"></td>
-					                                        <td th:text="${#temporals.format(order.orderTime, 'yyyy-MM-dd HH:mm')}"></td>
-					                                        <td th:text="${delivery.situation}"></td>
-					                                    </tr>
-					                                </tbody>
-					                            </table>
-					                        </td>
+					                    <tr th:each="order : ${myOrder}">
+					                    	<td th:text="${order.id}"></td>
+					                    	<td th:text="${order.product.name}"></td>
+					                    	<td th:text="${#temporals.format(order.orderTime, 'yyyy-MM-dd HH:mm')}"></td>
+					                    	<td th:text="${order.situation}"></td>
 					                    </tr>
 					                </tbody>
 					            </table>
@@ -70,7 +63,7 @@
                             <a href="/user/allReview" class="text-white">작성한 리뷰</a>
                         </div>
                         <div class="card-body bg-white text-dark">
-                            <div th:if="${user.review != null and !#lists.isEmpty(user.review)}">
+                            <div th:if="${myReview != null and !#lists.isEmpty(myReview)}">
                                 <table class="table table-bordered">
                                     <thead>
                                         <tr>
@@ -92,7 +85,7 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div th:if="${user.review == null or #lists.isEmpty(user.review)}">
+                            <div th:if="${user.review == null and #lists.isEmpty(user.review)}">
                                 <p>작성한 리뷰가 없습니다.</p>
                             </div>
                         </div>

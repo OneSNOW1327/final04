@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout}">
+<div class="container my-3" layout:fragment="content">
+
+               <div class="col-md-8">
+                    <!-- 주문 내역 카드 -->
+					<div class="card order-history-card">
+					    <a class="card-header bg-primary text-white text-decoration-none" href="/product/simplePayResult" style="text-decoration: none;">
+					        취소 내역
+					    </a>
+					    <div class="card-body bg-white text-dark">
+					        <div th:if="${payCancel != null and !#lists.isEmpty(payCancel)}">
+					            <table class="table table-bordered">
+					                <thead>
+					                    <tr>
+					                        <th>주문 ID</th>
+					                        <th>상품명</th>
+					                        <th>주문 날짜</th>
+					                        <th>상태</th>
+					                    </tr>
+					                </thead>
+					                <tbody>
+					                    <tr >
+					                    	<td th:text="${payCancel.id}"></td>
+					                    	<td th:text="${payCancel.product.name}"></td>
+					                    	<td th:text="${#temporals.format(payCancel.orderTime, 'yyyy-MM-dd HH:mm')}"></td>
+					                    	<td th:text="${payCancel.situation}"></td>
+					                    </tr>
+					                </tbody>
+					            </table>
+					        </div>
+					    </div>
+					</div>
+
+</div>
+
+<th:block layout:fragment="script">
+
+	<script>
+	
+		<!-- 스크 립트 -->
+	
+   </script>
+
+
+</th:block>
+</html>
