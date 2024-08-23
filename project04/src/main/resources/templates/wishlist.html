@@ -1,51 +1,55 @@
 <!DOCTYPE html>
 <html layout:decorate="~{layout}">
-<div class="container my-3" layout:fragment="content">
-
-	<h1>관심 상품 목록</h1>
-		<div th:if="${#lists.isEmpty(wishList)}">
-			<p>찜한 상품이 없습니다.</p>
-		</div>
-		<form id="deleteForm" action="/product/wishlist/removeSelected" method="post">
-            <table border="1">
-                <thead>
-                    <input id="selectAllWish" type="checkbox" /><span>전체선택  </span>
-                    <button type="button" id="deleteSelected">선택삭제</button>
+<div class="container my-5" layout:fragment="content">
+    <h1 class="mb-4">관심 상품 목록</h1>
+    <form id="deleteForm" action="/product/wishlist/removeSelected" method="post">
+        <div class="mb-3">
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" id="selectAllWish" type="checkbox" />
+                <label class="form-check-label" for="selectAllWish">전체선택</label>
+            </div>
+            <button type="button" id="deleteSelected" class="btn btn-danger btn-sm">선택삭제</button>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
                     <tr>
                         <th>선택</th>
                         <th>상품사진</th>
                         <th>상품명</th>
                         <th>설명</th>
                         <th>가격</th>
-                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr th:each="product : ${user.wishList}">
                         <td>
-                            <input class="wish-check" type="checkbox" name="selectedIds" th:value="${product.id}" />
+                            <input class="form-check-input wish-check" type="checkbox" name="selectedIds" th:value="${product.id}" />
                         </td>
                         <td>
-                            <img th:src="|/file/display?folder=thumbnails&filename=${product.thumbnail[0].sysname}|" style="max-width: 100px;">
+                            <img th:src="|/file/display?folder=thumbnails&filename=${product.thumbnail[0].sysname}|" class="img-thumbnail" style="max-width: 100px;">
                         </td>
                         <td th:text="${product.name}">상품명</td>
                         <td th:text="${product.description}">상품 설명</td>
                         <td th:text="${product.sellPrice*(1-product.discount/100)} + ' 원'">가격</td>
-                        <td>
-                            <button id="basketAdd" th:data-product-id="${product.id}">장바구니담기</button><br>
-                        </td>
+
                     </tr>
                 </tbody>
             </table>
+        </div>
+    </form>
 
-
-        </form>
-<!-- 장바구니 팝업 -->
-			<div id="popup" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background-color:white; padding:20px; border:1px solid black;">
-			    <p>상품이 장바구니에 담겼습니다.</p>
-			    <button onclick="goToBasket()">장바구니 이동</button>
-			    <button onclick="closePopup()">닫기</button>
-			</div>
+    <!-- 장바구니 팝업 -->
+    <div id="popup" class="modal fade" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">알림</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <th:block layout:fragment="script">
