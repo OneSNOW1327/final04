@@ -62,9 +62,9 @@ public class KakaoPayService {
         params.put("quantity", String.valueOf(quantity)); // 상품 수량
         params.put("total_amount", payPrice); // 상품 가격  
         params.put("tax_free_amount", "0"); // 상품 비과세 금액_특정 상품에 대해 세금이 면제되는 금액
-        params.put("approval_url", "http://localhost:8080/kakao/kakaoPaySuccess"); // 성공시 url
-        params.put("cancel_url", "http://localhost:8080/kakao/cancel"); // 실패시 url
-        params.put("fail_url", "http://localhost:8080/kakao/fail");
+        params.put("approval_url", "http://192.168.219.203:8080/kakao/kakaoPaySuccess"); // 성공시 url
+        params.put("cancel_url", "http://192.168.219.203:8080/kakao/cancel"); // 실패시 url
+        params.put("fail_url", "http://192.168.219.203:8080/kakao/fail");
 
         // 헤더와 바디 붙이기
         HttpEntity<Map<String, String>> body = new HttpEntity<Map<String, String>>(params, headers);
@@ -109,9 +109,9 @@ public class KakaoPayService {
         params.put("quantity", "1"); // 상품 수량
         params.put("total_amount", payPrice); // 상품 가격  
         params.put("tax_free_amount", "0"); // 상품 비과세 금액_특정 상품에 대해 세금이 면제되는 금액
-        params.put("approval_url", "http://localhost:8080/kakao/kakaoPaySuccess"); // 성공시 url
-        params.put("cancel_url", "http://localhost:8080/"); // 실패시 url
-        params.put("fail_url", "http://localhost:8080/kakao/fail");
+        params.put("approval_url", "http://192.168.219.203:8080/kakao/kakaoPaySuccess"); // 성공시 url
+        params.put("cancel_url", "http://192.168.219.203:8080/"); // 실패시 url
+        params.put("fail_url", "http://192.168.219.203:8080/kakao/fail");
 
         // 헤더와 바디 붙이기
         HttpEntity<Map<String, String>> body = new HttpEntity<Map<String, String>>(params, headers);
@@ -171,7 +171,6 @@ public class KakaoPayService {
     }
     
     public String cancelPayment(OrderlistDTO oDTO) {
-    	System.out.println("==================="+oDTO.getTid());
     	long cancelAmount = (long)(oDTO.getProduct().getSellPrice()*((100-oDTO.getDiscount())/100)*oDTO.getQuantity());
     	
     	RestTemplate restTemplate = new RestTemplate();
