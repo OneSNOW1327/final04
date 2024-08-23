@@ -23,7 +23,7 @@ public class EmailService {
 		simpleMailMessage.setTo(productDTO.getOrderEmail());
 		simpleMailMessage.setSubject("물품 구매");
 		simpleMailMessage.setFrom("shadow132789@gmail.com");
-		simpleMailMessage.setText(productDTO.getName()+" 상품 " +stock+"개 구매");
+		simpleMailMessage.setText(productDTO.getName()+" 상품 " +stock+"개 구매 부탁드리겠습니다.");
 		
 		try {
 			javaMailSender.send(simpleMailMessage);
@@ -31,7 +31,6 @@ public class EmailService {
 			e.printStackTrace();
 			return msg;
 		}
-		
 		return msg = true;
 		
 	}

@@ -36,11 +36,7 @@
 			<p class="text-muted">가격: <span th:text="|${productDTO.sellPrice}원|">가격</span></p>
 			<p class="text-danger">할인가: <span th:text="|${productDTO.sellPrice - (productDTO.sellPrice * (productDTO.discount / 100))}원|">할인가</span></p>
 			<p class="text-info">할인률: <span th:text="|${productDTO.discount}%|">할인률</span></p>
-			<!-- 수정 및 삭제 버튼 추가 -->
-			<a th:href="@{/product/writeForm(id=${productDTO.id})}" class="btn btn-warning mt-2">수정</a>
-			<form th:action="@{/product/delete/{id}(id=${productDTO.id})}" method="post" style="display: inline;">
-				<button type="submit" class="btn btn-danger mt-2">삭제</button>
-			</form>
+
 		</div>
 	</div>
 	
@@ -49,8 +45,8 @@
 	<form th:action="@{|/product/basketAdd|}" method="post" onsubmit="return basketQuantity();">
     <input type="hidden" name="productId" th:value="${productDTO.id}">
     <label>수량</label>
-    <input type="hidden" name="quantity" id="basketQuantity"/>
-    <input type="submit" value="장바구니" onclick="submitForm(event)"> 
+    <input type="hidden" name="quantity" id="basketQuantity"/><br/>
+    <input type="submit" value="장바구니" class="btn btn-sm btn-outline-primary"  onclick="submitForm(event)"> 
 	</form>
 <!-- 장바구니로 이동 하시겠습니까? -->
 	<div id="popup" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background-color:white; padding:20px; border:1px solid black; z-index: 999;">
@@ -62,7 +58,7 @@
 	<form th:action="@{|/product/directPayPage|}" method="post" onsubmit="return directQuantity();">
 	    <input type="hidden" name="productId" th:value="${productDTO.id}">
 	    <input type="hidden" name="quantity" id="directQuantity"/>
-	    <input type="submit" value="바로구매">
+	    <input type="submit" value="바로구매"class="btn btn-sm btn-outline-primary" >
 	</form>
 <!-- 찜 -->
 						<div th:if="${#authentication.getPrincipal() != null}">

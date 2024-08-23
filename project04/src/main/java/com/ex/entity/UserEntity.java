@@ -66,6 +66,7 @@ public class UserEntity {
     private List<ProductEntity> wishList; //찜목록
     
     @OneToMany(mappedBy = "user", cascade=CascadeType.REMOVE)
+	@OrderBy("id DESC")
     private List<DeliveryEntity> delivery; //주문내역, 결제
     
     @OneToMany(mappedBy = "writer", cascade = CascadeType.REMOVE)

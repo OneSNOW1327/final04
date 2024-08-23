@@ -33,7 +33,6 @@ public class KakaoController {
             logger.error("Access Token을 가져오는 중 오류 발생: " + e.getMessage());
             return "redirect:/error";
         }
-
         KakaoDTO kakaoDTO;
         try {
             kakaoDTO = kakaoService.getUserInfo(accessToken);
@@ -43,11 +42,12 @@ public class KakaoController {
         }
 
         UserDTO kakaoMember = userService.findUserByEmail(kakaoDTO.getEmail());
-
+       
         if (kakaoMember != null) {
             // 모델을 사용하여 사용자 정보를 kakaoLogin 페이지로 전달
             model.addAttribute("username", kakaoMember.getUsername());
             model.addAttribute("password", "qlalfqjsgh");
+            System.out.println("========================"+kakaoMember.getUsername());
             return "kakaoLogin"; // kakaoLogin.html 페이지로 이동
         } else {
             return "redirect:/user/agreement?email=" + kakaoDTO.getEmail();

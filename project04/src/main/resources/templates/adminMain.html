@@ -17,17 +17,6 @@
 			</form>
 		
 		</div>
-	
-	<div th:if="${allAmount!=null}" th:each="total : ${allAmount}">
-		<span th:text="${total.reason}"></span>
-		<span th:text="${total.totalAmount}"></span>
-	</div>
-	<br/>
-	<div th:if="${totalSell != null}" th:each="sells : ${totalSell}">
-		<span th:text="${sells.totalAmount}"></span>
-		<span th:text="${sells.recordDate}"></span>
-	</div>
-	
 	<div>
 	<h2>매출액 그래프</h2>
 	<canvas id="amountChart" width="400" height="200"></canvas>

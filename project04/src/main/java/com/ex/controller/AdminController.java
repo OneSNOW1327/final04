@@ -1,3 +1,4 @@
+
 package com.ex.controller;
 
 import java.io.IOException;
@@ -170,7 +171,7 @@ public class AdminController {
     public String mainNotice(@PathVariable("id")Integer id) {
     	noticeService.changeMainNotice(id);
     	
-    	return "redirect:/noticeList";
+    	return "redirect:/NoticeList";
     }
     
 	

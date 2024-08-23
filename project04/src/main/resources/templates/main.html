@@ -118,7 +118,9 @@
             <div id="popup-content">
                 <button id="close-button">&times;</button>
                 <div id="popup-images">
+                <a th:href="@{|/NoticeDetail/${notice.id}|}">
                     <img th:src="@{|/file/display?folder=notice&filename=${notice.noticePhotoPath[0].sysname}|}" alt="공지사항 이미지">
+                    </a>
                 </div>
                 <div id="dont-show">
                     <input type="checkbox" id="dont-show-checkbox">

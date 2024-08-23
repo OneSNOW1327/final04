@@ -523,7 +523,7 @@ public class ProductService {
 		adminService.amount(amountDTO, LocalDate.now());
 	}
 
-	@Scheduled(cron= "0 0 0 * * *")
+	@Scheduled(cron= "0 * * * * *")
 	@Transactional
 	public void deliveryReady() {
 		List<OrderlistEntity> oll = orderlistRepository.findAllBySituation("결제 완료");
@@ -537,7 +537,7 @@ public class ProductService {
 		}
 	}
 
-	@Scheduled(cron= "0 0 0 * * *")
+	@Scheduled(cron= "0 * * * * *")
 	@Transactional
 	public void inDelivery() {
 		List<OrderlistEntity> oll = orderlistRepository.findAllBySituation("배송 준비");
@@ -551,7 +551,7 @@ public class ProductService {
 		}
 	}
 	
-	@Scheduled(cron= "0 0 0 * * *")
+	@Scheduled(cron= "0 * * * * *")
 	@Transactional
 	public void deliveryComplete() {
 		List<OrderlistEntity> oll = orderlistRepository.findAllBySituation("배송중");
@@ -565,7 +565,7 @@ public class ProductService {
 		}
 	}
 
-	@Scheduled(cron= "0 0 0 * * *")
+	@Scheduled(cron= "0 * * * * *")
 	@Transactional
 	public void stockBuy() {
 		List<ProductEntity> pel = productRepository.findAllByStockLessThanEqual(10);

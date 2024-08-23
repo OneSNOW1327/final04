@@ -24,7 +24,7 @@ public class KakaoService {
 
     private static final String KAKAO_TOKEN_URL = "https://kauth.kakao.com/oauth/token";
     private static final String KAKAO_USER_INFO_URL = "https://kapi.kakao.com/v2/user/me";
-    private static final String REDIRECT_URI = "http://localhost:8080/user/kakao";
+    private static final String REDIRECT_URI = "http://192.168.219.203:8080/user/kakao";
     private static final String CLIENT_ID = "2973e8a76b1a6fd676870daca0d61cc1";
     private static final String CLIENT_SECRET = "3OHnlturZOhcXWnCKEryAfOBSzcdQKbh";
 

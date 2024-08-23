@@ -29,7 +29,9 @@
                         <td>
                             <img th:src="|/file/display?folder=thumbnails&filename=${product.thumbnail[0].sysname}|" class="img-thumbnail" style="max-width: 100px;">
                         </td>
-                        <td th:text="${product.name}">상품명</td>
+                        <td>
+							<a  th:text="${product.name}" th:href="@{|/product/detail/${product.id}|}" class="text-dark"></a>
+						</td>
                         <td th:text="${product.description}">상품 설명</td>
                         <td th:text="${product.sellPrice*(1-product.discount/100)} + ' 원'">가격</td>
 

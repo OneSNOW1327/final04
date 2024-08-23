@@ -51,27 +51,12 @@
 				<p class="text-danger">할인가: <span th:text="|${productDTO.sellPrice - (productDTO.sellPrice * (productDTO.discount / 100))}원|">할인가</span></p>
 				<p class="text-info">할인률: <span th:text="|${productDTO.discount}%|">할인률</span></p>
 				<!-- 수정 및 삭제 버튼 추가 -->
-				<a th:href="@{/product/writeForm(id=${productDTO.id})}" class="btn btn-warning mt-2" sec:authorize="hasRole('ROLE_ADMIN')">수정</a>
+				<a th:href="@{/product/writeForm(id=${productDTO.id})}" class="btn btn-warning mt-2" sec:authorize="hasRole('ROLE_ADMIN')" >수정</a>
 				<form th:action="@{/product/delete/{id}(id=${productDTO.id})}" method="post" style="display: inline;">
-					<button type="submit" class="btn btn-danger mt-2">삭제</button>
+					<button type="submit" class="btn btn-danger mt-2" sec:authorize="hasRole('ROLE_ADMIN')" >삭제</button>
 				</form>
 			</div>
 		</div>
-		<form th:action="@{|/product/basketAdd|}" method="post">
-			<input type="hidden" name="productId" th:value="${productDTO.id}">
-			<label th:text="수량"></label>
-			<input type="number" name="quantity" min="1" value="1">
-			<input type="submit" value="장바구니"> 
-		</form> 
-		<form th:attr="id='form-' + ${productDTO.id}" th:action="@{|/바로구매/|}" method="post">
-			<input type="hidden" name="productId" th:value="${productDTO.id}">
-			<input type="submit" value="바로구매"> 
-		</form>
-		<form th:attr="id='form-' + ${productDTO.id}" th:action="@{|/찜♥/|}" method="post">
-			<input type="hidden" name="productId" th:value="${productDTO.id}">
-			<input type="submit" value="찜♥"> 
-		</form> 
-		
 		<div class="row mt-5">
 			<div class="col-12">
 				<!-- 상품 상세 이미지 표시 -->

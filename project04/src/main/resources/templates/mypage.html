@@ -38,15 +38,16 @@
 					            <table class="table table-bordered">
 					                <thead>
 					                    <tr>
-					                        <th>주문 ID</th>
+					                        <th>주문 번호</th>
 					                        <th>상품명</th>
 					                        <th>주문 날짜</th>
 					                        <th>상태</th>
 					                    </tr>
 					                </thead>
 					                <tbody>
-					                    <tr th:each="order : ${myOrder}">
-					                    	<td th:text="${order.id}"></td>
+					                    <tr th:each="order,loop : ${myOrder}">
+					                    	<td th:text="${loop.index+1}"></td>
+					                    	
 					                    	<td th:text="${order.product.name}"></td>
 					                    	<td th:text="${#temporals.format(order.orderTime, 'yyyy-MM-dd HH:mm')}"></td>
 					                    	<td th:text="${order.situation}"></td>
